@@ -1,8 +1,8 @@
 using NuGet;
 
-namespace Deployd.Core.NuSpecParsing
+namespace Deployd.Core.FileFormatAdapters
 {
-    public interface IPackageReader
+    public interface IPackageAdapter
     {
         IPackageBuilder LoadPackage(string path);
     }

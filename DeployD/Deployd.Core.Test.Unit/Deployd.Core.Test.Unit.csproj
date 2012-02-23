@@ -47,7 +47,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="NuSpecParsing\PackageReaderTests.cs" />
+    <Compile Include="FileFormatAdapters\NuGetFeedAdapterTests.cs" />
+    <Compile Include="FileFormatAdapters\PackageReaderTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

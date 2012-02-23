@@ -73,8 +73,10 @@
     </Compile>
     <Compile Include="Hosting\WcfService.cs" />
     <Compile Include="Hosting\WindowsServiceRunner.cs" />
-    <Compile Include="NuSpecParsing\IPackageReader.cs" />
-    <Compile Include="NuSpecParsing\PackageReader.cs" />
+    <Compile Include="FileFormatAdapters\INuGetFeedAdapter.cs" />
+    <Compile Include="FileFormatAdapters\NuGetFeedAdapter.cs" />
+    <Compile Include="FileFormatAdapters\IPackageAdapter.cs" />
+    <Compile Include="FileFormatAdapters\PackageAdapter.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

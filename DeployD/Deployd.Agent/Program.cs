@@ -19,7 +19,7 @@ namespace Deployd.Agent
             XmlConfigurator.Configure();
 
             new WindowsServiceRunner(args,
-                ()=> new IWindowsService [] { new DeploymentService() },
+                ()=> new IWindowsService [] { new PackageDownloadingService(), new DeploymentService() },
                 installationSettings: (serviceInstaller, serviceProcessInstaller) =>
                 {
                     serviceInstaller.ServiceName = NAME;

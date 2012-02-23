@@ -1,37 +1,37 @@
 ﻿using System;
-using Deployd.Core.NuSpecParsing;
+using Deployd.Core.FileFormatAdapters;
 using NUnit.Framework;
 
-namespace Deployd.Agent.Test.Unit.NuSpecParsing
+namespace Deployd.Core.Test.Unit.FileFormatAdapters
 {
     [TestFixture]
     public class PackageReaderTests
     {
-        private PackageReader _packageReader;
+        private PackageAdapter _packageAdapter;
 
         [SetUp]
         public void SetUp()
         {
-            _packageReader = new PackageReader();
+            _packageAdapter = new PackageAdapter();
         }
 
         [TestCase("")]
         [TestCase(" ")]
         public void LoadPackage_PassedEmptyWhitespace_ThrowsArgumentException(string path)
         {
-            Assert.Throws<ArgumentException>(() => _packageReader.LoadPackage(path));
+            Assert.Throws<ArgumentException>(() => _packageAdapter.LoadPackage(path));
         }
 
         [TestCase(null)]
         public void LoadPackage_PassedNull_ThrowsArgumentException(string path)
         {
-            Assert.Throws<ArgumentNullException>(() => _packageReader.LoadPackage(path));
+            Assert.Throws<ArgumentNullException>(() => _packageAdapter.LoadPackage(path));
         }
 
         [Test]
         public void LoadPackage_PassedValidPath_ReturnsParsedPackageObject()
         {
-            var result = _packageReader.LoadPackage("test.nuspec");
+            var result = _packageAdapter.LoadPackage("test.nuspec");
 
             Assert.That(result, Is.Not.Null);
         }
