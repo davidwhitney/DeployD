@@ -29,5 +29,16 @@ namespace Deployd.Agent.Test.Unit
             _packageRepoMock.Verify(x=>x.GetPackages());
         }
 
+        [Test]
+        public void LocallyCachePackages_CallsPackageRepoForPackageList()
+        {
+            var items = new IPackage[] {}.AsQueryable();
+            _packageRepoMock.Setup(x => x.GetPackages()).Returns(items);
+
+            _pds.LocallyCachePackages();
+
+            _packageRepoMock.Verify(x=>x.GetPackages());
+        }
+
     }
 }
