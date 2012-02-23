@@ -9,12 +9,12 @@ namespace Deployd.Agent
         
         public void Start(string[] args)
         {
-            throw new NotImplementedException();
+            Console.WriteLine("Started");
         }
 
         public void Stop()
         {
-            throw new NotImplementedException();
+            Console.WriteLine("Stopped");
         }
 
     }
