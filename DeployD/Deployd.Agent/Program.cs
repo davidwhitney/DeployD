@@ -10,7 +10,9 @@ namespace Deployd.Agent
 {
     public class Program
     {
-        protected static readonly ILog Logger = LogManager.GetLogger("Deployd.Agent");
+        private const string NAME = "Deployd.Agent";
+
+        protected static readonly ILog Logger = LogManager.GetLogger(NAME);
 
         static void Main(string[] args)
         {
@@ -20,7 +22,7 @@ namespace Deployd.Agent
                 ()=> new IWindowsService [] { new DeploymentService() },
                 installationSettings: (serviceInstaller, serviceProcessInstaller) =>
                 {
-                    serviceInstaller.ServiceName = "GG.PaymentProcessing.Agent";
+                    serviceInstaller.ServiceName = NAME;
                     serviceInstaller.StartType = ServiceStartMode.Automatic;
                     serviceProcessInstaller.Account = ServiceAccount.LocalSystem;
                 },
