@@ -71,6 +71,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Conventions\ContainerConfiguration.cs" />
     <Compile Include="DeploymentService.cs" />
     <Compile Include="PackageDownloadingService.cs" />
     <Compile Include="Program.cs">
