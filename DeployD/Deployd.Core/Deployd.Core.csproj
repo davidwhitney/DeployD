@@ -62,6 +62,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Caching\NuGetPackageCache.cs" />
     <Compile Include="Hosting\ApplicationContext.cs" />
     <Compile Include="Hosting\IIocContainer.cs" />
     <Compile Include="Hosting\IWindowsService.cs" />

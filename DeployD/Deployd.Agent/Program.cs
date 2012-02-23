@@ -29,7 +29,8 @@ namespace Deployd.Agent
                 ()=> new IWindowsService []
                          {
                              _kernel.Get<PackageDownloadingService>(), 
-                             _kernel.Get<DeploymentService>() 
+                             _kernel.Get<DeploymentService>(),
+                             _kernel.Get<ManagementInterfaceHost>() 
                          },
                 installationSettings: (serviceInstaller, serviceProcessInstaller) =>
                 {

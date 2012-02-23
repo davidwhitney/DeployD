@@ -63,6 +63,8 @@
     <Reference Include="System" />
     <Reference Include="System.Configuration.Install" />
     <Reference Include="System.Core" />
+    <Reference Include="System.ServiceModel" />
+    <Reference Include="System.ServiceModel.Web" />
     <Reference Include="System.ServiceProcess" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -73,15 +75,21 @@
   <ItemGroup>
     <Compile Include="Conventions\ContainerConfiguration.cs" />
     <Compile Include="Services\DeploymentService.cs" />
+    <Compile Include="Services\ManagementInterfaceHost.cs" />
     <Compile Include="Services\PackageDownloadingService.cs" />
     <Compile Include="Program.cs">
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="WebUi\NancyConventionsBootstrapper.cs" />
+    <Compile Include="WebUi\WebUiModule.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
     <None Include="packages.config" />
+    <None Include="WebUi\Views\index.cshtml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Deployd.Core\Deployd.Core.csproj">
