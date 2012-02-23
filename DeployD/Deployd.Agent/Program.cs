@@ -1,7 +1,7 @@
-﻿using System;
-using System.ComponentModel;
+﻿using System.ComponentModel;
 using System.ServiceProcess;
 using Deployd.Agent.Conventions;
+using Deployd.Agent.Services;
 using Deployd.Core.Hosting;
 using Ninject;
 using Ninject.Modules;
@@ -29,7 +29,7 @@ namespace Deployd.Agent
                 ()=> new IWindowsService []
                          {
                              _kernel.Get<PackageDownloadingService>(), 
-                             _kernel.Get<DeploymentService>(), 
+                             _kernel.Get<DeploymentService>() 
                          },
                 installationSettings: (serviceInstaller, serviceProcessInstaller) =>
                 {

@@ -1,7 +1,7 @@
 ﻿using System;
 using Deployd.Core.Hosting;
 
-namespace Deployd.Agent
+namespace Deployd.Agent.Services
 {
     public class DeploymentService : IWindowsService
     {

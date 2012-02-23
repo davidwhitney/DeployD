@@ -74,6 +74,8 @@
     <Compile Include="Hosting\WcfService.cs" />
     <Compile Include="Hosting\WindowsServiceRunner.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Queries\IRetrieveAllAvailablePackageManifestsQuery.cs" />
+    <Compile Include="Queries\RetrieveAllAvailablePackageManifestsQuery.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

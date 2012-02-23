@@ -72,8 +72,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Conventions\ContainerConfiguration.cs" />
-    <Compile Include="DeploymentService.cs" />
-    <Compile Include="PackageDownloadingService.cs" />
+    <Compile Include="Services\DeploymentService.cs" />
+    <Compile Include="Services\PackageDownloadingService.cs" />
     <Compile Include="Program.cs">
       <SubType>Component</SubType>
     </Compile>
