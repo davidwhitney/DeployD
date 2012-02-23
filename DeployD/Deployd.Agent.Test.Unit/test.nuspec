@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<package>
+	<metadata> 
+		<id>package-id</id> 
+		<version>1.5.4</version> 
+		<authors>Author Name</authors> 
+		<owners>My Name</owners>
+		<description>A package desc</description> 
+		<projectUrl>http://www.site.com</projectUrl>
+		<licenseUrl>http://www.opensource.org/licenses/MIT</licenseUrl>
+		<tags>package</tags>
+		<language>en-US</language> 
+	</metadata> 	
+	<files>
+	</files>  
+</package>
