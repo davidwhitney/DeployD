@@ -5,13 +5,14 @@
     <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
     <ProductVersion>8.0.30703</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{86CDB912-81EA-45E1-B8DB-B09DE466540F}</ProjectGuid>
-    <OutputType>Library</OutputType>
+    <ProjectGuid>{39C028F6-7773-4482-918E-812250AB0298}</ProjectGuid>
+    <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Deployd.Core</RootNamespace>
-    <AssemblyName>Deployd.Core</AssemblyName>
+    <RootNamespace>Deployd.Server</RootNamespace>
+    <AssemblyName>Deployd.Server</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
-    <TargetFrameworkProfile>Client</TargetFrameworkProfile>
+    <TargetFrameworkProfile>
+    </TargetFrameworkProfile>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
@@ -33,31 +34,25 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
-  <PropertyGroup>
-    <StartupObject />
-  </PropertyGroup>
   <ItemGroup>
     <Reference Include="log4net">
       <HintPath>..\packages\log4net.2.0.0\lib\net40-client\log4net.dll</HintPath>
     </Reference>
-    <Reference Include="NuGet.Core, Version=1.6.30117.9648, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\NuGet.Core.1.6.2\lib\net40\NuGet.Core.dll</HintPath>
+    <Reference Include="Nancy">
+      <HintPath>..\packages\Nancy.0.10.0\lib\net40\Nancy.dll</HintPath>
     </Reference>
-    <Reference Include="nunit.framework">
-      <HintPath>..\packages\NUnit.2.5.10.11092\lib\nunit.framework.dll</HintPath>
+    <Reference Include="Nancy.Hosting.Wcf">
+      <HintPath>..\packages\Nancy.Hosting.Wcf.0.10.0\lib\net40\Nancy.Hosting.Wcf.dll</HintPath>
     </Reference>
-    <Reference Include="nunit.mocks">
-      <HintPath>..\packages\NUnit.2.5.10.11092\lib\nunit.mocks.dll</HintPath>
-    </Reference>
-    <Reference Include="pnunit.framework">
-      <HintPath>..\packages\NUnit.2.5.10.11092\lib\pnunit.framework.dll</HintPath>
+    <Reference Include="Ninject">
+      <HintPath>..\packages\Ninject.2.2.1.4\lib\net40-Full\Ninject.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Configuration" />
     <Reference Include="System.Configuration.Install" />
     <Reference Include="System.Core" />
     <Reference Include="System.ServiceModel" />
+    <Reference Include="System.ServiceModel.Web" />
     <Reference Include="System.ServiceProcess" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -66,37 +61,30 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AgentConfiguration\DeploydConfiguration.cs" />
-    <Compile Include="AgentConfiguration\DeploymentEnvironment.cs" />
-    <Compile Include="AgentConfiguration\AgentInstance.cs" />
-    <Compile Include="AgentConfiguration\EnvironmentsCollection.cs" />
-    <Compile Include="AgentConfiguration\IAgentInstance.cs" />
-    <Compile Include="AgentConfiguration\IDeploymentEnvironment.cs" />
-    <Compile Include="AgentConfiguration\ISupportedPackage.cs" />
-    <Compile Include="AgentConfiguration\PackageCollection.cs" />
-    <Compile Include="AgentConfiguration\PackageSupportedInEnvironmentConfiguration.cs" />
-    <Compile Include="Caching\INuGetPackageCache.cs" />
-    <Compile Include="Caching\NuGetPackageCache.cs" />
-    <Compile Include="Hosting\ApplicationContext.cs" />
-    <Compile Include="Hosting\IIocContainer.cs" />
-    <Compile Include="Hosting\IWindowsService.cs" />
-    <Compile Include="Hosting\ServiceContainer.cs">
+    <Compile Include="Conventions\ContainerConfiguration.cs" />
+    <Compile Include="Program.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Hosting\ServiceInstaller.cs">
-      <SubType>Component</SubType>
-    </Compile>
-    <Compile Include="Hosting\WcfService.cs" />
-    <Compile Include="Hosting\WindowsServiceRunner.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Queries\IRetrieveAllAvailablePackageManifestsQuery.cs" />
-    <Compile Include="Queries\FeedLocation.cs" />
-    <Compile Include="Queries\RetrieveAllAvailablePackageManifestsQuery.cs" />
+    <Compile Include="Services\Management\ManagementInterfaceHost.cs" />
+    <Compile Include="WebUi\Modules\HomeModule.cs" />
+    <Compile Include="WebUi\NancyConventionsBootstrapper.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="packages.config" />
+    <ProjectReference Include="..\Deployd.Core\Deployd.Core.csproj">
+      <Project>{86CDB912-81EA-45E1-B8DB-B09DE466540F}</Project>
+      <Name>Deployd.Core</Name>
+    </ProjectReference>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <None Include="app.config" />
+    <None Include="WebUi\Views\index.cshtml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="WebUi\Models\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

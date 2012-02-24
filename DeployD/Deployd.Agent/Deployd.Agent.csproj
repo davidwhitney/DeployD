@@ -86,7 +86,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Conventions\ContainerConfiguration.cs" />
-    <Compile Include="Core\AgentConfiguration.cs" />
     <Compile Include="Services\Deployment\DeploymentService.cs" />
     <Compile Include="Services\Management\ManagementInterfaceHost.cs" />
     <Compile Include="Services\PackageDownloading\PackageDownloadingService.cs" />
