@@ -28,12 +28,30 @@ namespace Deployd.Core.Caching
 
         public IList<string> AvailablePackages
         {
-            get { return Directory.GetDirectories(_cacheDirectory).ToList(); }
+            get
+            {
+                var dirs = Directory.GetDirectories(_cacheDirectory).ToList();
+
+                for (var index = 0; index < dirs.Count; index++)
+                {
+                    dirs[index] = dirs[index].Replace(_cacheDirectory + "\\", "");
+                }
+
+                return dirs;
+            }
         } 
 
         public IList<string> AvailablePackageVersions(string packageId)
         {
-            return Directory.GetFiles(PackageCacheLocation(packageId)).ToList();
+            var files = Directory.GetFiles(PackageCacheLocation(packageId)).ToList();
+
+            for (var index = 0; index < files.Count; index++)
+            {
+                files[index] = files[index].Replace(_cacheDirectory + "/", "");
+                files[index] = files[index].Replace(packageId + "\\", "");
+            }
+
+            return files;
         } 
 
         public void Add(IPackage package)

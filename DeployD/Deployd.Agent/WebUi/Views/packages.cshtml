@@ -7,9 +7,9 @@
         <h1>Deployd.Agent</h1>
         
         <h2>Available Packages</h2>
-        @foreach(var package in Model)
+        @foreach(var packageId in Model)
         {
-            @package <br/>
+            <a href="/packages/@packageId">@packageId</a><br/>
         }
 
     </body>
