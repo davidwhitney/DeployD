@@ -56,7 +56,7 @@ namespace Deployd.Agent.Services.PackageDownloading
             
             try
             {
-                _agentCache.Cache(_allPackagesQuery.AllAvailablePackages);
+                _agentCache.Add(_allPackagesQuery.AllAvailablePackages);
             }
             finally
             {

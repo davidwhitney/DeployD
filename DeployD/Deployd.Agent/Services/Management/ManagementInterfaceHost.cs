@@ -3,6 +3,7 @@ using System.Reflection;
 using System.ServiceModel;
 using System.ServiceModel.Web;
 using Deployd.Agent.WebUi;
+using Deployd.Agent.WebUi.Modules;
 using Deployd.Core.Hosting;
 using Nancy.Hosting.Wcf;
 using log4net;
@@ -20,7 +21,7 @@ namespace Deployd.Agent.Services.Management
 
         public void Start(string[] args)
         {
-            WebUiModule.Container = AppContext.Container;
+            HomeModule.Container = AppContext.Container;
             WebUiAddress = new Uri("http://localhost:9000/");
             _host = new WebServiceHost(new NancyWcfGenericService(), WebUiAddress);
             _host.AddServiceEndpoint(typeof(NancyWcfGenericService), new WebHttpBinding(), "");

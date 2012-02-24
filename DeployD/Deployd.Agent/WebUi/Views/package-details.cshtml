@@ -6,7 +6,11 @@
     <body>
         <h1>Deployd.Agent</h1>
         
-        <a href="/packages">Packages</a>
+        <h2>Available Package Versions for Model.PackageName</h2>
+        @foreach(var package in Model)
+        {
+            @package <br/>
+        }
 
     </body>
 </html>

@@ -1,6 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using NuGet;
 using log4net;
 
@@ -26,13 +26,23 @@ namespace Deployd.Core.Caching
             EnsureDirectoryExists(_cacheDirectory);
         }
 
-        public void Cache(IPackage package)
+        public IList<string> AvailablePackages
         {
-            var packageCache = _cacheDirectory + "/" + package.Id;
+            get { return Directory.GetDirectories(_cacheDirectory).ToList(); }
+        } 
+
+        public IList<string> AvailablePackageVersions(string packageId)
+        {
+            return Directory.GetFiles(PackageCacheLocation(packageId)).ToList();
+        } 
+
+        public void Add(IPackage package)
+        {
+            var packageCache = PackageCacheLocation(package);
 
             EnsureDirectoryExists(packageCache);
 
-            var packagePath = packageCache + "/" + package.Version + ".zip";
+            var packagePath = packageCache + "/" + package.Id + "-" + package.Version + ".nupkg";
 
             if (File.Exists(packagePath))
             {
@@ -44,21 +54,30 @@ namespace Deployd.Core.Caching
             Logger.InfoFormat("Cached {0} to {1}.", package.Id, package);
         }
 
-        public void Cache(IList<IPackage> allAvailablePackages)
+        private string PackageCacheLocation(IPackage package)
+        {
+            return PackageCacheLocation(package.Id);
+        }
+
+        private string PackageCacheLocation(string packageId)
+        {
+            return _cacheDirectory + "/" + packageId;
+        }
+
+        public void Add(IEnumerable<IPackage> allAvailablePackages)
         {
             foreach (var package in allAvailablePackages)
             {
-                Cache(package);
+                Add(package);
             }
         }
 
-        private void EnsureDirectoryExists(string cacheDirectory)
+        private static void EnsureDirectoryExists(string cacheDirectory)
         {
-            if (!Directory.Exists(cacheDirectory))
-            {
-                Logger.InfoFormat("Creating cache directory '{0}'.", cacheDirectory);
-                Directory.CreateDirectory(cacheDirectory);
-            }
+            if (Directory.Exists(cacheDirectory)) return;
+            
+            Logger.InfoFormat("Creating cache directory '{0}'.", cacheDirectory);
+            Directory.CreateDirectory(cacheDirectory);
         }
     }
 }
