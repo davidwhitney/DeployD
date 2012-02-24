@@ -36,6 +36,7 @@ namespace Deployd.Core.Caching
 
             if (File.Exists(packagePath))
             {
+                Logger.DebugFormat("Skpping caching '{0}', cached item already exists.", packagePath);
                 return;
             }
 
