@@ -11,12 +11,15 @@ namespace Deployd.Core.Test.Unit.Queries
     {
         private Mock<IPackageRepository> _packageRepoMock;
         private RetrieveAllAvailablePackageManifestsQuery _query;
+        private Mock<IPackageRepositoryFactory> _packageRepoFactoryMock;
 
         [SetUp]
         public void SetUp()
         {
             _packageRepoMock = new Mock<IPackageRepository>();
-            _query = new RetrieveAllAvailablePackageManifestsQuery(_packageRepoMock.Object);
+            _packageRepoFactoryMock = new Mock<IPackageRepositoryFactory>();
+            _packageRepoFactoryMock.Setup(x => x.CreateRepository(It.IsAny<string>())).Returns(_packageRepoMock.Object);
+            _query = new RetrieveAllAvailablePackageManifestsQuery(_packageRepoFactoryMock.Object, new FeedLocation{ Source = "source"});
         }
 
         [Test]

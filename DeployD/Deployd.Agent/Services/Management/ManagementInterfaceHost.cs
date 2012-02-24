@@ -7,7 +7,7 @@ using Deployd.Core.Hosting;
 using Nancy.Hosting.Wcf;
 using log4net;
 
-namespace Deployd.Agent.Services
+namespace Deployd.Agent.Services.Management
 {
     public class ManagementInterfaceHost : IWindowsService
     {

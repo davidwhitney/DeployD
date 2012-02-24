@@ -2,6 +2,9 @@
 using System.ServiceProcess;
 using Deployd.Agent.Conventions;
 using Deployd.Agent.Services;
+using Deployd.Agent.Services.Deployment;
+using Deployd.Agent.Services.Management;
+using Deployd.Agent.Services.PackageDownloading;
 using Deployd.Core.Hosting;
 using Ninject;
 using Ninject.Modules;

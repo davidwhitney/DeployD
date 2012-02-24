@@ -1,4 +1,5 @@
-﻿using Deployd.Core.Queries;
+﻿using Deployd.Core.Caching;
+using Deployd.Core.Queries;
 using Ninject.Modules;
 using NuGet;
 
@@ -9,12 +10,13 @@ namespace Deployd.Agent.Conventions
         public override void Load()
         {
             Bind<IRetrieveAllAvailablePackageManifestsQuery>().To<RetrieveAllAvailablePackageManifestsQuery>();
+            Bind<IPackageRepositoryFactory>().To<PackageRepositoryFactory>();
+            Bind<INuGetPackageCache>().To<NuGetPackageCache>();
 
-            Bind<IPackageRepository>().ToMethod(context =>
-                                                    {
-                                                        var factory = new PackageRepositoryFactory();
-                                                        return factory.CreateRepository("http://packages.nuget.org");
-                                                    });
+            Bind<FeedLocation>().ToMethod(context => new FeedLocation
+                                                         {
+                                                             Source = "http://packages.nuget.org"
+                                                         });
         }
     }
 }

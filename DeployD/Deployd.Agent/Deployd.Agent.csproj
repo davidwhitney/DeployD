@@ -24,6 +24,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <UseVSHostingProcess>true</UseVSHostingProcess>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
     <PlatformTarget>x86</PlatformTarget>
@@ -74,9 +75,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Conventions\ContainerConfiguration.cs" />
-    <Compile Include="Services\DeploymentService.cs" />
-    <Compile Include="Services\ManagementInterfaceHost.cs" />
-    <Compile Include="Services\PackageDownloadingService.cs" />
+    <Compile Include="Core\AgentConfiguration.cs" />
+    <Compile Include="Services\Deployment\DeploymentService.cs" />
+    <Compile Include="Services\Management\ManagementInterfaceHost.cs" />
+    <Compile Include="Services\PackageDownloading\PackageDownloadingService.cs" />
     <Compile Include="Program.cs">
       <SubType>Component</SubType>
     </Compile>

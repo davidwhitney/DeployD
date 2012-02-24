@@ -5,17 +5,29 @@ using NuGet;
 namespace Deployd.Core.Queries
 {
     public class RetrieveAllAvailablePackageManifestsQuery : IRetrieveAllAvailablePackageManifestsQuery
-    {        
+    {
+        private readonly IPackageRepositoryFactory _packageRepositoryFactory;
         private readonly IPackageRepository _packageRepository;
 
         public IList<IPackage> AllAvailablePackages 
         {
-            get { return _packageRepository.GetPackages().ToList(); }
+            get
+            {
+                var queryable = _packageRepository.GetPackages().Where(x => x.Id == "justgiving-sdk");
+                var list = queryable.ToList();
+                return list;
+            }
         }
 
-        public RetrieveAllAvailablePackageManifestsQuery(IPackageRepository packageRepository)
+        public RetrieveAllAvailablePackageManifestsQuery(FeedLocation feedLocation)
+            :this(new PackageRepositoryFactory(), feedLocation)
         {
-            _packageRepository = packageRepository;
+        }
+
+        public RetrieveAllAvailablePackageManifestsQuery(IPackageRepositoryFactory packageRepositoryFactory, FeedLocation feedLocation)
+        {
+            _packageRepositoryFactory = packageRepositoryFactory;
+            _packageRepository = _packageRepositoryFactory.CreateRepository(feedLocation.Source);
         }
     }
 }

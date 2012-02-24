@@ -37,6 +37,9 @@
     <StartupObject />
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="log4net">
+      <HintPath>..\packages\log4net.2.0.0\lib\net40-client\log4net.dll</HintPath>
+    </Reference>
     <Reference Include="NuGet.Core, Version=1.6.30117.9648, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\NuGet.Core.1.6.2\lib\net40\NuGet.Core.dll</HintPath>
@@ -62,6 +65,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Caching\INuGetPackageCache.cs" />
     <Compile Include="Caching\NuGetPackageCache.cs" />
     <Compile Include="Hosting\ApplicationContext.cs" />
     <Compile Include="Hosting\IIocContainer.cs" />
@@ -76,6 +80,7 @@
     <Compile Include="Hosting\WindowsServiceRunner.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Queries\IRetrieveAllAvailablePackageManifestsQuery.cs" />
+    <Compile Include="Queries\FeedLocation.cs" />
     <Compile Include="Queries\RetrieveAllAvailablePackageManifestsQuery.cs" />
   </ItemGroup>
   <ItemGroup>
