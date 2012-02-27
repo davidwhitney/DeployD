@@ -10,14 +10,12 @@ namespace Deployd.Agent.Services.AgentConfiguration
 {
     public class AgentConfigurationService : PackageSyncServiceBase
     {
+        private const string AGENT_CONFIGURATION_FILE = "AgentConfiguration.xml";
+        private const string DEPLOYD_CONFIGURATION_PACKAGE_NAME = "Deployd.Configuration";
+
         public AgentConfigurationService(IRetrieveAllAvailablePackageManifestsQuery allPackagesQuery, INuGetPackageCache agentCache)
             : base(allPackagesQuery, agentCache, 60000)
         {
-        } 
-
-        public override IList<string> GetPackagesToDownload()
-        {
-            return new[] {"Deployd.Configuration"};
         }
 
         public override void FetchPackages(object sender, ElapsedEventArgs e)
@@ -27,32 +25,24 @@ namespace Deployd.Agent.Services.AgentConfiguration
 
         public override void FetchPackages()
         {
-            if (!Monitor.TryEnter(_oneSyncAtATimeLock))
+            OneAtATime(()=>
             {
-                Logger.Info("Skipping a local cache operation because a previous cache operation is still running.");
-                return;
-            }
-
-            try
-            {
-                var configPackage = _allPackagesQuery.GetLatestPackage(GetPackagesToDownload().First()).FirstOrDefault();
+                var configPackage = _allPackagesQuery.GetLatestPackage(DEPLOYD_CONFIGURATION_PACKAGE_NAME).FirstOrDefault();
 
                 if (configPackage == null)
                 {
-                    throw new InvalidOperationException("No configuration! Oh my!");
+                    throw new InvalidOperationException("No package configuration was found. Node will not sync.");
                 }
-                
-                var files = configPackage.GetFiles();
 
-            }
-            catch(Exception ex)
-            {
-                Logger.Error("No package configuration was found. Node will not sync.");
-            }
-            finally
-            {
-                Monitor.Exit(_oneSyncAtATimeLock);
-            }
+                var files = configPackage.GetFiles();
+                var agentConfigurationFileStream = files.Where(x => x.Path == AGENT_CONFIGURATION_FILE).ToList()[0].GetStream();
+
+            });
+        }
+
+        public override IList<string> GetPackagesToDownload()
+        {
+            return new List<string>{DEPLOYD_CONFIGURATION_PACKAGE_NAME};
         }
     }
 }

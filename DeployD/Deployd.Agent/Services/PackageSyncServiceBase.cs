@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Timers;
@@ -50,19 +51,31 @@ namespace Deployd.Agent.Services
 
         public virtual void FetchPackages()
         {
-            if (!Monitor.TryEnter(_oneSyncAtATimeLock))
-            {
-                Logger.Info("Skipping a local cache operation because a previous cache operation is still running.");
-                return;
-            }
-            
-            try
+            OneAtATime(()=>
             {
                 var packages = GetPackagesToDownload();
                 foreach (var latestPackageOfType in packages.Select(packageId => _allPackagesQuery.GetLatestPackage(packageId)))
                 {
                     _agentCache.Add(latestPackageOfType);
-                }
+                }                 
+            });
+        }
+
+        protected void OneAtATime(Action action)
+        {
+            if (!Monitor.TryEnter(_oneSyncAtATimeLock))
+            {
+                Logger.Info("Skipping sync operation because a previous sync is still running.");
+                return;
+            }
+
+            try
+            {
+                action();
+            }
+            catch (Exception ex)
+            {
+                Logger.Error(ex);
             }
             finally
             {
