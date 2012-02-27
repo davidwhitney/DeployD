@@ -27,6 +27,20 @@ namespace Deployd.Agent.WebUi.Modules
                 var packageVersions = cache.AvailablePackageVersions(x.packageId);
                 return View["package-details.cshtml", new PackageVersionsViewModel(x.packageId, packageVersions)];
             };
+
+            Post["/packages/{packageId}/install", y => true] = x =>
+            {
+                // install latest
+                return HttpStatusCode.OK;
+            };
+
+            Post["/packages/{packageId}/install/{specificVersion}", y => true] = x =>
+            {
+                // install specific
+                string specificVersion = x.specificVersion;
+
+                return HttpStatusCode.OK;
+            };
         }
     }
 }

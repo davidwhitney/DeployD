@@ -6,10 +6,18 @@
     <body>
         <h1>Deployd.Agent</h1>
         
+        <form action="/packages/@Model.PackageName/install" method="POST">
+            <input type="submit" value="Install Latest"></input>
+        </form>
+
         <h2>Available Package Versions for @Model.PackageName</h2>
         @foreach(var package in Model)
         {
             @package <br/>
+            
+            <form action="/packages/@Model.PackageName/install/@package" method="POST">
+                <input type="submit" value="Install"></input>
+            </form>
         }
 
     </body>
