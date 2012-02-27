@@ -30,7 +30,7 @@ namespace Deployd.Agent.Services.AgentConfiguration
 
             var memoryStream = new MemoryStream();
             agentConfigurationFileStream.CopyTo(memoryStream);
-            File.WriteAllBytes("AgentConfiguration.xml", memoryStream.ToArray());
+            File.WriteAllBytes("GlobalAgentConfiguration.xml", memoryStream.ToArray());
         }
     }
 }

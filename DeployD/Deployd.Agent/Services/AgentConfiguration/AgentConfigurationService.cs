@@ -7,7 +7,7 @@ namespace Deployd.Agent.Services.AgentConfiguration
     public class AgentConfigurationService : IWindowsService
     {
         protected static readonly ILog Logger = LogManager.GetLogger("AgentConfigurationService");
-        private const string AGENT_CONFIGURATION_FILE = "AgentConfiguration.xml";
+        private const string AGENT_CONFIGURATION_FILE = "GlobalAgentConfiguration.xml";
         
         public ApplicationContext AppContext { get; set; }
 

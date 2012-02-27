@@ -66,15 +66,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AgentConfiguration\DeploydConfiguration.cs" />
+    <Compile Include="AgentConfiguration\GlobalAgentConfiguration.cs" />
     <Compile Include="AgentConfiguration\DeploymentEnvironment.cs" />
-    <Compile Include="AgentConfiguration\AgentInstance.cs" />
-    <Compile Include="AgentConfiguration\EnvironmentsCollection.cs" />
-    <Compile Include="AgentConfiguration\IAgentInstance.cs" />
-    <Compile Include="AgentConfiguration\IDeploymentEnvironment.cs" />
-    <Compile Include="AgentConfiguration\ISupportedPackage.cs" />
-    <Compile Include="AgentConfiguration\PackageCollection.cs" />
-    <Compile Include="AgentConfiguration\PackageSupportedInEnvironmentConfiguration.cs" />
+    <Compile Include="AgentConfiguration\AgentSettings.cs" />
     <Compile Include="Caching\INuGetPackageCache.cs" />
     <Compile Include="Caching\NuGetPackageCache.cs" />
     <Compile Include="Hosting\ApplicationContext.cs" />
