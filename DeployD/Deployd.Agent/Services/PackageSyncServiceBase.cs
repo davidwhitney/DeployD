@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Timers;
 using Deployd.Core.Caching;
@@ -15,10 +16,10 @@ namespace Deployd.Agent.Services
         
         public ApplicationContext AppContext { get; set; }
 
-        private readonly IRetrieveAllAvailablePackageManifestsQuery _allPackagesQuery;
-        private readonly INuGetPackageCache _agentCache;
+        protected readonly IRetrieveAllAvailablePackageManifestsQuery _allPackagesQuery;
+        protected readonly INuGetPackageCache _agentCache;
         private readonly Timer _cacheUpdateTimer;
-        private readonly object _oneSyncAtATimeLock;
+        protected readonly object _oneSyncAtATimeLock;
 
         protected PackageSyncServiceBase(IRetrieveAllAvailablePackageManifestsQuery allPackagesQuery, INuGetPackageCache agentCache, int timerIntervalInMs)
         {
@@ -31,23 +32,23 @@ namespace Deployd.Agent.Services
 
         public void Start(string[] args)
         {
-            _cacheUpdateTimer.Elapsed += LocallyCachePackages; 
+            _cacheUpdateTimer.Elapsed += FetchPackages; 
             _cacheUpdateTimer.Start();
-            LocallyCachePackages();
+            FetchPackages();
         }
 
         public void Stop()
         {
-            _cacheUpdateTimer.Elapsed -= LocallyCachePackages; 
+            _cacheUpdateTimer.Elapsed -= FetchPackages; 
             _cacheUpdateTimer.Stop();
         }
 
-        public void LocallyCachePackages(object sender, ElapsedEventArgs e)
+        public virtual void FetchPackages(object sender, ElapsedEventArgs e)
         {
-            LocallyCachePackages();
+            FetchPackages();
         }
 
-        public void LocallyCachePackages()
+        public virtual void FetchPackages()
         {
             if (!Monitor.TryEnter(_oneSyncAtATimeLock))
             {
@@ -57,9 +58,10 @@ namespace Deployd.Agent.Services
             
             try
             {
-                foreach (var packageId in GetPackagesToDownload())
+                var packages = GetPackagesToDownload();
+                foreach (var latestPackageOfType in packages.Select(packageId => _allPackagesQuery.GetLatestPackage(packageId)))
                 {
-                    _agentCache.Add(_allPackagesQuery.GetLatestPackage(packageId));
+                    _agentCache.Add(latestPackageOfType);
                 }
             }
             finally

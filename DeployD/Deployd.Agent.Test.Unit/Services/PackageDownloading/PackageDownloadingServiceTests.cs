@@ -34,7 +34,7 @@ namespace Deployd.Agent.Test.Unit.Services.PackageDownloading
             var items = new List<IPackage>();
             _packageRepoMock.Setup(x => x.GetLatestPackage(PACKAGE_ID)).Returns(items);
 
-            _pds.LocallyCachePackages();
+            _pds.FetchPackages();
 
             _packageRepoMock.Verify(x => x.GetLatestPackage(PACKAGE_ID));
         }
