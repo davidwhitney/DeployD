@@ -28,7 +28,7 @@ namespace Deployd.Core.Test.Unit.Queries
             var items = new IPackage[] {}.AsQueryable();
             _packageRepoMock.Setup(x => x.GetPackages()).Returns(items);
 
-            var packages = _query.AllAvailablePackages;
+            var packages = _query.GetLatestPackage("packageId");
 
             _packageRepoMock.Verify(x=>x.GetPackages());
         }

@@ -86,6 +86,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Conventions\ContainerConfiguration.cs" />
+    <Compile Include="Services\AgentConfiguration\AgentConfigurationManager.cs" />
+    <Compile Include="Services\AgentConfiguration\AgentConfigurationService.cs" />
+    <Compile Include="Services\AgentConfiguration\IAgentConfigurationManager.cs" />
     <Compile Include="Services\Deployment\DeploymentService.cs" />
     <Compile Include="Services\Management\ManagementInterfaceHost.cs" />
     <Compile Include="Services\PackageDownloading\PackageDownloadingService.cs" />

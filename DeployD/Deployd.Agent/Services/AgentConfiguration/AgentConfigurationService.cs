@@ -1,31 +1,28 @@
 ﻿using System.Threading;
 using System.Timers;
-using Deployd.Agent.Services.AgentConfiguration;
 using Deployd.Core.Caching;
 using Deployd.Core.Hosting;
 using Deployd.Core.Queries;
 using log4net;
 using Timer = System.Timers.Timer;
 
-namespace Deployd.Agent.Services.PackageDownloading
+namespace Deployd.Agent.Services.AgentConfiguration
 {
-    public class PackageDownloadingService : IWindowsService
+    public class AgentConfigurationService : IWindowsService
     {
-        protected static readonly ILog Logger = LogManager.GetLogger("PackageDownloadingService");
+        protected static readonly ILog Logger = LogManager.GetLogger("AgentConfigurationService");
         
         public ApplicationContext AppContext { get; set; }
 
         private readonly IRetrieveAllAvailablePackageManifestsQuery _allPackagesQuery;
         private readonly INuGetPackageCache _agentCache;
-        private readonly IAgentConfigurationManager _agentConfigurationManager;
         private readonly Timer _cacheUpdateTimer;
         private readonly object _oneSyncAtATimeLock;
 
-        public PackageDownloadingService(IRetrieveAllAvailablePackageManifestsQuery allPackagesQuery, INuGetPackageCache agentCache, IAgentConfigurationManager agentConfigurationManager)
+        public AgentConfigurationService(IRetrieveAllAvailablePackageManifestsQuery allPackagesQuery, INuGetPackageCache agentCache)
         {
             _allPackagesQuery = allPackagesQuery;
             _agentCache = agentCache;
-            _agentConfigurationManager = agentConfigurationManager;
 
             _cacheUpdateTimer = new Timer(60000) {Enabled = true};
             _oneSyncAtATimeLock = new object();
@@ -59,10 +56,7 @@ namespace Deployd.Agent.Services.PackageDownloading
             
             try
             {
-                foreach (var packageId in _agentConfigurationManager.WatchedPackages)
-                {
-                    _agentCache.Add(_allPackagesQuery.GetLatestPackage(packageId));
-                }
+                _agentCache.Add(_allPackagesQuery.GetLatestPackage("Deployd.Configuration"));
             }
             finally
             {
