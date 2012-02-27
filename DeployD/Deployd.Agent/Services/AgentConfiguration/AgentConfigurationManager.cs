@@ -26,8 +26,12 @@ namespace Deployd.Agent.Services.AgentConfiguration
 
         public GlobalAgentConfiguration ReadFromDisk(string fileName)
         {
-            var fs = new FileStream(fileName, FileMode.Open);
-            return (GlobalAgentConfiguration)new XmlSerializer(typeof(GlobalAgentConfiguration)).Deserialize(fs);
+            using (var fs = new FileStream(fileName, FileMode.Open))
+            {
+                var item = (GlobalAgentConfiguration) new XmlSerializer(typeof (GlobalAgentConfiguration)).Deserialize(fs);
+                fs.Close();
+                return item;
+            }
         }
 
         public void SaveToDisk(GlobalAgentConfiguration configuration, string fileName)
