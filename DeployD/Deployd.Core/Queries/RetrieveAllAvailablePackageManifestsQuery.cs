@@ -13,7 +13,7 @@ namespace Deployd.Core.Queries
         {
             get
             {
-                var queryable = _packageRepository.GetPackages().Where(x => x.Id == "justgiving-sdk");
+                var queryable = _packageRepository.GetPackages().Where(x => x.Id == "justgiving-sdk" && x.IsLatestVersion);
                 var list = queryable.ToList();
                 return list;
             }

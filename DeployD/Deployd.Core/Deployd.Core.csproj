@@ -94,6 +94,9 @@
     <Compile Include="Queries\RetrieveAllAvailablePackageManifestsQuery.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="sampleConfig.config">
+      <SubType>Designer</SubType>
+    </None>
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup />
