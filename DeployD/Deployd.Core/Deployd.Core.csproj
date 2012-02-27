@@ -92,6 +92,7 @@
     <Compile Include="Queries\IRetrieveAllAvailablePackageManifestsQuery.cs" />
     <Compile Include="Queries\FeedLocation.cs" />
     <Compile Include="Queries\RetrieveAllAvailablePackageManifestsQuery.cs" />
+    <Compile Include="TimedSingleExecutionTask.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="sampleConfig.config">

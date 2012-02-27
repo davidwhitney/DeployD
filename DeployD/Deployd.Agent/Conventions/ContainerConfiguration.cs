@@ -16,6 +16,7 @@ namespace Deployd.Agent.Conventions
 
             Bind<IAgentConfigurationManager>().ToMethod(context => new AgentConfigurationManager() );
 
+            Bind<IAgentConfigurationDownloader>().To<AgentConfigurationDownloader>();
             Bind<IRetrieveAllAvailablePackageManifestsQuery>().To<RetrieveAllAvailablePackageManifestsQuery>();
             Bind<IPackageRepositoryFactory>().To<PackageRepositoryFactory>();
             Bind<INuGetPackageCache>().To<NuGetPackageCache>();

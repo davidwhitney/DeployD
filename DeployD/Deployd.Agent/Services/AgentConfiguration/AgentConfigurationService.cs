@@ -1,52 +1,38 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Timers;
-using Deployd.Core.Caching;
-using Deployd.Core.Queries;
+﻿using Deployd.Core;
+using Deployd.Core.Hosting;
+using log4net;
 
 namespace Deployd.Agent.Services.AgentConfiguration
 {
-    public class AgentConfigurationService : PackageSyncServiceBase
+    public class AgentConfigurationService : IWindowsService
     {
+        protected static readonly ILog Logger = LogManager.GetLogger("AgentConfigurationService");
         private const string AGENT_CONFIGURATION_FILE = "AgentConfiguration.xml";
-        private const string DEPLOYD_CONFIGURATION_PACKAGE_NAME = "Deployd.Configuration";
+        
+        public ApplicationContext AppContext { get; set; }
 
-        public AgentConfigurationService(IRetrieveAllAvailablePackageManifestsQuery allPackagesQuery, INuGetPackageCache agentCache)
-            : base(allPackagesQuery, agentCache, 60000)
+        private readonly IAgentConfigurationDownloader _configurationDownloader;
+        private readonly TimedSingleExecutionTask _task;
+
+        public AgentConfigurationService(IAgentConfigurationDownloader configurationDownloader)
         {
+            _configurationDownloader = configurationDownloader;
+            _task = new TimedSingleExecutionTask(60000, DownloadConfiguration);
         }
 
-        public override void FetchPackages(object sender, ElapsedEventArgs e)
+        public void Start(string[] args)
         {
-            FetchPackages();
+            _task.Start(args);
         }
 
-        public override void FetchPackages()
+        public void Stop()
         {
-            OneAtATime(()=>
-            {
-                var configPackage = _allPackagesQuery.GetLatestPackage(DEPLOYD_CONFIGURATION_PACKAGE_NAME).FirstOrDefault();
-
-                if (configPackage == null)
-                {
-                    throw new InvalidOperationException("No package configuration was found. Node will not sync.");
-                }
-
-                var files = configPackage.GetFiles();
-                var agentConfigurationFileStream = files.Where(x => x.Path == AGENT_CONFIGURATION_FILE).ToList()[0].GetStream();
-
-                var memoryStream = new MemoryStream();
-                agentConfigurationFileStream.CopyTo(memoryStream);
-                File.WriteAllBytes("AgentConfiguration.xml", memoryStream.ToArray());
-
-            });
+            _task.Stop();
         }
 
-        public override IList<string> GetPackagesToDownload()
+        public void DownloadConfiguration()
         {
-            return new List<string>{DEPLOYD_CONFIGURATION_PACKAGE_NAME};
+            _configurationDownloader.DownloadAgentConfiguration(AGENT_CONFIGURATION_FILE);
         }
     }
 }
