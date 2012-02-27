@@ -17,7 +17,7 @@ namespace Deployd.Agent.Services.AgentConfiguration
         public AgentConfigurationService(IAgentConfigurationDownloader configurationDownloader)
         {
             _configurationDownloader = configurationDownloader;
-            _task = new TimedSingleExecutionTask(60000, DownloadConfiguration);
+            _task = new TimedSingleExecutionTask(60000, DownloadConfiguration, true);
         }
 
         public void Start(string[] args)

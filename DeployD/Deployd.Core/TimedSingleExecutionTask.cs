@@ -9,14 +9,16 @@ namespace Deployd.Core
     public class TimedSingleExecutionTask
     {
         private readonly Action _action;
+        private readonly bool _runWhenCreated;
         protected static readonly ILog Logger = LogManager.GetLogger("TimedSingleExecutionTask");
 
         private readonly Timer _cacheUpdateTimer;
         protected readonly object OneSyncAtATimeLock;
         
-        public TimedSingleExecutionTask(int timerIntervalInMs, Action action)
+        public TimedSingleExecutionTask(int timerIntervalInMs, Action action, bool runWhenCreated = false)
         {
             _action = action;
+            _runWhenCreated = runWhenCreated;
             _cacheUpdateTimer = new Timer(timerIntervalInMs) { Enabled = true };
             OneSyncAtATimeLock = new object();
         }
@@ -25,7 +27,11 @@ namespace Deployd.Core
         {
             _cacheUpdateTimer.Elapsed += Perform;
             _cacheUpdateTimer.Start();
-            _action();
+
+            if (_runWhenCreated)
+            {
+                _action();
+            }
         }
 
         public void Stop()
