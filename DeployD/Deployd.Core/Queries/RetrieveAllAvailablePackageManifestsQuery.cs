@@ -8,17 +8,7 @@ namespace Deployd.Core.Queries
     {
         private readonly IPackageRepositoryFactory _packageRepositoryFactory;
         private readonly IPackageRepository _packageRepository;
-
-        public IList<IPackage> AllAvailablePackages 
-        {
-            get
-            {
-                var queryable = _packageRepository.GetPackages().Where(x => x.Id == "justgiving-sdk" && x.IsLatestVersion);
-                var list = queryable.ToList();
-                return list;
-            }
-        }
-
+        
         public RetrieveAllAvailablePackageManifestsQuery(FeedLocation feedLocation)
             :this(new PackageRepositoryFactory(), feedLocation)
         {
@@ -28,6 +18,11 @@ namespace Deployd.Core.Queries
         {
             _packageRepositoryFactory = packageRepositoryFactory;
             _packageRepository = _packageRepositoryFactory.CreateRepository(feedLocation.Source);
+        }
+
+        public IList<IPackage> GetLatestPackage(string packageId)
+        {
+            return _packageRepository.GetPackages().Where(x => x.Id == packageId && x.IsLatestVersion).ToList();
         }
     }
 }

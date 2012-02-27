@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel;
 using System.ServiceProcess;
 using Deployd.Agent.Conventions;
-using Deployd.Agent.Services;
+using Deployd.Agent.Services.AgentConfiguration;
 using Deployd.Agent.Services.Deployment;
 using Deployd.Agent.Services.Management;
 using Deployd.Agent.Services.PackageDownloading;
@@ -31,6 +31,7 @@ namespace Deployd.Agent
             new WindowsServiceRunner(args,
                 ()=> new IWindowsService []
                          {
+                             _kernel.Get<AgentConfigurationService>(), 
                              _kernel.Get<PackageDownloadingService>(), 
                              _kernel.Get<DeploymentService>(),
                              _kernel.Get<ManagementInterfaceHost>() 

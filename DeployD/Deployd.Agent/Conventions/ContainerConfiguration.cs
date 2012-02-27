@@ -1,4 +1,7 @@
-﻿using Deployd.Agent.Services.Deployment;
+using Deployd.Core.Caching;
+using Deployd.Agent.Services.Deployment;
+using System.IO;
+using Deployd.Agent.Services.AgentConfiguration;
 using Deployd.Core.Caching;
 using Deployd.Core.Queries;
 using Ninject.Modules;
@@ -10,6 +13,9 @@ namespace Deployd.Agent.Conventions
     {
         public override void Load()
         {
+
+            Bind<IAgentConfigurationManager>().ToMethod(context => new AgentConfigurationManager() );
+
             Bind<IRetrieveAllAvailablePackageManifestsQuery>().To<RetrieveAllAvailablePackageManifestsQuery>();
             Bind<IPackageRepositoryFactory>().To<PackageRepositoryFactory>();
             Bind<INuGetPackageCache>().To<NuGetPackageCache>();
@@ -17,7 +23,7 @@ namespace Deployd.Agent.Conventions
 
             Bind<FeedLocation>().ToMethod(context => new FeedLocation
                                                          {
-                                                             Source = "http://packages.nuget.org"
+                                                             Source = Directory.GetCurrentDirectory() + @"\DebugPackageSource"
                                                          });
 
             Bind<DeploymentService>().To<DeploymentService>();
