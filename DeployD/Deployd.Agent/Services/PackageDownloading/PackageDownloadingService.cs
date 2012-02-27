@@ -10,7 +10,7 @@ namespace Deployd.Agent.Services.PackageDownloading
         private readonly IAgentConfigurationManager _agentConfigurationManager;
 
         public PackageDownloadingService(IRetrieveAllAvailablePackageManifestsQuery allPackagesQuery, INuGetPackageCache agentCache, IAgentConfigurationManager agentConfigurationManager)
-            : base(allPackagesQuery, agentCache)
+            : base(allPackagesQuery, agentCache, 60000)
         {
             _agentConfigurationManager = agentConfigurationManager;
         } 

@@ -20,12 +20,12 @@ namespace Deployd.Agent.Services
         private readonly Timer _cacheUpdateTimer;
         private readonly object _oneSyncAtATimeLock;
 
-        protected PackageSyncServiceBase(IRetrieveAllAvailablePackageManifestsQuery allPackagesQuery, INuGetPackageCache agentCache)
+        protected PackageSyncServiceBase(IRetrieveAllAvailablePackageManifestsQuery allPackagesQuery, INuGetPackageCache agentCache, int timerIntervalInMs)
         {
             _allPackagesQuery = allPackagesQuery;
             _agentCache = agentCache;
 
-            _cacheUpdateTimer = new Timer(60000) {Enabled = true};
+            _cacheUpdateTimer = new Timer(timerIntervalInMs) { Enabled = true };
             _oneSyncAtATimeLock = new object();
         }
 

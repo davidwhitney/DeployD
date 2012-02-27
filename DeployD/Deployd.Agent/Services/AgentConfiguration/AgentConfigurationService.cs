@@ -7,7 +7,7 @@ namespace Deployd.Agent.Services.AgentConfiguration
     public class AgentConfigurationService : PackageSyncServiceBase
     {
         public AgentConfigurationService(IRetrieveAllAvailablePackageManifestsQuery allPackagesQuery, INuGetPackageCache agentCache)
-            : base(allPackagesQuery, agentCache)
+            : base(allPackagesQuery, agentCache, 60000)
         {
         } 
 
