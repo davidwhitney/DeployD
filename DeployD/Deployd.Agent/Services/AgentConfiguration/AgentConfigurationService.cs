@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
-using System.Threading;
 using System.Timers;
 using Deployd.Core.Caching;
 using Deployd.Core.Queries;
@@ -36,6 +36,10 @@ namespace Deployd.Agent.Services.AgentConfiguration
 
                 var files = configPackage.GetFiles();
                 var agentConfigurationFileStream = files.Where(x => x.Path == AGENT_CONFIGURATION_FILE).ToList()[0].GetStream();
+
+                var memoryStream = new MemoryStream();
+                agentConfigurationFileStream.CopyTo(memoryStream);
+                File.WriteAllBytes("AgentConfiguration.xml", memoryStream.ToArray());
 
             });
         }
