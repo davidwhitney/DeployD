@@ -22,7 +22,7 @@ namespace Deployd.Agent.Test.Unit.Services.PackageDownloading
         public void SetUp()
         {
             _agentConfigManagerMock = new Mock<IAgentConfigurationManager>();
-            _agentConfigManagerMock.Setup(x=>x.WatchedPackages).Returns(new List<string>{PACKAGE_ID});
+            _agentConfigManagerMock.Setup(x=>x.GetWatchedPackages()).Returns(new List<string>{PACKAGE_ID});
             _packageRepoMock = new Mock<IRetrieveAllAvailablePackageManifestsQuery>();
             _packageCacheMock = new Mock<INuGetPackageCache>();
             _pds = new PackageDownloadingService(_packageRepoMock.Object, _packageCacheMock.Object, _agentConfigManagerMock.Object);

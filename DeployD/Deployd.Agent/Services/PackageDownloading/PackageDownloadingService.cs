@@ -40,7 +40,7 @@ namespace Deployd.Agent.Services.PackageDownloading
 
         public void FetchPackages()
         {
-            var packages = _agentConfigurationManager.WatchedPackages;
+            var packages = _agentConfigurationManager.GetWatchedPackages();
             foreach (var latestPackageOfType in packages.Select(packageId => AllPackagesQuery.GetLatestPackage(packageId)))
             {
                 AgentCache.Add(latestPackageOfType);

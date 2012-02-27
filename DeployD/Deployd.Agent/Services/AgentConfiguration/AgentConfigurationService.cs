@@ -7,7 +7,7 @@ namespace Deployd.Agent.Services.AgentConfiguration
     public class AgentConfigurationService : IWindowsService
     {
         protected static readonly ILog Logger = LogManager.GetLogger("AgentConfigurationService");
-        private const string AGENT_CONFIGURATION_FILE = "GlobalAgentConfiguration.xml";
+        
         
         public ApplicationContext AppContext { get; set; }
 
@@ -32,7 +32,7 @@ namespace Deployd.Agent.Services.AgentConfiguration
 
         public void DownloadConfiguration()
         {
-            _configurationDownloader.DownloadAgentConfiguration(AGENT_CONFIGURATION_FILE);
+            _configurationDownloader.DownloadAgentConfiguration(ConfigurationFiles.AGENT_CONFIGURATION_FILE);
         }
     }
 }

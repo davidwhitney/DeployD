@@ -94,6 +94,7 @@
     <Compile Include="Services\AgentConfiguration\AgentConfigurationDownloader.cs" />
     <Compile Include="Services\AgentConfiguration\AgentConfigurationManager.cs" />
     <Compile Include="Services\AgentConfiguration\AgentConfigurationService.cs" />
+    <Compile Include="Services\AgentConfiguration\ConfigurationFiles.cs" />
     <Compile Include="Services\AgentConfiguration\IAgentConfigurationDownloader.cs" />
     <Compile Include="Services\AgentConfiguration\IAgentConfigurationManager.cs" />
     <Compile Include="Services\Deployment\DeploymentContext.cs" />

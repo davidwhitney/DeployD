@@ -6,5 +6,10 @@ namespace Deployd.Core.AgentConfiguration
     {
         public string Name { get; set; }
         public List<string> Packages { get; set; }
+
+        public DeploymentEnvironment()
+        {
+            Packages = new List<string>();
+        }
     }
 }
