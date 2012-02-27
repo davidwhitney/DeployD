@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using Deployd.Agent.Services.AgentConfiguration;
 using Deployd.Agent.Services.PackageDownloading;
+using Deployd.Core.AgentConfiguration;
 using Deployd.Core.Caching;
 using Deployd.Core.Queries;
 using Moq;
@@ -16,16 +17,18 @@ namespace Deployd.Agent.Test.Unit.Services.PackageDownloading
         private Mock<INuGetPackageCache> _packageCacheMock;
         private PackageDownloadingService _pds;
         private Mock<IAgentConfigurationManager> _agentConfigManagerMock;
+        private AgentSettings _agentSettings;
         private const string PACKAGE_ID = "packageId";
 
         [SetUp]
         public void SetUp()
         {
+            _agentSettings = new AgentSettings {DeploymentEnvironment = "Staging"};
             _agentConfigManagerMock = new Mock<IAgentConfigurationManager>();
-            _agentConfigManagerMock.Setup(x=>x.GetWatchedPackages()).Returns(new List<string>{PACKAGE_ID});
+            _agentConfigManagerMock.Setup(x => x.GetWatchedPackages(_agentSettings.DeploymentEnvironment)).Returns(new List<string> { PACKAGE_ID });
             _packageRepoMock = new Mock<IRetrieveAllAvailablePackageManifestsQuery>();
             _packageCacheMock = new Mock<INuGetPackageCache>();
-            _pds = new PackageDownloadingService(_packageRepoMock.Object, _packageCacheMock.Object, _agentConfigManagerMock.Object);
+            _pds = new PackageDownloadingService(_agentSettings, _packageRepoMock.Object, _packageCacheMock.Object, _agentConfigManagerMock.Object);
         }
 
         [Test]

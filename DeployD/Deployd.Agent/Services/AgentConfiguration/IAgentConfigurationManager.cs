@@ -4,6 +4,6 @@ namespace Deployd.Agent.Services.AgentConfiguration
 {
     public interface IAgentConfigurationManager
     {
-        IList<string> GetWatchedPackages();
+        IList<string> GetWatchedPackages(string environmentName);
     }
 }

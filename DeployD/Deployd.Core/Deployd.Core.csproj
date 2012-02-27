@@ -69,6 +69,7 @@
     <Compile Include="AgentConfiguration\GlobalAgentConfiguration.cs" />
     <Compile Include="AgentConfiguration\DeploymentEnvironment.cs" />
     <Compile Include="AgentConfiguration\AgentSettings.cs" />
+    <Compile Include="AgentConfiguration\IAgentSettings.cs" />
     <Compile Include="Caching\INuGetPackageCache.cs" />
     <Compile Include="Caching\NuGetPackageCache.cs" />
     <Compile Include="Hosting\ApplicationContext.cs" />

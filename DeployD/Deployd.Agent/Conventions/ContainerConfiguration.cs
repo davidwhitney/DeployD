@@ -1,3 +1,4 @@
+using Deployd.Core.AgentConfiguration;
 using Deployd.Core.Caching;
 using Deployd.Agent.Services.Deployment;
 using System.IO;
@@ -20,6 +21,8 @@ namespace Deployd.Agent.Conventions
             Bind<IRetrieveAllAvailablePackageManifestsQuery>().To<RetrieveAllAvailablePackageManifestsQuery>();
             Bind<IPackageRepositoryFactory>().To<PackageRepositoryFactory>();
             Bind<INuGetPackageCache>().To<NuGetPackageCache>();
+
+            Bind<IAgentSettings>().ToMethod(context => new AgentSettings {DeploymentEnvironment = "Staging"});
             
 
             Bind<FeedLocation>().ToMethod(context => new FeedLocation

@@ -2,7 +2,7 @@
 
 namespace Deployd.Core.AgentConfiguration
 {
-    public class AgentSettings
+    public class AgentSettings : IAgentSettings
     {
         public string DeploymentEnvironment { get; set; }
     }

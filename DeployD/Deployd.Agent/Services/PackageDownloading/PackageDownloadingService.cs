@@ -1,6 +1,7 @@
 ﻿using System.Linq;
 using Deployd.Agent.Services.AgentConfiguration;
 using Deployd.Core;
+using Deployd.Core.AgentConfiguration;
 using Deployd.Core.Caching;
 using Deployd.Core.Hosting;
 using Deployd.Core.Queries;
@@ -15,13 +16,15 @@ namespace Deployd.Agent.Services.PackageDownloading
 
         public ApplicationContext AppContext { get; set; }
 
+        private readonly IAgentSettings _settings;
         protected readonly IRetrieveAllAvailablePackageManifestsQuery AllPackagesQuery;
         protected readonly INuGetPackageCache AgentCache;
 
         private readonly TimedSingleExecutionTask _task;
 
-        public PackageDownloadingService(IRetrieveAllAvailablePackageManifestsQuery allPackagesQuery, INuGetPackageCache agentCache, IAgentConfigurationManager agentConfigurationManager)
+        public PackageDownloadingService(IAgentSettings settings, IRetrieveAllAvailablePackageManifestsQuery allPackagesQuery, INuGetPackageCache agentCache, IAgentConfigurationManager agentConfigurationManager)
         {
+            _settings = settings;
             AllPackagesQuery = allPackagesQuery;
             AgentCache = agentCache;
             _agentConfigurationManager = agentConfigurationManager;
@@ -40,7 +43,7 @@ namespace Deployd.Agent.Services.PackageDownloading
 
         public void FetchPackages()
         {
-            var packages = _agentConfigurationManager.GetWatchedPackages();
+            var packages = _agentConfigurationManager.GetWatchedPackages(_settings.DeploymentEnvironment);
             foreach (var latestPackageOfType in packages.Select(packageId => AllPackagesQuery.GetLatestPackage(packageId)))
             {
                 AgentCache.Add(latestPackageOfType);
