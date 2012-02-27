@@ -27,6 +27,8 @@ namespace Deployd.Agent.Conventions
                                                          });
 
             Bind<DeploymentService>().To<DeploymentService>();
+
+            Bind<IDeploymentHook>().To<PowershellScriptRunner>();
         }
     }
 }

@@ -36,6 +36,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Gallio, Version=3.3.0.0, Culture=neutral, PublicKeyToken=eb9cfa67ee6ab36e, processorArchitecture=MSIL" />
     <Reference Include="log4net">
       <HintPath>..\packages\log4net.2.0.0\lib\net40-full\log4net.dll</HintPath>
     </Reference>
@@ -93,7 +94,11 @@
     <Compile Include="Services\AgentConfiguration\AgentConfigurationManager.cs" />
     <Compile Include="Services\AgentConfiguration\AgentConfigurationService.cs" />
     <Compile Include="Services\AgentConfiguration\IAgentConfigurationManager.cs" />
+    <Compile Include="Services\Deployment\DeploymentContext.cs" />
     <Compile Include="Services\Deployment\DeploymentService.cs" />
+    <Compile Include="Services\Deployment\IDeploymentHook.cs" />
+    <Compile Include="Services\Deployment\PackageExtractor.cs" />
+    <Compile Include="Services\Deployment\PowershellScriptRunner.cs" />
     <Compile Include="Services\Management\ManagementInterfaceHost.cs" />
     <Compile Include="Services\PackageDownloading\PackageDownloadingService.cs" />
     <Compile Include="Program.cs">
