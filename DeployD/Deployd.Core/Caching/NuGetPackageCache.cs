@@ -90,6 +90,21 @@ namespace Deployd.Core.Caching
             }
         }
 
+        public IPackage GetLatestVersion(string packageId)
+        {
+            string location = PackageCacheLocation(packageId);
+            var versions = AvailablePackageVersions(packageId);
+            
+            List<IPackage> foundPackages = new List<IPackage>();
+            foreach(var version in versions)
+            {
+                var package = new ZipPackage(Path.Combine(PackageCacheLocation(packageId), version));
+                foundPackages.Add(package);
+            }
+
+            return foundPackages.SingleOrDefault(p => p.IsLatestVersion);
+        }
+
         private static void EnsureDirectoryExists(string cacheDirectory)
         {
             if (Directory.Exists(cacheDirectory)) return;

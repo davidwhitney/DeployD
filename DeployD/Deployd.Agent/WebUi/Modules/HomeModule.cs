@@ -1,4 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using Deployd.Agent.Services.Deployment;
 using Deployd.Agent.WebUi.Models;
 using Deployd.Core.Caching;
 using Deployd.Core.Hosting;
@@ -31,6 +34,14 @@ namespace Deployd.Agent.WebUi.Modules
             Post["/packages/{packageId}/install", y => true] = x =>
             {
                 // install latest
+                var cache = Container().GetType<INuGetPackageCache>();
+                var package = cache.GetLatestVersion(x.packageId);
+                
+
+                // deploy
+                var deploymentService = Container().GetType<DeploymentService>();
+                deploymentService.Deploy(package);
+
                 return HttpStatusCode.OK;
             };
 

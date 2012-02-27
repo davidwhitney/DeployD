@@ -1,5 +1,7 @@
 ﻿using System;
+using Deployd.Core.Caching;
 using Deployd.Core.Hosting;
+using NuGet;
 
 namespace Deployd.Agent.Services.Deployment
 {
@@ -15,6 +17,11 @@ namespace Deployd.Agent.Services.Deployment
         public void Stop()
         {
             Console.WriteLine("Stopped");
+        }
+
+        public void Deploy(IPackage package)
+        {
+            
         }
     }
 }
