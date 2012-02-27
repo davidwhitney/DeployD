@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<package>
+	<metadata> 
+		<id>Deployd.Configuration</id> 
+		<version>1.0.0</version> 
+		<authors>Deployd</authors> 
+		<owners>Deployd</owners>
+		<description>Deployd configuration package</description> 
+		<projectUrl>http://www.test.com</projectUrl>
+		<licenseUrl>http://www.opensource.org/licenses/MIT</licenseUrl>
+		<tags>configuration</tags>
+		<language>en-US</language> 
+	</metadata> 
+	<files>
+	  <file src="AgentConfiguration.xml" target="" /> 
+	</files>  
+</package>
