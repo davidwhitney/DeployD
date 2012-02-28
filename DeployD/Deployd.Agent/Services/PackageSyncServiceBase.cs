@@ -54,6 +54,11 @@ namespace Deployd.Agent.Services
             OneAtATime(()=>
             {
                 var packages = GetPackagesToDownload();
+                foreach(var p in packages)
+                {
+                    Logger.Debug(p);
+                }
+
                 foreach (var latestPackageOfType in packages.Select(packageId => _allPackagesQuery.GetLatestPackage(packageId)))
                 {
                     _agentCache.Add(latestPackageOfType);

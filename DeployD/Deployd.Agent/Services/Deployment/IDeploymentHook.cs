@@ -4,8 +4,8 @@ namespace Deployd.Agent.Services.Deployment
 {
     public interface IDeploymentHook
     {
-        void BeforeDeploy(DeploymentContext context);
-        void Deploy(DeploymentContext context);
-        void AfterDeploy(DeploymentContext context);
+        bool BeforeDeploy(DeploymentContext context);
+        bool Deploy(DeploymentContext context);
+        bool AfterDeploy(DeploymentContext context);
     }
 }

@@ -11,44 +11,49 @@ using log4net;
 
 namespace Deployd.Agent.Services.Deployment
 {
-    public class PowershellScriptRunner : IDeploymentHook
+    public class PowershellDeploymentHook : IDeploymentHook
     {
         private static ILog _logger = LogManager.GetLogger("PowershellScriptRunner");
-        public void BeforeDeploy(DeploymentContext context)
+        public bool BeforeDeploy(DeploymentContext context)
         {
-            ExecuteScriptIfFoundInPackage(context, "beforedeploy.ps1");
+            return ExecuteScriptIfFoundInPackage(context, "beforedeploy.ps1");
         }
 
-        public void Deploy(DeploymentContext context)
+        public bool Deploy(DeploymentContext context)
         {
-            ExecuteScriptIfFoundInPackage(context, "deploy.ps1");
+            return ExecuteScriptIfFoundInPackage(context, "deploy.ps1");
         }
 
-        public void AfterDeploy(DeploymentContext context)
+        public bool AfterDeploy(DeploymentContext context)
         {
-            ExecuteScriptIfFoundInPackage(context, "afterdeploy.ps1");
+            return ExecuteScriptIfFoundInPackage(context, "afterdeploy.ps1");
         }
 
-        private void ExecuteScriptIfFoundInPackage(DeploymentContext context, string scriptPath)
+        private bool ExecuteScriptIfFoundInPackage(DeploymentContext context, string scriptPath)
         {
             var file = context.Package.GetFiles().SingleOrDefault(f => f.Path.Equals(scriptPath, StringComparison.InvariantCultureIgnoreCase));
             if (file == null)
-                return;
+                return false;
 
             _logger.DebugFormat("Found script {0}, executing...", scriptPath);
 
             try
             {
                 LoadAndExecuteScript(Path.Combine(context.WorkingFolder, file.Path));
+                
             } catch (Exception ex)
             {
                 _logger.Fatal("Failed executing powershell script " + file.Path, ex);
             }
+            return true;
         }
 
         private void LoadAndExecuteScript(string pathToScript)
         {
+            string serviceManagementScript = File.ReadAllText("Scripts/PS/Services.ps1");
+
             string scriptText = File.ReadAllText(pathToScript);
+
 
             // create Powershell runspace
             Runspace runspace = RunspaceFactory.CreateRunspace();
@@ -58,6 +63,10 @@ namespace Deployd.Agent.Services.Deployment
 
             // create a popeline and feed it the script text
             Pipeline pipeline = runspace.CreatePipeline();
+
+            // add our service management script
+            pipeline.Commands.AddScript(serviceManagementScript);
+            // add the custom script
             pipeline.Commands.AddScript(scriptText);
 
             // add an extra command to transform the script output objects into nicely formatted strings 

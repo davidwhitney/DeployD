@@ -94,11 +94,12 @@
     <Compile Include="Services\AgentConfiguration\AgentConfigurationManager.cs" />
     <Compile Include="Services\AgentConfiguration\AgentConfigurationService.cs" />
     <Compile Include="Services\AgentConfiguration\IAgentConfigurationManager.cs" />
+    <Compile Include="Services\Deployment\DefaultDeploymentHook.cs" />
     <Compile Include="Services\Deployment\DeploymentContext.cs" />
     <Compile Include="Services\Deployment\DeploymentService.cs" />
     <Compile Include="Services\Deployment\IDeploymentHook.cs" />
     <Compile Include="Services\Deployment\PackageExtractor.cs" />
-    <Compile Include="Services\Deployment\PowershellScriptRunner.cs" />
+    <Compile Include="Services\Deployment\PowershellDeploymentHook.cs" />
     <Compile Include="Services\Management\ManagementInterfaceHost.cs" />
     <Compile Include="Services\PackageDownloading\PackageDownloadingService.cs" />
     <Compile Include="Program.cs">
@@ -115,10 +116,14 @@
     <None Include="DebugPackageSource\Deployd.Configuration.1.0.0.nupkg">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Include="DebugPackageSource\GG.Search.Indexing.Service.1.0.0.0.nupkg" />
     <None Include="DebugPackageSource\justgiving-sdk-1.5.4.nupkg">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="packages.config" />
+    <Content Include="Scripts\PS\Services.ps1">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <None Include="web.config" />
     <None Include="WebUi\Views\package-details.cshtml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
