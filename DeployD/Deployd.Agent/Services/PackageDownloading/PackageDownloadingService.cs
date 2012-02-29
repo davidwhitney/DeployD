@@ -20,7 +20,7 @@ namespace Deployd.Agent.Services.PackageDownloading
         protected readonly IRetrievePackageQuery AllPackagesQuery;
         protected readonly INuGetPackageCache AgentCache;
 
-        private readonly TimedSingleExecutionTask _task;
+        public TimedSingleExecutionTask TimedTask { get; private set; }
 
         public PackageDownloadingService(IAgentSettings agentSettings, IRetrievePackageQuery allPackagesQuery, INuGetPackageCache agentCache, IAgentConfigurationManager agentConfigurationManager)
         {
@@ -28,17 +28,17 @@ namespace Deployd.Agent.Services.PackageDownloading
             AllPackagesQuery = allPackagesQuery;
             AgentCache = agentCache;
             _agentConfigurationManager = agentConfigurationManager;
-            _task = new TimedSingleExecutionTask(agentSettings.PackageSyncIntervalMs, FetchPackages);
+            TimedTask = new TimedSingleExecutionTask(agentSettings.PackageSyncIntervalMs, FetchPackages);
         }
 
         public void Start(string[] args)
         {
-            _task.Start(args);
+            TimedTask.Start(args);
         }
 
         public void Stop()
         {
-            _task.Stop();
+            TimedTask.Stop();
         }
 
         public void FetchPackages()

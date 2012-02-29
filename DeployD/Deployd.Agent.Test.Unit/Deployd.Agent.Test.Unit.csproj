@@ -51,6 +51,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Services\AgentConfiguration\AgentConfigurationDownloaderTests.cs" />
+    <Compile Include="Services\AgentConfiguration\AgentConfigurationNotFoundExceptionTests.cs" />
+    <Compile Include="Services\AgentConfiguration\AgentConfigurationPackageNotFoundExceptionTests.cs" />
     <Compile Include="Services\AgentConfiguration\AgentConfigurationServiceTests.cs" />
     <Compile Include="Services\PackageDownloading\PackageDownloadingServiceTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

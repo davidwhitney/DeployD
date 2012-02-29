@@ -55,7 +55,7 @@ namespace Deployd.Agent.Test.Unit.Services.AgentConfiguration
             _configurationDownloader.Setup(x => x.DownloadAgentConfiguration());
 
             _acs.Start(new string[0]);
-            Thread.Sleep(10);
+            Thread.Sleep(100);
 
             _configurationDownloader.VerifyAll();
         }

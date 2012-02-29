@@ -28,6 +28,15 @@ namespace Deployd.Agent.Test.Unit.Services.AgentConfiguration
         }
 
         [Test]
+        public void DownloadAgentConfiguration_WhenConfigPackageDoesntExist_ThrowsAgentConfigurationPackageNotFoundException()
+        {
+            var packageFile = new List<IPackage>();
+            _retrieveQueryMock.Setup(x => x.GetLatestPackage(AgentConfigurationDownloader.DEPLOYD_CONFIGURATION_PACKAGE_NAME)).Returns(packageFile);
+
+            Assert.Throws<AgentConfigurationPackageNotFoundException>(() => _downloader.DownloadAgentConfiguration());
+        }
+
+        [Test]
         public void DownloadAgentConfiguration_WhenConfigPackageDoesntHaveAgentConfiguration_ThrowsAgentConfigurationNotFoundException()
         {
             var packageFile = new List<IPackage> {_nugetPackageMock.Object};

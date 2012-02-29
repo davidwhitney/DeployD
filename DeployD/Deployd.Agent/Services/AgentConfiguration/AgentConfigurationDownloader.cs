@@ -27,7 +27,7 @@ namespace Deployd.Agent.Services.AgentConfiguration
 
             if (configPackage == null)
             {
-                throw new InvalidOperationException("No package configuration was found. Node will not sync.");
+                throw new AgentConfigurationPackageNotFoundException(DEPLOYD_CONFIGURATION_PACKAGE_NAME);
             }
 
             var files = configPackage.GetFiles();
@@ -51,10 +51,7 @@ namespace Deployd.Agent.Services.AgentConfiguration
 
             if (agentConfigFileList.Count == 0)
             {
-                throw new AgentConfigurationNotFoundException(
-                    string.Format(
-                        "Agent configuration file was not found in package '{0}'. Looking for a configuration file in the package root called '{1}'.",
-                        DEPLOYD_CONFIGURATION_PACKAGE_NAME, targetFile));
+                throw new AgentConfigurationNotFoundException(DEPLOYD_CONFIGURATION_PACKAGE_NAME, targetFile);
             }
 
             return agentConfigFileList[0];

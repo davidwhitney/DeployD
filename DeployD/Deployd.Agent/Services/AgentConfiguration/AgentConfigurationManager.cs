@@ -23,28 +23,17 @@ namespace Deployd.Agent.Services.AgentConfiguration
         public IList<string> GetWatchedPackages(string environmentName)
         {
             var firstOrDefault = GlobalAgentConfiguration.Environments.FirstOrDefault(x => x.Name == environmentName);
-            if (firstOrDefault != null)
-            {
-                return firstOrDefault.Packages;
-            }
-
-            return new string[0];
+            return firstOrDefault != null ? firstOrDefault.Packages : new List<string>();
         }
 
         public GlobalAgentConfiguration ReadFromDisk(string fileName = ConfigurationFiles.AGENT_CONFIGURATION_FILE)
         {
             lock (_fileLock)
             {
-                GlobalAgentConfiguration config;
-
                 using (var fs = new FileStream(fileName, FileMode.Open))
                 {
-                    config =
-                        (GlobalAgentConfiguration) new XmlSerializer(typeof (GlobalAgentConfiguration)).Deserialize(fs);
-                    fs.Close();
+                    return (GlobalAgentConfiguration) new XmlSerializer(typeof (GlobalAgentConfiguration)).Deserialize(fs);
                 }
-
-                return config;
             }
         }
 
@@ -55,7 +44,6 @@ namespace Deployd.Agent.Services.AgentConfiguration
                 using (var writer = new StreamWriter(fileName))
                 {
                     new XmlSerializer(typeof (GlobalAgentConfiguration)).Serialize(writer, configuration);
-                    writer.Close();
                 }
             }
         }

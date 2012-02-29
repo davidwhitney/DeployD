@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Threading;
 using Deployd.Agent.Services.AgentConfiguration;
 using Deployd.Agent.Services.PackageDownloading;
 using Deployd.Core.AgentConfiguration;
@@ -23,7 +24,7 @@ namespace Deployd.Agent.Test.Unit.Services.PackageDownloading
         [SetUp]
         public void SetUp()
         {
-            _agentSettings = new AgentSettings {DeploymentEnvironment = "Staging", PackageSyncIntervalMs = 1000};
+            _agentSettings = new AgentSettings {DeploymentEnvironment = "Staging", PackageSyncIntervalMs = 1};
             _agentConfigManagerMock = new Mock<IAgentConfigurationManager>();
             _agentConfigManagerMock.Setup(x => x.GetWatchedPackages(_agentSettings.DeploymentEnvironment)).Returns(new List<string> { PACKAGE_ID });
             _packageRepoMock = new Mock<IRetrievePackageQuery>();
@@ -40,6 +41,30 @@ namespace Deployd.Agent.Test.Unit.Services.PackageDownloading
             _pds.FetchPackages();
 
             _packageRepoMock.Verify(x => x.GetLatestPackage(PACKAGE_ID));
+        }
+
+        [Test]
+        public void Start_WhenInvoked_UsesTimerToCallDownloadConfiguration()
+        {
+            var items = new List<IPackage>();
+            _packageRepoMock.Setup(x => x.GetLatestPackage(PACKAGE_ID)).Returns(items);
+
+            _pds.Start(new string[0]);
+            Thread.Sleep(100);
+
+            _packageRepoMock.VerifyAll();
+        }
+
+        [Test]
+        public void Stop_WhenInvoked_StopsTask()
+        {
+            _agentSettings.ConfigurationSyncIntervalMs = 10000;
+
+            _pds.Start(new string[0]);
+            Assert.That(_pds.TimedTask.IsRunning, Is.True);
+
+            _pds.Stop();
+            Assert.That(_pds.TimedTask.IsRunning, Is.False);
         }
 
     }
