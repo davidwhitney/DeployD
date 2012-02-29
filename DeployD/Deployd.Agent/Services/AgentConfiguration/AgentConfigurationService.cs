@@ -1,4 +1,5 @@
-﻿using Deployd.Core;
+﻿using System;
+using Deployd.Core;
 using Deployd.Core.AgentConfiguration;
 using Deployd.Core.Hosting;
 using log4net;
@@ -15,6 +16,9 @@ namespace Deployd.Agent.Services.AgentConfiguration
 
         public AgentConfigurationService(IAgentSettings agentSettings, IAgentConfigurationDownloader configurationDownloader)
         {
+            if (agentSettings == null) throw new ArgumentNullException("agentSettings");
+            if (configurationDownloader == null) throw new ArgumentNullException("configurationDownloader");
+
             _configurationDownloader = configurationDownloader;
             _task = new TimedSingleExecutionTask(agentSettings.ConfigurationSyncIntervalMs, DownloadConfiguration, true);
         }
