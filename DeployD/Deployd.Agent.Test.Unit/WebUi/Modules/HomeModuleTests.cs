@@ -51,6 +51,18 @@ namespace Deployd.Agent.Test.Unit.WebUi.Modules
             Assert.That(result.Body.AsString().Contains("package2"));
         }
 
+        [Test]
+        public void Get_PackageById_ReturnsMarkupWithAvailableVersionsFromCache()
+        {
+            _containerStub.NuGetPackageCacheMock.Setup(x => x.AvailablePackageVersions("mypackage")).Returns(new List<string> { "ver1", "ver2" });
+            
+            var result = _browser.Get("/packages/mypackage", with => with.HttpRequest());
+
+            Assert.That(result.StatusCode, Is.EqualTo(HttpStatusCode.OK));
+            Assert.That(result.Body.AsString().Contains("ver1"));
+            Assert.That(result.Body.AsString().Contains("ver2"));
+        }
+
         public class ContainerStub : IIocContainer
         {
             public Mock<INuGetPackageCache> NuGetPackageCacheMock { get; set; }
