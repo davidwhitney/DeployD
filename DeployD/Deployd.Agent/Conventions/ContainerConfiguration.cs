@@ -12,7 +12,6 @@ namespace Deployd.Agent.Conventions
     {
         public override void Load()
         {
-
             Bind<IAgentConfigurationManager>().ToMethod(context => new AgentConfigurationManager() );
             Bind<IAgentSettingsManager>().To<AgentSettingsManager>();
             Bind<IAgentSettings>().ToMethod(context => GetService<IAgentSettingsManager>().LoadSettings());
@@ -25,6 +24,7 @@ namespace Deployd.Agent.Conventions
             Bind<IAgentConfigurationDownloader>().To<AgentConfigurationDownloader>();
 
             Bind<IDeploymentHook>().To<PowershellScriptRunner>();
+            Bind<System.IO.Abstractions.IFileSystem>().To<System.IO.Abstractions.FileSystem>();
         }
 
         private T GetService<T>()

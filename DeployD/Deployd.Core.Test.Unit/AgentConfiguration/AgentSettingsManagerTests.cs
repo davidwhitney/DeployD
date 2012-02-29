@@ -1,5 +1,7 @@
 ﻿using System.Collections.Specialized;
+using System.IO.Abstractions;
 using Deployd.Core.AgentConfiguration;
+using Moq;
 using NUnit.Framework;
 
 namespace Deployd.Core.Test.Unit.AgentConfiguration
@@ -8,11 +10,14 @@ namespace Deployd.Core.Test.Unit.AgentConfiguration
     public class AgentSettingsManagerTests
     {
         private AgentSettingsManager _mgr;
+        private Mock<IFileSystem> _fileSystemMock;
 
         [SetUp]
         public void SetUp()
         {
-            _mgr = new AgentSettingsManager();            
+            _fileSystemMock = new Mock<IFileSystem>();
+            _fileSystemMock.Setup(x => x.Directory.GetCurrentDirectory()).Returns("c:\\fakedirectory");
+            _mgr = new AgentSettingsManager(_fileSystemMock.Object);            
         }
 
         [Test]
@@ -22,10 +27,10 @@ namespace Deployd.Core.Test.Unit.AgentConfiguration
 
             Assert.That(settings.ConfigurationSyncIntervalMs, Is.EqualTo(60000));
             Assert.That(settings.DeploymentEnvironment, Is.EqualTo("Production"));
-            Assert.That(settings.InstallationDirectory, Is.StringContaining("\\app_root"));
-            Assert.That(settings.NuGetRepository, Is.StringContaining("\\DebugPackageSource"));
+            Assert.That(settings.InstallationDirectory, Is.EqualTo("c:\\fakedirectory\\app_root"));
+            Assert.That(settings.NuGetRepository, Is.EqualTo("c:\\fakedirectory\\DebugPackageSource"));
             Assert.That(settings.PackageSyncIntervalMs, Is.EqualTo(60000));
-            Assert.That(settings.UnpackingLocation, Is.StringContaining("\\app_unpack"));
+            Assert.That(settings.UnpackingLocation, Is.EqualTo("c:\\fakedirectory\\app_unpack"));
         }
 
         [Test]

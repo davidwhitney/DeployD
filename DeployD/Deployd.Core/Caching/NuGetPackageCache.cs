@@ -3,6 +3,7 @@ using System.IO;
 using System.Linq;
 using NuGet;
 using log4net;
+using IFileSystem = System.IO.Abstractions.IFileSystem;
 
 namespace Deployd.Core.Caching
 {
@@ -11,19 +12,21 @@ namespace Deployd.Core.Caching
     /// </summary>
     public class NuGetPackageCache : INuGetPackageCache
     {
+        private readonly IFileSystem _fileSystem;
         protected static readonly ILog Logger = LogManager.GetLogger("NuGetPackageCache"); 
 
         private readonly string _cacheDirectory;
 
-        public NuGetPackageCache() : this("package_cache")
+        public NuGetPackageCache(IFileSystem fileSystem) : this(fileSystem, "package_cache")
         {
         }
 
-        public NuGetPackageCache(string cacheDirectory)
+        public NuGetPackageCache(IFileSystem fileSystem, string cacheDirectory)
         {
+            _fileSystem = fileSystem;
             _cacheDirectory = cacheDirectory;
 
-            DirectoryHelpers.EnsureExists(_cacheDirectory);
+            _fileSystem.EnsureDirectoryExists(_cacheDirectory);
         }
 
         public IList<string> AvailablePackages
@@ -58,7 +61,7 @@ namespace Deployd.Core.Caching
         {
             var packageCache = PackageCacheLocation(package);
 
-            DirectoryHelpers.EnsureExists(packageCache);
+            _fileSystem.EnsureDirectoryExists(packageCache);
 
             var packagePath = packageCache + "/" + package.Id + "-" + package.Version + ".nupkg";
 

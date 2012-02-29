@@ -1,12 +1,19 @@
 ﻿using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Configuration;
+using System.IO.Abstractions;
 
 namespace Deployd.Core.AgentConfiguration
 {
     public class AgentSettingsManager : IAgentSettingsManager
     {
+        private readonly IFileSystem _fileSystem;
         public static Dictionary<string, string> ConfigurationDefaults { get; private set; }
+
+        public AgentSettingsManager(IFileSystem fileSystem)
+        {
+            _fileSystem = fileSystem;
+        }
 
         static AgentSettingsManager()
         {
@@ -35,13 +42,13 @@ namespace Deployd.Core.AgentConfiguration
             return agentSettings;
         }
 
-        private static void EnsurePathsExist(AppSettings agentSettings)
+        private void EnsurePathsExist(AppSettings agentSettings)
         {
-            DirectoryHelpers.EnsureExists(agentSettings.InstallationDirectory);
-            DirectoryHelpers.EnsureExists(agentSettings.UnpackingLocation);
+            _fileSystem.EnsureDirectoryExists(agentSettings.InstallationDirectory);
+            _fileSystem.EnsureDirectoryExists(agentSettings.UnpackingLocation);
         }
 
-        private static void ConfigureDefaults(NameValueCollection settings, IDictionary<string, string> agentSettings)
+        private void ConfigureDefaults(NameValueCollection settings, IDictionary<string, string> agentSettings)
         {
             foreach (var keyValuePair in ConfigurationDefaults)
             {
@@ -49,10 +56,10 @@ namespace Deployd.Core.AgentConfiguration
             }
         }
 
-        private static string SettingOrDefault(NameValueCollection settings, string key)
+        private string SettingOrDefault(NameValueCollection settings, string key)
         {
             var value = (settings[key] ?? ConfigurationDefaults[key]) ?? string.Empty;
-            return DirectoryHelpers.MapVirtualPath(value);
+            return _fileSystem.MapVirtualPath(value);
         }
     }
 }

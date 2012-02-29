@@ -8,11 +8,6 @@ namespace Deployd.Core.Queries
     {
         private readonly IPackageRepositoryFactory _packageRepositoryFactory;
         private readonly IPackageRepository _packageRepository;
-        
-        public RetrievePackageQuery(FeedLocation feedLocation)
-            :this(new PackageRepositoryFactory(), feedLocation)
-        {
-        }
 
         public RetrievePackageQuery(IPackageRepositoryFactory packageRepositoryFactory, FeedLocation feedLocation)
         {
