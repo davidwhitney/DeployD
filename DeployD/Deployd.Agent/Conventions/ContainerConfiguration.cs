@@ -1,3 +1,4 @@
+using System;
 using Deployd.Core.AgentConfiguration;
 using Deployd.Core.Caching;
 using Deployd.Agent.Services.Deployment;
@@ -27,9 +28,14 @@ namespace Deployd.Agent.Conventions
             Bind<System.IO.Abstractions.IFileSystem>().To<System.IO.Abstractions.FileSystem>();
         }
 
-        private T GetService<T>()
+        public T GetService<T>()
         {
-            return (T)Kernel.GetService(typeof (T));
+            return (T) GetService(typeof (T));
+        }
+
+        public object GetService(Type type)
+        {
+            return Kernel.GetService(type);
         }
     }
 }
