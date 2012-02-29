@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using Deployd.Agent.Services.AgentConfiguration;
 using Deployd.Core.AgentConfiguration;
 using Moq;
@@ -45,6 +46,30 @@ namespace Deployd.Agent.Test.Unit.Services.AgentConfiguration
             _acs.DownloadConfiguration();
 
             _configurationDownloader.VerifyAll();
+        }
+
+        [Test]
+        public void Start_WhenInvoked_UsesTimerToCallDownloadConfiguration()
+        {
+            _agentSettings.ConfigurationSyncIntervalMs = 1;
+            _configurationDownloader.Setup(x => x.DownloadAgentConfiguration());
+
+            _acs.Start(new string[0]);
+            Thread.Sleep(10);
+
+            _configurationDownloader.VerifyAll();
+        }
+
+        [Test]
+        public void Stop_WhenInvoked_StopsTask()
+        {
+            _agentSettings.ConfigurationSyncIntervalMs = 10000;
+            
+            _acs.Start(new string[0]);
+            Assert.That(_acs.TimedTask.IsRunning, Is.True);
+
+            _acs.Stop();
+            Assert.That(_acs.TimedTask.IsRunning, Is.False);
         }
     }
 }

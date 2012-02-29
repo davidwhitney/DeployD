@@ -14,6 +14,8 @@ namespace Deployd.Core
 
         private readonly Timer _cacheUpdateTimer;
         protected readonly object OneSyncAtATimeLock;
+
+        public bool IsRunning { get; private set; }
         
         public TimedSingleExecutionTask(int timerIntervalInMs, Action action, bool runWhenCreated = false)
         {
@@ -25,6 +27,7 @@ namespace Deployd.Core
 
         public void Start(string[] args)
         {
+            IsRunning = true;
             _cacheUpdateTimer.Elapsed += Perform;
             _cacheUpdateTimer.Start();
 
@@ -36,6 +39,7 @@ namespace Deployd.Core
 
         public void Stop()
         {
+            IsRunning = false;
             _cacheUpdateTimer.Elapsed -= Perform;
             _cacheUpdateTimer.Stop();
         }
