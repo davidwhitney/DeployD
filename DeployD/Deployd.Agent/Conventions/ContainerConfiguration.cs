@@ -3,7 +3,6 @@ using Deployd.Core.Caching;
 using Deployd.Agent.Services.Deployment;
 using System.IO;
 using Deployd.Agent.Services.AgentConfiguration;
-using Deployd.Core.Caching;
 using Deployd.Core.Queries;
 using Ninject.Modules;
 using NuGet;
@@ -16,23 +15,22 @@ namespace Deployd.Agent.Conventions
         {
 
             Bind<IAgentConfigurationManager>().ToMethod(context => new AgentConfigurationManager() );
+            Bind<IAgentSettingsManager>().To<AgentSettingsManager>();
+            Bind<IAgentSettings>().ToMethod(context => GetService<IAgentSettingsManager>().LoadSettings());
+            Bind<FeedLocation>().ToMethod(context => new FeedLocation { Source = GetService<IAgentSettings>().NuGetRepository });
 
-            Bind<IAgentConfigurationDownloader>().To<AgentConfigurationDownloader>();
             Bind<IRetrieveAllAvailablePackageManifestsQuery>().To<RetrieveAllAvailablePackageManifestsQuery>();
             Bind<IPackageRepositoryFactory>().To<PackageRepositoryFactory>();
             Bind<INuGetPackageCache>().To<NuGetPackageCache>();
-
-            Bind<IAgentSettings>().ToMethod(context => new AgentSettings {DeploymentEnvironment = "Staging"});
             
-
-            Bind<FeedLocation>().ToMethod(context => new FeedLocation
-                                                         {
-                                                             Source = Directory.GetCurrentDirectory() + @"\DebugPackageSource"
-                                                         });
-
-            Bind<DeploymentService>().To<DeploymentService>();
+            Bind<IAgentConfigurationDownloader>().To<AgentConfigurationDownloader>();
 
             Bind<IDeploymentHook>().To<PowershellScriptRunner>();
+        }
+
+        private T GetService<T>()
+        {
+            return (T)Kernel.GetService(typeof (T));
         }
     }
 }

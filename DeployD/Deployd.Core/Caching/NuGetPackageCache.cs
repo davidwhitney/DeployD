@@ -23,7 +23,7 @@ namespace Deployd.Core.Caching
         {
             _cacheDirectory = cacheDirectory;
 
-            EnsureDirectoryExists(_cacheDirectory);
+            DirectoryHelpers.EnsureExists(_cacheDirectory);
         }
 
         public IList<string> AvailablePackages
@@ -58,7 +58,7 @@ namespace Deployd.Core.Caching
         {
             var packageCache = PackageCacheLocation(package);
 
-            EnsureDirectoryExists(packageCache);
+            DirectoryHelpers.EnsureExists(packageCache);
 
             var packagePath = packageCache + "/" + package.Id + "-" + package.Version + ".nupkg";
 
@@ -103,14 +103,6 @@ namespace Deployd.Core.Caching
             }
 
             return foundPackages.SingleOrDefault(p => p.IsLatestVersion);
-        }
-
-        private static void EnsureDirectoryExists(string cacheDirectory)
-        {
-            if (Directory.Exists(cacheDirectory)) return;
-            
-            Logger.InfoFormat("Creating cache directory '{0}'.", cacheDirectory);
-            Directory.CreateDirectory(cacheDirectory);
         }
     }
 }
