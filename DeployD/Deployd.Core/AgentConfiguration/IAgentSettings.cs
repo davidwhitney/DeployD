@@ -2,11 +2,11 @@ namespace Deployd.Core.AgentConfiguration
 {
     public interface IAgentSettings
     {
-        int PackageSyncIntervalMs { get; set; }
-        int ConfigurationSyncIntervalMs { get; set; }
-        string DeploymentEnvironment { get; set; }
-        string InstallationDirectory { get; set; } 
-        string UnpackingLocation { get; set; }
-        string NuGetRepository { get; set; }
+        int PackageSyncIntervalMs { get; }
+        int ConfigurationSyncIntervalMs { get; }
+        string DeploymentEnvironment { get; }
+        string InstallationDirectory { get; } 
+        string UnpackingLocation { get; }
+        string NuGetRepository { get; }
     }
 }

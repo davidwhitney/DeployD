@@ -1,41 +1,59 @@
-﻿using System;
+﻿using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Configuration;
-using System.IO;
 
 namespace Deployd.Core.AgentConfiguration
 {
     public class AgentSettingsManager : IAgentSettingsManager
     {
-        public IAgentSettings LoadSettings()
+        public static Dictionary<string, string> ConfigurationDefaults { get; private set; }
+
+        static AgentSettingsManager()
         {
-            var packageSyncIntervalMs = ConfigurationManager.AppSettings["PackageSyncIntervalMs"] ?? "60000";
-            var configurationSyncIntervalMs = ConfigurationManager.AppSettings["ConfigurationSyncIntervalMs"] ?? "60000";
-            var deploymentEnv = ConfigurationManager.AppSettings["DeploymentEnvironment"] ?? "Production";
-            var installationDir = ConfigurationManager.AppSettings["InstallationDirectory"] ?? "~\\app_root";
-            var unpackingLocation = ConfigurationManager.AppSettings["UnpackingLocation"] ?? "~\\app_unpack";
-            var nuGetRepo = ConfigurationManager.AppSettings["NuGetRepository"] ?? "~\\DebugPackageSource";
-
-            installationDir = MapVirtualPath(installationDir);
-            unpackingLocation = MapVirtualPath(unpackingLocation);
-            nuGetRepo = MapVirtualPath(nuGetRepo);
-
-            DirectoryHelpers.EnsureExists(installationDir);
-            DirectoryHelpers.EnsureExists(unpackingLocation);
-
-            return new AgentSettings
-                       {
-                           PackageSyncIntervalMs = Int32.Parse(packageSyncIntervalMs),
-                           ConfigurationSyncIntervalMs = Int32.Parse(configurationSyncIntervalMs),
-                           DeploymentEnvironment = deploymentEnv,
-                           InstallationDirectory = installationDir,
-                           UnpackingLocation = unpackingLocation,
-                           NuGetRepository = nuGetRepo
-                       };
+            ConfigurationDefaults = new Dictionary<string, string>
+            {
+                {"NuGetRepository", "~\\DebugPackageSource"},
+                {"UnpackingLocation", "~\\app_unpack"},
+                {"InstallationDirectory", "~\\app_root"},
+                {"DeploymentEnvironment", "Production"},
+                {"ConfigurationSyncIntervalMs", "60000"},
+                {"PackageSyncIntervalMs", "60000"}
+            };
         }
 
-        private static string MapVirtualPath(string path)
+        public IAgentSettings LoadSettings()
         {
-            return path.Replace("~\\", Directory.GetCurrentDirectory() + "\\");
+            return LoadSettings(ConfigurationManager.AppSettings);
+        }
+
+        public IAgentSettings LoadSettings(NameValueCollection settings)
+        {
+            var appSettings = new AppSettings(settings);
+            
+            ConfigureDefaults(appSettings);
+            EnsurePathsExist(appSettings);
+
+            return appSettings;
+        }
+
+        private static void EnsurePathsExist(AppSettings agentSettings)
+        {
+            DirectoryHelpers.EnsureExists(agentSettings.InstallationDirectory);
+            DirectoryHelpers.EnsureExists(agentSettings.UnpackingLocation);
+        }
+
+        private static void ConfigureDefaults(IDictionary<string, string> agentSettings)
+        {
+            foreach (var keyValuePair in ConfigurationDefaults)
+            {
+                agentSettings[keyValuePair.Key] = SettingOrDefault(keyValuePair.Key);
+            }
+        }
+
+        private static string SettingOrDefault(string key)
+        {
+            var value = (ConfigurationManager.AppSettings[key] ?? ConfigurationDefaults[key]) ?? string.Empty;
+            return DirectoryHelpers.MapVirtualPath(value);
         }
     }
 }

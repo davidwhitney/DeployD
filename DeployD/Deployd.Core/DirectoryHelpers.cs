@@ -14,5 +14,10 @@ namespace Deployd.Core
             Directory.CreateDirectory(dir);
         
         }
+
+        public static string MapVirtualPath(string path)
+        {
+            return path.Replace("~\\", Directory.GetCurrentDirectory() + "\\");
+        }
     }
 }

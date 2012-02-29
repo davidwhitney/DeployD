@@ -37,6 +37,9 @@
     <StartupObject />
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="AutoMapper">
+      <HintPath>..\packages\AutoMapper.2.1.265\lib\net40\AutoMapper.dll</HintPath>
+    </Reference>
     <Reference Include="log4net">
       <HintPath>..\packages\log4net.2.0.0\lib\net40-client\log4net.dll</HintPath>
     </Reference>
@@ -67,6 +70,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AgentConfiguration\AgentSettingsManager.cs" />
+    <Compile Include="AgentConfiguration\AppSettings.cs" />
     <Compile Include="AgentConfiguration\GlobalAgentConfiguration.cs" />
     <Compile Include="AgentConfiguration\DeploymentEnvironment.cs" />
     <Compile Include="AgentConfiguration\AgentSettings.cs" />

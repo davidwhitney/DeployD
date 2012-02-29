@@ -11,7 +11,7 @@ namespace Deployd.Agent.Test.Unit.Services.AgentConfiguration
     public class AgentConfigurationServiceTests
     {
         private AgentConfigurationService _acs;
-        private IAgentSettings _agentSettings;
+        private AgentSettings _agentSettings;
         private Mock<IAgentConfigurationDownloader> _configurationDownloader;
 
         [SetUp]

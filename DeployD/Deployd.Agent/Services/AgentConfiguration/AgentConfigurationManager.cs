@@ -41,9 +41,11 @@ namespace Deployd.Agent.Services.AgentConfiguration
         {
             lock (_fileLock)
             {
-                using (var writer = new StreamWriter(fileName))
+                using (var memoryStream = new MemoryStream())
+                using (var writer = new StreamWriter(memoryStream))
                 {
                     new XmlSerializer(typeof (GlobalAgentConfiguration)).Serialize(writer, configuration);
+                    SaveToDisk(memoryStream.ToArray(), fileName);
                 }
             }
         }
