@@ -19,7 +19,10 @@ namespace Deployd.Core
 
         public static string MapVirtualPath(this IFileSystem fs, string path)
         {
-            return path.Replace("~\\", fs.Directory.GetCurrentDirectory() + "\\");
+            const string virtualToken = "~\\";
+            return !path.Contains(virtualToken)
+                       ? path
+                       : path.Replace(virtualToken, fs.Directory.GetCurrentDirectory() + "\\");
         }
     }
 }
