@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using Deployd.Agent.Services.Deployment;
 using Deployd.Agent.WebUi;
 using Deployd.Agent.WebUi.Modules;

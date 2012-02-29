@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using NuGet;
@@ -23,6 +24,9 @@ namespace Deployd.Core.Caching
 
         public NuGetPackageCache(IFileSystem fileSystem, string cacheDirectory)
         {
+            if (fileSystem == null) throw new ArgumentNullException("fileSystem");
+            if (string.IsNullOrWhiteSpace(cacheDirectory)) throw new ArgumentException("", "cacheDirectory");
+
             _fileSystem = fileSystem;
             _cacheDirectory = cacheDirectory;
 
