@@ -87,9 +87,9 @@
     <Compile Include="Hosting\WcfService.cs" />
     <Compile Include="Hosting\WindowsServiceRunner.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Queries\IRetrieveAllAvailablePackageManifestsQuery.cs" />
+    <Compile Include="Queries\IRetrievePackageQuery.cs" />
     <Compile Include="Queries\FeedLocation.cs" />
-    <Compile Include="Queries\RetrieveAllAvailablePackageManifestsQuery.cs" />
+    <Compile Include="Queries\RetrievePackageQuery.cs" />
     <Compile Include="TimedSingleExecutionTask.cs" />
   </ItemGroup>
   <ItemGroup>

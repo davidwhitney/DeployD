@@ -13,7 +13,7 @@ namespace Deployd.Agent.Test.Unit.Services.PackageDownloading
     [TestFixture]
     public class PackageDownloadingServiceTests 
     {
-        private Mock<IRetrieveAllAvailablePackageManifestsQuery> _packageRepoMock;
+        private Mock<IRetrievePackageQuery> _packageRepoMock;
         private Mock<INuGetPackageCache> _packageCacheMock;
         private PackageDownloadingService _pds;
         private Mock<IAgentConfigurationManager> _agentConfigManagerMock;
@@ -26,7 +26,7 @@ namespace Deployd.Agent.Test.Unit.Services.PackageDownloading
             _agentSettings = new AgentSettings {DeploymentEnvironment = "Staging", PackageSyncIntervalMs = 1000};
             _agentConfigManagerMock = new Mock<IAgentConfigurationManager>();
             _agentConfigManagerMock.Setup(x => x.GetWatchedPackages(_agentSettings.DeploymentEnvironment)).Returns(new List<string> { PACKAGE_ID });
-            _packageRepoMock = new Mock<IRetrieveAllAvailablePackageManifestsQuery>();
+            _packageRepoMock = new Mock<IRetrievePackageQuery>();
             _packageCacheMock = new Mock<INuGetPackageCache>();
             _pds = new PackageDownloadingService(_agentSettings, _packageRepoMock.Object, _packageCacheMock.Object, _agentConfigManagerMock.Object);
         }

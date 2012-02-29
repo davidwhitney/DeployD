@@ -4,17 +4,17 @@ using NuGet;
 
 namespace Deployd.Core.Queries
 {
-    public class RetrieveAllAvailablePackageManifestsQuery : IRetrieveAllAvailablePackageManifestsQuery
+    public class RetrievePackageQuery : IRetrievePackageQuery
     {
         private readonly IPackageRepositoryFactory _packageRepositoryFactory;
         private readonly IPackageRepository _packageRepository;
         
-        public RetrieveAllAvailablePackageManifestsQuery(FeedLocation feedLocation)
+        public RetrievePackageQuery(FeedLocation feedLocation)
             :this(new PackageRepositoryFactory(), feedLocation)
         {
         }
 
-        public RetrieveAllAvailablePackageManifestsQuery(IPackageRepositoryFactory packageRepositoryFactory, FeedLocation feedLocation)
+        public RetrievePackageQuery(IPackageRepositoryFactory packageRepositoryFactory, FeedLocation feedLocation)
         {
             _packageRepositoryFactory = packageRepositoryFactory;
             _packageRepository = _packageRepositoryFactory.CreateRepository(feedLocation.Source);

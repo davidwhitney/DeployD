@@ -1,7 +1,6 @@
 using Deployd.Core.AgentConfiguration;
 using Deployd.Core.Caching;
 using Deployd.Agent.Services.Deployment;
-using System.IO;
 using Deployd.Agent.Services.AgentConfiguration;
 using Deployd.Core.Queries;
 using Ninject.Modules;
@@ -19,7 +18,7 @@ namespace Deployd.Agent.Conventions
             Bind<IAgentSettings>().ToMethod(context => GetService<IAgentSettingsManager>().LoadSettings());
             Bind<FeedLocation>().ToMethod(context => new FeedLocation { Source = GetService<IAgentSettings>().NuGetRepository });
 
-            Bind<IRetrieveAllAvailablePackageManifestsQuery>().To<RetrieveAllAvailablePackageManifestsQuery>();
+            Bind<IRetrievePackageQuery>().To<RetrievePackageQuery>();
             Bind<IPackageRepositoryFactory>().To<PackageRepositoryFactory>();
             Bind<INuGetPackageCache>().To<NuGetPackageCache>();
             
