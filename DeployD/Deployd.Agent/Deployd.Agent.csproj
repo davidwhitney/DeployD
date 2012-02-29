@@ -104,6 +104,7 @@
     <Compile Include="Services\Deployment\DeploymentContext.cs" />
     <Compile Include="Services\Deployment\DeploymentService.cs" />
     <Compile Include="Services\Deployment\IDeploymentHook.cs" />
+    <Compile Include="Services\Deployment\IDeploymentService.cs" />
     <Compile Include="Services\Deployment\PackageExtractor.cs" />
     <Compile Include="Services\Deployment\PowershellScriptRunner.cs" />
     <Compile Include="Services\Management\ManagementInterfaceHost.cs" />

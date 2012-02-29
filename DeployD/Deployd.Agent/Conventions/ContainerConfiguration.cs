@@ -24,6 +24,8 @@ namespace Deployd.Agent.Conventions
             
             Bind<IAgentConfigurationDownloader>().To<AgentConfigurationDownloader>();
 
+            Bind<IDeploymentService>().To<DeploymentService>();
+
             Bind<IDeploymentHook>().To<PowershellScriptRunner>();
             Bind<System.IO.Abstractions.IFileSystem>().To<System.IO.Abstractions.FileSystem>();
         }

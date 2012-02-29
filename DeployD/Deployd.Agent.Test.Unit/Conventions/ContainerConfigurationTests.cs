@@ -33,6 +33,7 @@ namespace Deployd.Agent.Test.Unit.Conventions
         [TestCase(typeof(INuGetPackageCache))]
         [TestCase(typeof(IAgentConfigurationDownloader))]
         [TestCase(typeof(IDeploymentHook))]
+        [TestCase(typeof(IDeploymentService))]
         [TestCase(typeof(System.IO.Abstractions.IFileSystem))]
         public void GetType_CanInstantiateBoundDependency_DoesNotThrow(Type type)
         {

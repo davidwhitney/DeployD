@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Deployd.Agent.Services.Deployment;
 using Deployd.Agent.WebUi;
 using Deployd.Agent.WebUi.Modules;
 using Deployd.Core.Caching;
@@ -10,6 +11,7 @@ using Moq;
 using NUnit.Framework;
 using Nancy;
 using Nancy.Testing;
+using NuGet;
 
 namespace Deployd.Agent.Test.Unit.WebUi.Modules
 {
@@ -24,7 +26,8 @@ namespace Deployd.Agent.Test.Unit.WebUi.Modules
         {
             _containerStub = new ContainerStub
                                  {
-                                     NuGetPackageCacheMock = new Mock<INuGetPackageCache>()
+                                     NuGetPackageCacheMock = new Mock<INuGetPackageCache>(),
+                                     DeploymentServiceMock = new Mock<IDeploymentService>()
                                  };
 
             HomeModule.Container = () => _containerStub;
@@ -63,15 +66,34 @@ namespace Deployd.Agent.Test.Unit.WebUi.Modules
             Assert.That(result.Body.AsString().Contains("ver2"));
         }
 
+        [Test]
+        public void Get_PackageByIdInstall_InvokesInstallOnInstallationService()
+        {
+            var mockPackage = new Mock<IPackage>();
+            _containerStub.NuGetPackageCacheMock.Setup(x => x.GetLatestVersion("mypackage")).Returns(mockPackage.Object);
+
+            var result = _browser.Post("/packages/mypackage/install", with => with.HttpRequest());
+
+            Assert.That(result.StatusCode, Is.EqualTo(HttpStatusCode.OK));
+            _containerStub.DeploymentServiceMock.Verify(x=>x.Deploy(mockPackage.Object));
+
+        }
+
         public class ContainerStub : IIocContainer
         {
             public Mock<INuGetPackageCache> NuGetPackageCacheMock { get; set; }
+            public Mock<IDeploymentService> DeploymentServiceMock { get; set; }
 
             public T GetType<T>()
             {
                 if (typeof(T) == typeof(INuGetPackageCache))
                 {
                     return (T)NuGetPackageCacheMock.Object;
+                }
+
+                if (typeof(T) == typeof(IDeploymentService))
+                {
+                    return (T)DeploymentServiceMock.Object;
                 }
 
                 throw new NotImplementedException();
