@@ -23,7 +23,7 @@ namespace Deployd.Agent.Test.Unit.Services.PackageDownloading
         [SetUp]
         public void SetUp()
         {
-            _agentSettings = new AgentSettings {DeploymentEnvironment = "Staging"};
+            _agentSettings = new AgentSettings {DeploymentEnvironment = "Staging", PackageSyncIntervalMs = 1000};
             _agentConfigManagerMock = new Mock<IAgentConfigurationManager>();
             _agentConfigManagerMock.Setup(x => x.GetWatchedPackages(_agentSettings.DeploymentEnvironment)).Returns(new List<string> { PACKAGE_ID });
             _packageRepoMock = new Mock<IRetrieveAllAvailablePackageManifestsQuery>();

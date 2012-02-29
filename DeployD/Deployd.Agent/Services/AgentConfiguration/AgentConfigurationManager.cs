@@ -8,9 +8,16 @@ namespace Deployd.Agent.Services.AgentConfiguration
 {
     public class AgentConfigurationManager : IAgentConfigurationManager
     {
+        private readonly object _fileLock;
+
+        public AgentConfigurationManager()
+        {
+            _fileLock = new object();
+        }
+
         public GlobalAgentConfiguration GlobalAgentConfiguration
         {
-            get { return ReadFromDisk(ConfigurationFiles.AGENT_CONFIGURATION_FILE); }
+            get { return ReadFromDisk(); }
         }
 
         public IList<string> GetWatchedPackages(string environmentName)
@@ -24,22 +31,40 @@ namespace Deployd.Agent.Services.AgentConfiguration
             return new string[0];
         }
 
-        public GlobalAgentConfiguration ReadFromDisk(string fileName)
+        public GlobalAgentConfiguration ReadFromDisk(string fileName = ConfigurationFiles.AGENT_CONFIGURATION_FILE)
         {
-            using (var fs = new FileStream(fileName, FileMode.Open))
+            lock (_fileLock)
             {
-                var item = (GlobalAgentConfiguration) new XmlSerializer(typeof (GlobalAgentConfiguration)).Deserialize(fs);
-                fs.Close();
-                return item;
+                GlobalAgentConfiguration config;
+
+                using (var fs = new FileStream(fileName, FileMode.Open))
+                {
+                    config =
+                        (GlobalAgentConfiguration) new XmlSerializer(typeof (GlobalAgentConfiguration)).Deserialize(fs);
+                    fs.Close();
+                }
+
+                return config;
             }
         }
 
-        public void SaveToDisk(GlobalAgentConfiguration configuration, string fileName)
+        public void SaveToDisk(GlobalAgentConfiguration configuration, string fileName = ConfigurationFiles.AGENT_CONFIGURATION_FILE)
         {
-            using (var writer = new StreamWriter(fileName))
+            lock (_fileLock)
             {
-                new XmlSerializer(typeof(GlobalAgentConfiguration)).Serialize(writer, configuration);
-                writer.Close();
+                using (var writer = new StreamWriter(fileName))
+                {
+                    new XmlSerializer(typeof (GlobalAgentConfiguration)).Serialize(writer, configuration);
+                    writer.Close();
+                }
+            }
+        }
+
+        public void SaveToDisk(byte[] configuration, string fileName = ConfigurationFiles.AGENT_CONFIGURATION_FILE)
+        {
+            lock (_fileLock)
+            {
+                File.WriteAllBytes(fileName, configuration);
             }
         }
     }

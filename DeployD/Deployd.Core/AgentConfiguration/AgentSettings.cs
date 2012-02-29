@@ -1,9 +1,9 @@
-﻿using System.Configuration;
-
-namespace Deployd.Core.AgentConfiguration
+﻿namespace Deployd.Core.AgentConfiguration
 {
     public class AgentSettings : IAgentSettings
     {
+        public int PackageSyncIntervalMs { get; set; }
+        public int ConfigurationSyncIntervalMs { get; set; }
         public string DeploymentEnvironment { get; set; }
         public string InstallationDirectory { get; set; }
         public string NuGetRepository { get; set; }

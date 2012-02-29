@@ -22,13 +22,13 @@ namespace Deployd.Agent.Services.PackageDownloading
 
         private readonly TimedSingleExecutionTask _task;
 
-        public PackageDownloadingService(IAgentSettings settings, IRetrieveAllAvailablePackageManifestsQuery allPackagesQuery, INuGetPackageCache agentCache, IAgentConfigurationManager agentConfigurationManager)
+        public PackageDownloadingService(IAgentSettings agentSettings, IRetrieveAllAvailablePackageManifestsQuery allPackagesQuery, INuGetPackageCache agentCache, IAgentConfigurationManager agentConfigurationManager)
         {
-            _settings = settings;
+            _settings = agentSettings;
             AllPackagesQuery = allPackagesQuery;
             AgentCache = agentCache;
             _agentConfigurationManager = agentConfigurationManager;
-            _task = new TimedSingleExecutionTask(60000, FetchPackages);
+            _task = new TimedSingleExecutionTask(agentSettings.PackageSyncIntervalMs, FetchPackages);
         }
 
         public void Start(string[] args)

@@ -1,4 +1,5 @@
-﻿using System.Configuration;
+﻿using System;
+using System.Configuration;
 using System.IO;
 
 namespace Deployd.Core.AgentConfiguration
@@ -7,6 +8,8 @@ namespace Deployd.Core.AgentConfiguration
     {
         public IAgentSettings LoadSettings()
         {
+            var packageSyncIntervalMs = ConfigurationManager.AppSettings["PackageSyncIntervalMs"] ?? "60000";
+            var configurationSyncIntervalMs = ConfigurationManager.AppSettings["ConfigurationSyncIntervalMs"] ?? "60000";
             var deploymentEnv = ConfigurationManager.AppSettings["DeploymentEnvironment"] ?? "Production";
             var installationDir = ConfigurationManager.AppSettings["InstallationDirectory"] ?? "~\\app_root";
             var unpackingLocation = ConfigurationManager.AppSettings["UnpackingLocation"] ?? "~\\app_unpack";
@@ -21,6 +24,8 @@ namespace Deployd.Core.AgentConfiguration
 
             return new AgentSettings
                        {
+                           PackageSyncIntervalMs = Int32.Parse(packageSyncIntervalMs),
+                           ConfigurationSyncIntervalMs = Int32.Parse(configurationSyncIntervalMs),
                            DeploymentEnvironment = deploymentEnv,
                            InstallationDirectory = installationDir,
                            UnpackingLocation = unpackingLocation,
@@ -28,7 +33,7 @@ namespace Deployd.Core.AgentConfiguration
                        };
         }
 
-        private string MapVirtualPath(string path)
+        private static string MapVirtualPath(string path)
         {
             return path.Replace("~\\", Directory.GetCurrentDirectory() + "\\");
         }

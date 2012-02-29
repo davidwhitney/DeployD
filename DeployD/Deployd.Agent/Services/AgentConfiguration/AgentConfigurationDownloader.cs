@@ -9,10 +9,13 @@ namespace Deployd.Agent.Services.AgentConfiguration
     {
         private const string DEPLOYD_CONFIGURATION_PACKAGE_NAME = "Deployd.Configuration";
 
+        private readonly IAgentConfigurationManager _agentConfigurationManager;
         private readonly IRetrieveAllAvailablePackageManifestsQuery _packageQuery;
 
-        public AgentConfigurationDownloader(IRetrieveAllAvailablePackageManifestsQuery packageQuery)
+        public AgentConfigurationDownloader(IAgentConfigurationManager agentConfigurationManager,
+                                            IRetrieveAllAvailablePackageManifestsQuery packageQuery)
         {
+            _agentConfigurationManager = agentConfigurationManager;
             _packageQuery = packageQuery;
         }
 
@@ -28,9 +31,15 @@ namespace Deployd.Agent.Services.AgentConfiguration
             var files = configPackage.GetFiles();
             var agentConfigurationFileStream = files.Where(x => x.Path == targetFile).ToList()[0].GetStream();
 
-            var memoryStream = new MemoryStream();
-            agentConfigurationFileStream.CopyTo(memoryStream);
-            File.WriteAllBytes("GlobalAgentConfiguration.xml", memoryStream.ToArray());
+            byte[] configBytes;
+            using (var memoryStream = new MemoryStream())
+            {
+                agentConfigurationFileStream.CopyTo(memoryStream);
+                configBytes = memoryStream.ToArray();
+                memoryStream.Close();
+            }
+
+            _agentConfigurationManager.SaveToDisk(configBytes);
         }
     }
 }
