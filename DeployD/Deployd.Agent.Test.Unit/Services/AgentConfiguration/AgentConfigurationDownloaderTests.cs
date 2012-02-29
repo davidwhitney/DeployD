@@ -14,16 +14,14 @@ namespace Deployd.Agent.Test.Unit.Services.AgentConfiguration
         private AgentConfigurationDownloader _downloader;
         private Mock<IAgentConfigurationManager> _agentConfigManagerMock;
         private Mock<IRetrievePackageQuery> _retrieveQueryMock;
-        private string _targetFile;
         private Mock<IPackage> _nugetPackageMock;
         private PackageFileStub _nugetPackageFile;
 
         [SetUp]
         public void SetUp()
         {
-            _targetFile = ConfigurationFiles.AGENT_CONFIGURATION_FILE;
             _nugetPackageMock = new Mock<IPackage>();
-            _nugetPackageFile = new PackageFileStub { Path = _targetFile };
+            _nugetPackageFile = new PackageFileStub { Path = ConfigurationFiles.AGENT_CONFIGURATION_FILE };
             _agentConfigManagerMock = new Mock<IAgentConfigurationManager>();
             _retrieveQueryMock = new Mock<IRetrievePackageQuery>();
             _downloader = new AgentConfigurationDownloader(_agentConfigManagerMock.Object, _retrieveQueryMock.Object);
@@ -36,7 +34,7 @@ namespace Deployd.Agent.Test.Unit.Services.AgentConfiguration
             _nugetPackageMock.Setup(x => x.GetFiles()).Returns(new List<IPackageFile>());
             _retrieveQueryMock.Setup(x => x.GetLatestPackage(AgentConfigurationDownloader.DEPLOYD_CONFIGURATION_PACKAGE_NAME)).Returns(packageFile);
 
-            Assert.Throws<AgentConfigurationNotFoundException>(() => _downloader.DownloadAgentConfiguration(_targetFile));
+            Assert.Throws<AgentConfigurationNotFoundException>(() => _downloader.DownloadAgentConfiguration());
         }
 
         [Test]
@@ -44,7 +42,7 @@ namespace Deployd.Agent.Test.Unit.Services.AgentConfiguration
         {
             SetupMockPackageDownload();
 
-            _downloader.DownloadAgentConfiguration(_targetFile);
+            _downloader.DownloadAgentConfiguration();
 
             _retrieveQueryMock.VerifyAll();
         }
@@ -55,7 +53,7 @@ namespace Deployd.Agent.Test.Unit.Services.AgentConfiguration
             SetupMockPackageDownload();
             _nugetPackageFile.UnderlyingStream = new MemoryStream(new byte[] {66});
 
-            _downloader.DownloadAgentConfiguration(_targetFile);
+            _downloader.DownloadAgentConfiguration();
 
             _agentConfigManagerMock.Verify(x=>x.SaveToDisk(It.Is<byte[]>(y=>y[0] == 66), It.IsAny<string>()));
         }

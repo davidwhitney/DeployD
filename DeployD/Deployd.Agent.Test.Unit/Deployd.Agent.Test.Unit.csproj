@@ -50,8 +50,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Services\AgentConfiguration\AgentConfigurationManagerTests.cs" />
     <Compile Include="Services\AgentConfiguration\AgentConfigurationDownloaderTests.cs" />
+    <Compile Include="Services\AgentConfiguration\AgentConfigurationServiceTests.cs" />
     <Compile Include="Services\PackageDownloading\PackageDownloadingServiceTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

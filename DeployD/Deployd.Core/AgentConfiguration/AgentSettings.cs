@@ -8,5 +8,11 @@
         public string InstallationDirectory { get; set; }
         public string NuGetRepository { get; set; }
         public string UnpackingLocation { get; set; }
+
+        public AgentSettings()
+        {
+            PackageSyncIntervalMs = 1000;
+            ConfigurationSyncIntervalMs = 1000;
+        }
     }
 }

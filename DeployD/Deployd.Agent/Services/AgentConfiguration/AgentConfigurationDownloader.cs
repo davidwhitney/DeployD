@@ -21,7 +21,7 @@ namespace Deployd.Agent.Services.AgentConfiguration
             _packageQuery = packageQuery;
         }
 
-        public void DownloadAgentConfiguration(string targetFile)
+        public void DownloadAgentConfiguration()
         {
             var configPackage = _packageQuery.GetLatestPackage(DEPLOYD_CONFIGURATION_PACKAGE_NAME).FirstOrDefault();
 
@@ -31,7 +31,7 @@ namespace Deployd.Agent.Services.AgentConfiguration
             }
 
             var files = configPackage.GetFiles();
-            var agentConfigurationFile = ExtractAgentConfigurationFile(targetFile, files);
+            var agentConfigurationFile = ExtractAgentConfigurationFile(ConfigurationFiles.AGENT_CONFIGURATION_FILE, files);
             var agentConfigurationFileStream = agentConfigurationFile.GetStream();
 
             byte[] configBytes;

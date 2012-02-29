@@ -32,7 +32,7 @@ namespace Deployd.Agent.Services.AgentConfiguration
         public void DownloadConfiguration()
         {
             Logger.DebugFormat("Downloading " + ConfigurationFiles.AGENT_CONFIGURATION_FILE);
-            _configurationDownloader.DownloadAgentConfiguration(ConfigurationFiles.AGENT_CONFIGURATION_FILE);
+            _configurationDownloader.DownloadAgentConfiguration();
         }
     }
 }
