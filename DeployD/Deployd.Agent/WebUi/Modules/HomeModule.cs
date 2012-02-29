@@ -45,13 +45,7 @@ namespace Deployd.Agent.WebUi.Modules
                 return HttpStatusCode.OK;
             };
 
-            Post["/packages/{packageId}/install/{specificVersion}", y => true] = x =>
-            {
-                // install specific
-                string specificVersion = x.specificVersion;
-
-                return HttpStatusCode.OK;
-            };
+            Post["/packages/{packageId}/install/{specificVersion}", y => true] = x => HttpStatusCode.OK;
         }
     }
 }

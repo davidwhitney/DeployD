@@ -79,6 +79,14 @@ namespace Deployd.Agent.Test.Unit.WebUi.Modules
 
         }
 
+        [Test]
+        public void Get_PackageByIdInstallSpecificVersion_ReturnsOk()
+        {
+            var result = _browser.Post("/packages/mypackage/install/mypackage-1.0.0.0", with => with.HttpRequest());
+
+            Assert.That(result.StatusCode, Is.EqualTo(HttpStatusCode.OK));
+        }
+
         public class ContainerStub : IIocContainer
         {
             public Mock<INuGetPackageCache> NuGetPackageCacheMock { get; set; }
