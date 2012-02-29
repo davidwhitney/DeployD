@@ -13,35 +13,27 @@ namespace Deployd.Core.AgentConfiguration
 
         public int ConfigurationSyncIntervalMs
         {
-            get { return Int32.Parse(this["PackageSyncIntervalMs"]); }
+            get { return Int32.Parse(this["ConfigurationSyncIntervalMs"]); }
         }
 
         public string DeploymentEnvironment
         {
-            get { return this["PackageSyncIntervalMs"]; }
+            get { return this["DeploymentEnvironment"]; }
         }
 
         public string InstallationDirectory
         {
-            get { return this["PackageSyncIntervalMs"]; }
+            get { return this["InstallationDirectory"]; }
         }
 
         public string NuGetRepository
         {
-            get { return this["PackageSyncIntervalMs"]; }
+            get { return this["NuGetRepository"]; }
         }
 
         public string UnpackingLocation
         {
-            get { return this["PackageSyncIntervalMs"]; }
-        }
-
-        public AppSettings(NameValueCollection inner)
-        {
-            foreach (var key in inner.AllKeys)
-            {
-                Add(key, inner[key]);
-            }
+            get { return this["UnpackingLocation"]; }
         }
     }
 }

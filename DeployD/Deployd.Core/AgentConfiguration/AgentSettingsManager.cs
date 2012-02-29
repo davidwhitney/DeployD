@@ -28,12 +28,11 @@ namespace Deployd.Core.AgentConfiguration
 
         public IAgentSettings LoadSettings(NameValueCollection settings)
         {
-            var appSettings = new AppSettings(settings);
-            
-            ConfigureDefaults(appSettings);
-            EnsurePathsExist(appSettings);
+            var agentSettings = new AppSettings();
+            ConfigureDefaults(settings, agentSettings);
+            EnsurePathsExist(agentSettings);
 
-            return appSettings;
+            return agentSettings;
         }
 
         private static void EnsurePathsExist(AppSettings agentSettings)
@@ -42,17 +41,17 @@ namespace Deployd.Core.AgentConfiguration
             DirectoryHelpers.EnsureExists(agentSettings.UnpackingLocation);
         }
 
-        private static void ConfigureDefaults(IDictionary<string, string> agentSettings)
+        private static void ConfigureDefaults(NameValueCollection settings, IDictionary<string, string> agentSettings)
         {
             foreach (var keyValuePair in ConfigurationDefaults)
             {
-                agentSettings[keyValuePair.Key] = SettingOrDefault(keyValuePair.Key);
+                agentSettings[keyValuePair.Key] = SettingOrDefault(settings, keyValuePair.Key);
             }
         }
 
-        private static string SettingOrDefault(string key)
+        private static string SettingOrDefault(NameValueCollection settings, string key)
         {
-            var value = (ConfigurationManager.AppSettings[key] ?? ConfigurationDefaults[key]) ?? string.Empty;
+            var value = (settings[key] ?? ConfigurationDefaults[key]) ?? string.Empty;
             return DirectoryHelpers.MapVirtualPath(value);
         }
     }
