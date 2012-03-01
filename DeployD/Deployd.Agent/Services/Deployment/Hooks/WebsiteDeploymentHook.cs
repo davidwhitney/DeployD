@@ -56,7 +56,7 @@ namespace Deployd.Agent.Services.Deployment.Hooks
             _logger.Info("Execute msdeploy here");
 
             string msDeployArgsFormat =
-                @"-verb:sync -source:package=""{0}"" -dest:auto,computername=""http://localhost:8090/MsDeployAgentService2/"" -skip:objectName=filePath,absolutePath=.*app_offline\.htm -skip:objectName=filePath,absolutePath=.*\.log -allowUntrusted -setParam:""IIS Web Application Name""=""{0}""";
+                @"-verb:sync -source:package=""{0}"" -dest:auto,computername=""http://localhost:8090/MsDeployAgentService2/"" -skip:objectName=filePath,absolutePath=.*app_offline\.htm -skip:objectName=filePath,absolutePath=.*\.log -allowUntrusted -setParam:""IIS Web Application Name""=""{1}"" -verbose";
             string executableArgs = string.Format(msDeployArgsFormat,
                                                 Path.Combine(context.WorkingFolder, "Content\\" + context.Package.Title + ".zip"),
                                                 context.Package.Title);
