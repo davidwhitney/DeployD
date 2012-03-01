@@ -62,7 +62,7 @@ namespace Deployd.Agent.Services.Deployment.Hooks
                                                 context.Package.Title);
 
             string executablePath = @"c:\Program Files (x86)\IIS\Microsoft Web Deploy\msdeploy.exe";
-            RunProcess(executablePath, executableArgs);        
+            RunProcess(executablePath, executableArgs);
         }
 
         private void RunProcess(string executablePath, string executableArgs)

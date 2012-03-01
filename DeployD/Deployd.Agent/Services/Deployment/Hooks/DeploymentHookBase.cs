@@ -21,9 +21,11 @@ namespace Deployd.Agent.Services.Deployment.Hooks
 
         public virtual void BeforeDeploy(DeploymentContext context){}
 
-        public virtual void Deploy(DeploymentContext context)
+        public virtual void Deploy(DeploymentContext context){}
+
+        protected void CopyAllFilesToDestination(DeploymentContext context)
         {
-            // this is where file copy will occur
+// this is where file copy will occur
             var sourceFolder = new DirectoryInfo(Path.Combine(context.WorkingFolder, "content"));
 
             // clean the destination folder
@@ -42,7 +44,7 @@ namespace Deployd.Agent.Services.Deployment.Hooks
                 }
                 catch (Exception ex)
                 {
-                    if (retryCount==0)
+                    if (retryCount == 0)
                     {
                         _logger.Fatal("Failed to clean destination");
                         throw;
@@ -56,7 +58,8 @@ namespace Deployd.Agent.Services.Deployment.Hooks
             try
             {
                 RecursiveCopy(sourceFolder, context.TargetInstallationFolder);
-            } catch (Exception exception)
+            }
+            catch (Exception exception)
             {
                 _logger.Fatal("Copy failed", exception);
             }

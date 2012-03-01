@@ -54,7 +54,7 @@ namespace Deployd.Agent.Services.Deployment.Hooks
             // services are installed in a '\services' subfolder
             context.TargetInstallationFolder = Path.Combine(@"d:\wwwcom\services", context.Package.Title);
             
-            base.Deploy(context);
+            CopyAllFilesToDestination(context);
         }
 
         public override void AfterDeploy(DeploymentContext context)
