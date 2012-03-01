@@ -29,6 +29,7 @@ namespace Deployd.Agent.Conventions
 
             Bind<IDeploymentHook>().To<PowershellDeploymentHook>();
             Bind<IDeploymentHook>().To<ServiceDeploymentHook>();
+            Bind<IDeploymentHook>().To<WebsiteDeploymentHook>();
             Bind<System.IO.Abstractions.IFileSystem>().To<System.IO.Abstractions.FileSystem>();
         }
 

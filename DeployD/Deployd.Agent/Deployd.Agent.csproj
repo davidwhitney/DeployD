@@ -107,6 +107,7 @@
     <Compile Include="Services\Deployment\Hooks\IDeploymentHook.cs" />
     <Compile Include="Services\Deployment\Hooks\PowershellDeploymentHook.cs" />
     <Compile Include="Services\Deployment\Hooks\ServiceDeploymentHook.cs" />
+    <Compile Include="Services\Deployment\Hooks\WebsiteDeploymentHook.cs" />
     <Compile Include="Services\Deployment\IDeploymentService.cs" />
     <Compile Include="Services\Deployment\PackageExtractor.cs" />
     <Compile Include="Services\Management\ManagementInterfaceHost.cs" />

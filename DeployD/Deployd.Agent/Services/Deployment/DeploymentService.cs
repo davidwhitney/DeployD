@@ -59,7 +59,10 @@ namespace Deployd.Agent.Services.Deployment
         {
             foreach(var hook in _hooks)
             {
-                hook.AfterDeploy(context);
+                if (hook.HookValidForPackage(context))
+                {
+                    hook.AfterDeploy(context);
+                }
             }
         }
 
@@ -67,7 +70,10 @@ namespace Deployd.Agent.Services.Deployment
         {
             foreach (var hook in _hooks)
             {
-                hook.Deploy(context);
+                if (hook.HookValidForPackage(context))
+                {
+                    hook.Deploy(context);
+                }
             }
         }
 
@@ -75,7 +81,10 @@ namespace Deployd.Agent.Services.Deployment
         {
             foreach (var hook in _hooks)
             {
-                hook.BeforeDeploy(context);
+                if (hook.HookValidForPackage(context))
+                {
+                    hook.BeforeDeploy(context);
+                }
             }
 
         }
