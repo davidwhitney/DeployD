@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -56,13 +57,38 @@ namespace Deployd.Agent.Services.Deployment.Hooks
 
             string msDeployArgsFormat =
                 @"-verb:sync -source:package=""{0}"" -dest:auto,computername=""http://localhost:8090/MsDeployAgentService2/"" -skip:objectName=filePath,absolutePath=.*app_offline\.htm -skip:objectName=filePath,absolutePath=.*\.log -allowUntrusted -setParam:""IIS Web Application Name""=""{0}""";
-            string msDeployArgs = string.Format(msDeployArgsFormat,
+            string executableArgs = string.Format(msDeployArgsFormat,
                                                 Path.Combine(context.WorkingFolder, "Content\\" + context.Package.Title + ".zip"),
                                                 context.Package.Title);
 
-            System.Diagnostics.Process.Start(@"c:\Program Files (x86)\IIS\Microsoft Web Deploy\msdeploy.exe",
-                                             msDeployArgs);
-            _logger.InfoFormat(@"c:\Program Files (x86)\IIS\Microsoft Web Deploy\msdeploy.exe " + msDeployArgs);
+            string executablePath = @"c:\Program Files (x86)\IIS\Microsoft Web Deploy\msdeploy.exe";
+            RunProcess(executablePath, executableArgs);        
+        }
+
+        private void RunProcess(string executablePath, string executableArgs)
+        {
+            _logger.InfoFormat("{0} {1}", executablePath, executableArgs);
+            Process msDeploy = new Process();
+            msDeploy.StartInfo.UseShellExecute = false;
+            msDeploy.StartInfo.RedirectStandardError = true;
+            msDeploy.StartInfo.RedirectStandardOutput = true;
+            msDeploy.StartInfo.FileName = executablePath;
+            msDeploy.StartInfo.Arguments = executableArgs;
+            msDeploy.Start();
+
+            while (!msDeploy.HasExited)
+            {
+                string output = msDeploy.StandardOutput.ReadToEnd();
+                string error = msDeploy.StandardError.ReadToEnd();
+
+                _logger.Info(output);
+                if (error.Length > 0)
+                {
+                    _logger.Error(error);
+                }
+
+                msDeploy.WaitForExit(2000);
+            }
         }
 
         public override void AfterDeploy(DeploymentContext context)
