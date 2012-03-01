@@ -45,7 +45,11 @@ namespace Deployd.Agent.Services.Deployment.Hooks
             {
                 Directory.CreateDirectory(Path.GetDirectoryName(destinationFilePath));
             }
-            File.Copy(tempFilePath, destinationFilePath);
+
+            if (!File.Exists(destinationFilePath))
+            {
+                File.Copy(tempFilePath, destinationFilePath);
+            }
 
             // wait for the app to unload
             System.Threading.Thread.Sleep(1000);
