@@ -9,7 +9,7 @@
 			do {
 				Start-Sleep -m 100
 			} while (!$service.Status -eq "Running")
-			Write-Host $service.Name started
+			Write-Output $service.Name started
 		}
 	}
 }
@@ -21,7 +21,7 @@ function StopIfInstalledAndStarted([string]$serviceName,[string]$pathToExecutabl
 	{
 		if ( $service.Status -eq "Running" )
 		{
-			Write-Host Stopping $service.Name
+			Write-Output Stopping $service.Name
 			Stop-Service $serviceName
 			do {
 			Start-Sleep -m 100

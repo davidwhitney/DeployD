@@ -9,7 +9,7 @@ namespace Deployd.Agent.Services.AgentConfiguration
     {
         public IList<string> WatchedPackages
         {
-            get { return new[]{ "justgiving-sdk"}; }
+            get { return new[]{ "justgiving-sdk", "GG.Search.Indexing.Service"}; }
         }
     }
 }
