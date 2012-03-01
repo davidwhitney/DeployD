@@ -103,6 +103,7 @@
     <Compile Include="Services\AgentConfiguration\IAgentConfigurationManager.cs" />
     <Compile Include="Services\Deployment\DeploymentContext.cs" />
     <Compile Include="Services\Deployment\DeploymentService.cs" />
+    <Compile Include="Services\Deployment\Hooks\ConfigTransformationDeploymentHook.cs" />
     <Compile Include="Services\Deployment\Hooks\DeploymentHookBase.cs" />
     <Compile Include="Services\Deployment\Hooks\IDeploymentHook.cs" />
     <Compile Include="Services\Deployment\Hooks\PowershellDeploymentHook.cs" />
