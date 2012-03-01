@@ -31,6 +31,11 @@ namespace Deployd.Core.AgentConfiguration
             get { return this["NuGetRepository"]; }
         }
 
+        public string[] Tags
+        {
+            get { return this["Tags"].ToLower().Split(' ', ',', ';'); }
+        }
+
         public string UnpackingLocation
         {
             get { return this["UnpackingLocation"]; }

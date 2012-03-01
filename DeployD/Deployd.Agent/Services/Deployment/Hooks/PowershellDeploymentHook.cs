@@ -1,32 +1,41 @@
-﻿using System;
-using System.Collections.Generic;
+using System;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Management.Automation;
 using System.Management.Automation.Runspaces;
 using System.Text;
-using NuGet;
+using Deployd.Core.AgentConfiguration;
 using log4net;
 
-namespace Deployd.Agent.Services.Deployment
+namespace Deployd.Agent.Services.Deployment.Hooks
 {
-    public class PowershellDeploymentHook : IDeploymentHook
+    public class PowershellDeploymentHook : DeploymentHookBase
     {
         private static ILog _logger = LogManager.GetLogger("PowershellScriptRunner");
-        public bool BeforeDeploy(DeploymentContext context)
+
+        public PowershellDeploymentHook(IAgentSettings agentSettings) : base(agentSettings)
         {
-            return ExecuteScriptIfFoundInPackage(context, "beforedeploy.ps1");
         }
 
-        public bool Deploy(DeploymentContext context)
+        public override bool HookValidForPackage(DeploymentContext context)
         {
-            return ExecuteScriptIfFoundInPackage(context, "deploy.ps1");
+            return context.Package.GetFiles().Any(f => f.Path.EndsWith(".ps1", StringComparison.CurrentCultureIgnoreCase));
         }
 
-        public bool AfterDeploy(DeploymentContext context)
+        public override void BeforeDeploy(DeploymentContext context)
         {
-            return ExecuteScriptIfFoundInPackage(context, "afterdeploy.ps1");
+            ExecuteScriptIfFoundInPackage(context, "beforedeploy.ps1");
+        }
+
+        public override void Deploy(DeploymentContext context)
+        {
+            ExecuteScriptIfFoundInPackage(context, "deploy.ps1");
+        }
+
+        public override void AfterDeploy(DeploymentContext context)
+        {
+            ExecuteScriptIfFoundInPackage(context, "afterdeploy.ps1");
         }
 
         private bool ExecuteScriptIfFoundInPackage(DeploymentContext context, string scriptPath)

@@ -2,6 +2,7 @@
 using Deployd.Agent.Conventions;
 using Deployd.Agent.Services.AgentConfiguration;
 using Deployd.Agent.Services.Deployment;
+using Deployd.Agent.Services.Deployment.Hooks;
 using Deployd.Core.AgentConfiguration;
 using Deployd.Core.Caching;
 using Deployd.Core.Queries;

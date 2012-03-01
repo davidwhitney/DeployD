@@ -101,13 +101,14 @@
     <Compile Include="Services\AgentConfiguration\ConfigurationFiles.cs" />
     <Compile Include="Services\AgentConfiguration\IAgentConfigurationDownloader.cs" />
     <Compile Include="Services\AgentConfiguration\IAgentConfigurationManager.cs" />
-    <Compile Include="Services\Deployment\DefaultDeploymentHook.cs" />
     <Compile Include="Services\Deployment\DeploymentContext.cs" />
     <Compile Include="Services\Deployment\DeploymentService.cs" />
-    <Compile Include="Services\Deployment\IDeploymentHook.cs" />
+    <Compile Include="Services\Deployment\Hooks\DeploymentHookBase.cs" />
+    <Compile Include="Services\Deployment\Hooks\IDeploymentHook.cs" />
+    <Compile Include="Services\Deployment\Hooks\PowershellDeploymentHook.cs" />
+    <Compile Include="Services\Deployment\Hooks\ServiceDeploymentHook.cs" />
     <Compile Include="Services\Deployment\IDeploymentService.cs" />
     <Compile Include="Services\Deployment\PackageExtractor.cs" />
-    <Compile Include="Services\Deployment\PowershellDeploymentHook.cs" />
     <Compile Include="Services\Management\ManagementInterfaceHost.cs" />
     <Compile Include="Services\PackageDownloading\PackageDownloadingService.cs" />
     <Compile Include="Program.cs">

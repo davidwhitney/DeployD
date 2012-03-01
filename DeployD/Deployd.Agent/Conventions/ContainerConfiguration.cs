@@ -1,4 +1,5 @@
 using System;
+using Deployd.Agent.Services.Deployment.Hooks;
 using Deployd.Core.AgentConfiguration;
 using Deployd.Core.Caching;
 using Deployd.Agent.Services.Deployment;
@@ -26,8 +27,8 @@ namespace Deployd.Agent.Conventions
 
             Bind<IDeploymentService>().To<DeploymentService>();
 
-            Bind<IDeploymentHook>().To<DefaultDeploymentHook>();
             Bind<IDeploymentHook>().To<PowershellDeploymentHook>();
+            Bind<IDeploymentHook>().To<ServiceDeploymentHook>();
             Bind<System.IO.Abstractions.IFileSystem>().To<System.IO.Abstractions.FileSystem>();
         }
 

@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 namespace Deployd.Core.AgentConfiguration
 {
     public interface IAgentSettings
@@ -8,5 +10,6 @@ namespace Deployd.Core.AgentConfiguration
         string InstallationDirectory { get; } 
         string UnpackingLocation { get; }
         string NuGetRepository { get; }
+        string[] Tags { get; }
     }
 }

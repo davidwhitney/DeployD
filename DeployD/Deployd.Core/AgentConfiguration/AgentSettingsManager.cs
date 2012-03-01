@@ -24,7 +24,8 @@ namespace Deployd.Core.AgentConfiguration
                 {"InstallationDirectory", "~\\app_root"},
                 {"DeploymentEnvironment", "Production"},
                 {"ConfigurationSyncIntervalMs", "60000"},
-                {"PackageSyncIntervalMs", "60000"}
+                {"PackageSyncIntervalMs", "60000"},
+                {"Tags",""}
             };
         }
 

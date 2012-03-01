@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
+using Deployd.Agent.Services.Deployment.Hooks;
 using Deployd.Core.Hosting;
 using NuGet;
 using log4net;
@@ -44,7 +46,8 @@ namespace Deployd.Agent.Services.Deployment
                 Logger.Fatal("Could not extract package", ex);
             }
 
-            var deploymentContext = new DeploymentContext(package, outputPath);
+            string targetInstallationFolder = Path.Combine(@"d:\wwwcom", package.Title);
+            var deploymentContext = new DeploymentContext(package, outputPath, targetInstallationFolder);
             BeforeDeploy(deploymentContext);
 
             PerformDeploy(deploymentContext);
