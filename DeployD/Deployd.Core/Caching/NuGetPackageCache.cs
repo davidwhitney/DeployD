@@ -1,8 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using NuGet;
 using log4net;
+using IFileSystem = System.IO.Abstractions.IFileSystem;
 
 namespace Deployd.Core.Caching
 {
@@ -11,19 +13,24 @@ namespace Deployd.Core.Caching
     /// </summary>
     public class NuGetPackageCache : INuGetPackageCache
     {
+        private readonly IFileSystem _fileSystem;
         protected static readonly ILog Logger = LogManager.GetLogger("NuGetPackageCache"); 
 
         private readonly string _cacheDirectory;
 
-        public NuGetPackageCache() : this("package_cache")
+        public NuGetPackageCache(IFileSystem fileSystem) : this(fileSystem, "package_cache")
         {
         }
 
-        public NuGetPackageCache(string cacheDirectory)
+        public NuGetPackageCache(IFileSystem fileSystem, string cacheDirectory)
         {
+            if (fileSystem == null) throw new ArgumentNullException("fileSystem");
+            if (string.IsNullOrWhiteSpace(cacheDirectory)) throw new ArgumentException("", "cacheDirectory");
+
+            _fileSystem = fileSystem;
             _cacheDirectory = cacheDirectory;
 
-            EnsureDirectoryExists(_cacheDirectory);
+            _fileSystem.EnsureDirectoryExists(_cacheDirectory);
         }
 
         public IList<string> AvailablePackages
@@ -58,7 +65,7 @@ namespace Deployd.Core.Caching
         {
             var packageCache = PackageCacheLocation(package);
 
-            EnsureDirectoryExists(packageCache);
+            _fileSystem.EnsureDirectoryExists(packageCache);
 
             var packagePath = packageCache + "/" + package.Id + "-" + package.Version + ".nupkg";
 
@@ -103,14 +110,6 @@ namespace Deployd.Core.Caching
             }
 
             return foundPackages.SingleOrDefault(p => p.IsLatestVersion);
-        }
-
-        private static void EnsureDirectoryExists(string cacheDirectory)
-        {
-            if (Directory.Exists(cacheDirectory)) return;
-            
-            Logger.InfoFormat("Creating cache directory '{0}'.", cacheDirectory);
-            Directory.CreateDirectory(cacheDirectory);
         }
     }
 }

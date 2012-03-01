@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<GlobalAgentConfiguration xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <Environments>
+    <DeploymentEnvironment>
+      <Name>Staging</Name>
+      <Packages>
+        <string>justgiving-sdk</string>
+      </Packages>
+    </DeploymentEnvironment>
+  </Environments>
+</GlobalAgentConfiguration>

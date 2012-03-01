@@ -12,6 +12,6 @@
 		<language>en-US</language> 
 	</metadata> 
 	<files>
-	  <file src="AgentConfiguration.xml" target="" /> 
+	  <file src="GlobalAgentConfiguration.xml" target="" /> 
 	</files>  
 </package>

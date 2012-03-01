@@ -37,6 +37,9 @@
     <StartupObject />
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="AutoMapper">
+      <HintPath>..\packages\AutoMapper.2.1.265\lib\net40\AutoMapper.dll</HintPath>
+    </Reference>
     <Reference Include="log4net">
       <HintPath>..\packages\log4net.2.0.0\lib\net40-client\log4net.dll</HintPath>
     </Reference>
@@ -57,6 +60,9 @@
     <Reference Include="System.Configuration" />
     <Reference Include="System.Configuration.Install" />
     <Reference Include="System.Core" />
+    <Reference Include="System.IO.Abstractions">
+      <HintPath>..\packages\System.IO.Abstractions.1.4.0.12\lib\net35\System.IO.Abstractions.dll</HintPath>
+    </Reference>
     <Reference Include="System.ServiceModel" />
     <Reference Include="System.ServiceProcess" />
     <Reference Include="System.Xml.Linq" />
@@ -66,15 +72,14 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AgentConfiguration\DeploydConfiguration.cs" />
+    <Compile Include="AgentConfiguration\AgentSettingsManager.cs" />
+    <Compile Include="AgentConfiguration\AppSettings.cs" />
+    <Compile Include="AgentConfiguration\GlobalAgentConfiguration.cs" />
     <Compile Include="AgentConfiguration\DeploymentEnvironment.cs" />
-    <Compile Include="AgentConfiguration\AgentInstance.cs" />
-    <Compile Include="AgentConfiguration\EnvironmentsCollection.cs" />
-    <Compile Include="AgentConfiguration\IAgentInstance.cs" />
-    <Compile Include="AgentConfiguration\IDeploymentEnvironment.cs" />
-    <Compile Include="AgentConfiguration\ISupportedPackage.cs" />
-    <Compile Include="AgentConfiguration\PackageCollection.cs" />
-    <Compile Include="AgentConfiguration\PackageSupportedInEnvironmentConfiguration.cs" />
+    <Compile Include="AgentConfiguration\AgentSettings.cs" />
+    <Compile Include="AgentConfiguration\IAgentSettings.cs" />
+    <Compile Include="AgentConfiguration\IAgentSettingsManager.cs" />
+    <Compile Include="FileSystemExtensions.cs" />
     <Compile Include="Caching\INuGetPackageCache.cs" />
     <Compile Include="Caching\NuGetPackageCache.cs" />
     <Compile Include="Hosting\ApplicationContext.cs" />
@@ -89,9 +94,10 @@
     <Compile Include="Hosting\WcfService.cs" />
     <Compile Include="Hosting\WindowsServiceRunner.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Queries\IRetrieveAllAvailablePackageManifestsQuery.cs" />
+    <Compile Include="Queries\IRetrievePackageQuery.cs" />
     <Compile Include="Queries\FeedLocation.cs" />
-    <Compile Include="Queries\RetrieveAllAvailablePackageManifestsQuery.cs" />
+    <Compile Include="Queries\RetrievePackageQuery.cs" />
+    <Compile Include="TimedSingleExecutionTask.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="sampleConfig.config">

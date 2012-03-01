@@ -36,7 +36,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Gallio, Version=3.3.0.0, Culture=neutral, PublicKeyToken=eb9cfa67ee6ab36e, processorArchitecture=MSIL" />
     <Reference Include="log4net">
       <HintPath>..\packages\log4net.2.0.0\lib\net40-full\log4net.dll</HintPath>
     </Reference>
@@ -72,6 +71,9 @@
     <Reference Include="System" />
     <Reference Include="System.Configuration.Install" />
     <Reference Include="System.Core" />
+    <Reference Include="System.IO.Abstractions, Version=1.4.0.12, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.IO.Abstractions.1.4.0.12\lib\net35\System.IO.Abstractions.dll</HintPath>
+    </Reference>
     <Reference Include="System.Management.Automation, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\WindowsPowerShell\v1.0\System.Management.Automation.dll</HintPath>
@@ -91,13 +93,19 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Conventions\ContainerConfiguration.cs" />
+    <Compile Include="Services\AgentConfiguration\AgentConfigurationDownloader.cs" />
     <Compile Include="Services\AgentConfiguration\AgentConfigurationManager.cs" />
+    <Compile Include="Services\AgentConfiguration\AgentConfigurationNotFoundException.cs" />
+    <Compile Include="Services\AgentConfiguration\AgentConfigurationPackageNotFoundException.cs" />
     <Compile Include="Services\AgentConfiguration\AgentConfigurationService.cs" />
+    <Compile Include="Services\AgentConfiguration\ConfigurationFiles.cs" />
+    <Compile Include="Services\AgentConfiguration\IAgentConfigurationDownloader.cs" />
     <Compile Include="Services\AgentConfiguration\IAgentConfigurationManager.cs" />
     <Compile Include="Services\Deployment\DefaultDeploymentHook.cs" />
     <Compile Include="Services\Deployment\DeploymentContext.cs" />
     <Compile Include="Services\Deployment\DeploymentService.cs" />
     <Compile Include="Services\Deployment\IDeploymentHook.cs" />
+    <Compile Include="Services\Deployment\IDeploymentService.cs" />
     <Compile Include="Services\Deployment\PackageExtractor.cs" />
     <Compile Include="Services\Deployment\PowershellDeploymentHook.cs" />
     <Compile Include="Services\Management\ManagementInterfaceHost.cs" />
@@ -106,7 +114,6 @@
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Services\PackageSyncServiceBase.cs" />
     <Compile Include="WebUi\NancyConventionsBootstrapper.cs" />
     <Compile Include="WebUi\Modules\HomeModule.cs" />
     <Compile Include="WebUi\Models\PackageVersionsViewModel.cs" />

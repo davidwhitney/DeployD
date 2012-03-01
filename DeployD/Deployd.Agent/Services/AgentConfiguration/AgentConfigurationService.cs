@@ -1,48 +1,43 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Timers;
-using Deployd.Core.Caching;
-using Deployd.Core.Queries;
+using Deployd.Core;
+using Deployd.Core.AgentConfiguration;
+using Deployd.Core.Hosting;
+using log4net;
 
 namespace Deployd.Agent.Services.AgentConfiguration
 {
-    public class AgentConfigurationService : PackageSyncServiceBase
+    public class AgentConfigurationService : IWindowsService
     {
-        private const string AGENT_CONFIGURATION_FILE = "AgentConfiguration.xml";
-        private const string DEPLOYD_CONFIGURATION_PACKAGE_NAME = "Deployd.Configuration";
+        protected static readonly ILog Logger = LogManager.GetLogger("AgentConfigurationService");
+        
+        public ApplicationContext AppContext { get; set; }
+        public TimedSingleExecutionTask TimedTask { get; private set; }
 
-        public AgentConfigurationService(IRetrieveAllAvailablePackageManifestsQuery allPackagesQuery, INuGetPackageCache agentCache)
-            : base(allPackagesQuery, agentCache, 60000)
+        private readonly IAgentConfigurationDownloader _configurationDownloader;
+
+        public AgentConfigurationService(IAgentSettings agentSettings, IAgentConfigurationDownloader configurationDownloader)
         {
+            if (agentSettings == null) throw new ArgumentNullException("agentSettings");
+            if (configurationDownloader == null) throw new ArgumentNullException("configurationDownloader");
+
+            _configurationDownloader = configurationDownloader;
+            TimedTask = new TimedSingleExecutionTask(agentSettings.ConfigurationSyncIntervalMs, DownloadConfiguration, true);
         }
 
-        public override void FetchPackages(object sender, ElapsedEventArgs e)
+        public void Start(string[] args)
         {
-            FetchPackages();
+            TimedTask.Start(args);
         }
 
-        public override void FetchPackages()
+        public void Stop()
         {
-            OneAtATime(()=>
-            {
-                var configPackage = _allPackagesQuery.GetLatestPackage(DEPLOYD_CONFIGURATION_PACKAGE_NAME).FirstOrDefault();
-
-                if (configPackage == null)
-                {
-                    throw new InvalidOperationException("No package configuration was found. Node will not sync.");
-                }
-
-                var files = configPackage.GetFiles();
-                var agentConfigurationFileStream = files.Where(x => x.Path == AGENT_CONFIGURATION_FILE).ToList()[0].GetStream();
-
-            });
+            TimedTask.Stop();
         }
 
-        public override IList<string> GetPackagesToDownload()
+        public void DownloadConfiguration()
         {
-            return new List<string>{DEPLOYD_CONFIGURATION_PACKAGE_NAME};
+            Logger.DebugFormat("Downloading " + ConfigurationFiles.AGENT_CONFIGURATION_FILE);
+            _configurationDownloader.DownloadAgentConfiguration();
         }
     }
 }

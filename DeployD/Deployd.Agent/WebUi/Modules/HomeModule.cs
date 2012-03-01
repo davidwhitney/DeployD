@@ -39,19 +39,13 @@ namespace Deployd.Agent.WebUi.Modules
                 
 
                 // deploy
-                var deploymentService = Container().GetType<DeploymentService>();
+                var deploymentService = Container().GetType<IDeploymentService>();
                 deploymentService.Deploy(package);
 
                 return HttpStatusCode.OK;
             };
 
-            Post["/packages/{packageId}/install/{specificVersion}", y => true] = x =>
-            {
-                // install specific
-                string specificVersion = x.specificVersion;
-
-                return HttpStatusCode.OK;
-            };
+            Post["/packages/{packageId}/install/{specificVersion}", y => true] = x => HttpStatusCode.OK;
         }
     }
 }

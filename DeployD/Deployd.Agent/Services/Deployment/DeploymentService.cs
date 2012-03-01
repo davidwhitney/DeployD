@@ -1,13 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using Deployd.Core.Caching;
 using Deployd.Core.Hosting;
 using NuGet;
 using log4net;
 
 namespace Deployd.Agent.Services.Deployment
 {
-    public class DeploymentService : IWindowsService
+    public class DeploymentService : IDeploymentService
     {
         private readonly IEnumerable<IDeploymentHook> _hooks;
         protected static readonly ILog Logger = LogManager.GetLogger("DeploymentService"); 

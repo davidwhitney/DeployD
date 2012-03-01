@@ -3,7 +3,7 @@ using NuGet;
 
 namespace Deployd.Core.Queries
 {
-    public interface IRetrieveAllAvailablePackageManifestsQuery
+    public interface IRetrievePackageQuery
     {
         IList<IPackage> GetLatestPackage(string packageId);
     }
