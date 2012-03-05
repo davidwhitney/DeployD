@@ -109,7 +109,7 @@ namespace Deployd.Core.Caching
                 foundPackages.Add(package);
             }
 
-            return foundPackages.SingleOrDefault(p => p.IsLatestVersion);
+            return foundPackages.OrderByDescending(p => p.Version).First();
         }
 
         public IPackage GetSpecificVersion(string packageId, string version)
