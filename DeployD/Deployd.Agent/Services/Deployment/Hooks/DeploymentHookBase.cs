@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using Deployd.Core.AgentConfiguration;
@@ -114,6 +115,32 @@ namespace Deployd.Agent.Services.Deployment.Hooks
                 /*&& tags.Contains(AgentSettings.DeploymentEnvironment.ToLower())*/) // we're not worried about staging/production only server role
                 return true;
             return false;
+        }
+
+        protected void RunProcess(string executablePath, string executableArgs)
+        {
+            _logger.InfoFormat("{0} {1}", executablePath, executableArgs);
+            Process msDeploy = new Process();
+            msDeploy.StartInfo.UseShellExecute = false;
+            msDeploy.StartInfo.RedirectStandardError = true;
+            msDeploy.StartInfo.RedirectStandardOutput = true;
+            msDeploy.StartInfo.FileName = executablePath;
+            msDeploy.StartInfo.Arguments = executableArgs;
+            msDeploy.Start();
+
+            while (!msDeploy.HasExited)
+            {
+                string output = msDeploy.StandardOutput.ReadToEnd();
+                string error = msDeploy.StandardError.ReadToEnd();
+
+                _logger.Info(output);
+                if (error.Length > 0)
+                {
+                    _logger.Error(error);
+                }
+
+                msDeploy.WaitForExit(2000);
+            }
         }
     }
 }

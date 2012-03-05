@@ -106,9 +106,10 @@
     <Compile Include="Services\Deployment\Hooks\ConfigTransformationDeploymentHook.cs" />
     <Compile Include="Services\Deployment\Hooks\DeploymentHookBase.cs" />
     <Compile Include="Services\Deployment\Hooks\IDeploymentHook.cs" />
+    <Compile Include="Services\Deployment\Hooks\MsDeployDeploymentHook.cs" />
     <Compile Include="Services\Deployment\Hooks\PowershellDeploymentHook.cs" />
     <Compile Include="Services\Deployment\Hooks\ServiceDeploymentHook.cs" />
-    <Compile Include="Services\Deployment\Hooks\WebsiteDeploymentHook.cs" />
+    <Compile Include="Services\Deployment\Hooks\AppOfflineDeploymentHook.cs" />
     <Compile Include="Services\Deployment\IDeploymentService.cs" />
     <Compile Include="Services\Deployment\PackageExtractor.cs" />
     <Compile Include="Services\Management\ManagementInterfaceHost.cs" />
@@ -122,11 +123,19 @@
     <Compile Include="WebUi\Models\PackageVersionsViewModel.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Tools\Microsoft.Web.Publishing.Tasks.Dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Tools\NDesk.Options.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Tools\TransformVsConfiguration.exe">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <None Include="app.config" />
     <None Include="DebugPackageSource\Deployd.Configuration.1.0.0.nupkg">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="DebugPackageSource\GG.Search.Indexing.Service.1.0.0.0.nupkg" />
     <None Include="DebugPackageSource\justgiving-sdk-1.5.4.nupkg">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

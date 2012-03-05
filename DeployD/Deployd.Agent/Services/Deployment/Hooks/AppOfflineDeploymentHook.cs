@@ -9,10 +9,10 @@ using log4net;
 
 namespace Deployd.Agent.Services.Deployment.Hooks
 {
-    public class WebsiteDeploymentHook : DeploymentHookBase
+    public class AppOfflineDeploymentHook : DeploymentHookBase
     {
         private ILog _logger = LogManager.GetLogger("WebsiteDeploymentHook");
-        public WebsiteDeploymentHook(IAgentSettings agentSettings) : base(agentSettings)
+        public AppOfflineDeploymentHook(IAgentSettings agentSettings) : base(agentSettings)
         {
         }
 
@@ -55,45 +55,6 @@ namespace Deployd.Agent.Services.Deployment.Hooks
             System.Threading.Thread.Sleep(1000);
         }
 
-        public override void Deploy(DeploymentContext context)
-        {
-            _logger.Info("Execute msdeploy here");
-
-            string msDeployArgsFormat =
-                @"-verb:sync -source:package=""{0}"" -dest:auto,computername=""http://localhost:8090/MsDeployAgentService2/"" -skip:objectName=filePath,absolutePath=.*app_offline\.htm -skip:objectName=filePath,absolutePath=.*\.log -allowUntrusted -setParam:""IIS Web Application Name""=""{1}"" -verbose";
-            string executableArgs = string.Format(msDeployArgsFormat,
-                                                Path.Combine(context.WorkingFolder, "Content\\" + context.Package.Title + ".zip"),
-                                                context.Package.Title);
-
-            string executablePath = @"c:\Program Files (x86)\IIS\Microsoft Web Deploy\msdeploy.exe";
-            RunProcess(executablePath, executableArgs);
-        }
-
-        private void RunProcess(string executablePath, string executableArgs)
-        {
-            _logger.InfoFormat("{0} {1}", executablePath, executableArgs);
-            Process msDeploy = new Process();
-            msDeploy.StartInfo.UseShellExecute = false;
-            msDeploy.StartInfo.RedirectStandardError = true;
-            msDeploy.StartInfo.RedirectStandardOutput = true;
-            msDeploy.StartInfo.FileName = executablePath;
-            msDeploy.StartInfo.Arguments = executableArgs;
-            msDeploy.Start();
-
-            while (!msDeploy.HasExited)
-            {
-                string output = msDeploy.StandardOutput.ReadToEnd();
-                string error = msDeploy.StandardError.ReadToEnd();
-
-                _logger.Info(output);
-                if (error.Length > 0)
-                {
-                    _logger.Error(error);
-                }
-
-                msDeploy.WaitForExit(2000);
-            }
-        }
 
         public override void AfterDeploy(DeploymentContext context)
         {
