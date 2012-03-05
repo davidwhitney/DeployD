@@ -9,7 +9,7 @@
         <h2>Available Packages</h2>
         @foreach(var packageId in Model)
         {
-            <a href="/packages/@packageId">@packageId</a><br/>
+            <div style="clear:both"><a href="/packages/@packageId">@packageId</a><div style="float:right;margin-right:80px"><form style="display:inline" action="/packages/@packageId/install" method="POST"><input type="submit" value="Install Latest"></input></form></div></div>
         }
 
     </body>
