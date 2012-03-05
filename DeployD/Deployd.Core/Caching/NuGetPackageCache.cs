@@ -111,5 +111,15 @@ namespace Deployd.Core.Caching
 
             return foundPackages.SingleOrDefault(p => p.IsLatestVersion);
         }
+
+        public IPackage GetSpecificVersion(string packageId, string version)
+        {
+            if (!File.Exists(Path.Combine(PackageCacheLocation(packageId), version)))
+            {
+                throw new ArgumentOutOfRangeException("version");
+            }
+
+            return new ZipPackage(Path.Combine(PackageCacheLocation(packageId), version));
+        }
     }
 }

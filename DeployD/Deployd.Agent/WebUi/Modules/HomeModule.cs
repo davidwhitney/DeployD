@@ -45,7 +45,19 @@ namespace Deployd.Agent.WebUi.Modules
                 return HttpStatusCode.OK;
             };
 
-            Post["/packages/{packageId}/install/{specificVersion}", y => true] = x => HttpStatusCode.OK;
+            Post["/packages/{packageId}/install/{specificVersion}", y => true] = x =>
+            {
+                // find specific version if available
+                var cache = Container().GetType<INuGetPackageCache>();
+                var package = cache.GetSpecificVersion(x.packageId, x.specificVersion);
+
+                // deploy
+                var deploymentService = Container().GetType<IDeploymentService>();
+                deploymentService.Deploy(package);
+
+
+                return HttpStatusCode.OK;
+            };
         }
     }
 }
