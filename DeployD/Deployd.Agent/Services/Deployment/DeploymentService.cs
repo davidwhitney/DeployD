@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using Deployd.Agent.Services.Deployment.Hooks;
+using Deployd.Core.AgentConfiguration;
 using Deployd.Core.Hosting;
 using NuGet;
 using log4net;
@@ -11,12 +12,14 @@ namespace Deployd.Agent.Services.Deployment
     public class DeploymentService : IDeploymentService
     {
         private readonly IEnumerable<IDeploymentHook> _hooks;
+        private readonly IAgentSettings _agentSettings;
         protected static readonly ILog Logger = LogManager.GetLogger("DeploymentService"); 
         public ApplicationContext AppContext { get; set; }
 
-        public DeploymentService(IEnumerable<IDeploymentHook> hooks)
+        public DeploymentService(IEnumerable<IDeploymentHook> hooks, IAgentSettings agentSettings)
         {
             _hooks = hooks;
+            _agentSettings = agentSettings;
         }
 
         public void Start(string[] args)

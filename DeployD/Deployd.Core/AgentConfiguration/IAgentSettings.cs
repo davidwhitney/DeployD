@@ -11,5 +11,7 @@ namespace Deployd.Core.AgentConfiguration
         string UnpackingLocation { get; }
         string NuGetRepository { get; }
         string[] Tags { get; }
+        string LatestDirectory { get; }
+        string CacheDirectory { get; }
     }
 }

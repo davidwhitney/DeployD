@@ -27,6 +27,8 @@ namespace Deployd.Agent.Conventions
 
             Bind<IDeploymentService>().To<DeploymentService>();
 
+            Bind<ICurrentInstalledCache>().To<CurrentInstalledCache>();
+
             Bind<IDeploymentHook>().To<PowershellDeploymentHook>();
             Bind<IDeploymentHook>().To<ServiceDeploymentHook>();
             Bind<IDeploymentHook>().To<MsDeployDeploymentHook>();

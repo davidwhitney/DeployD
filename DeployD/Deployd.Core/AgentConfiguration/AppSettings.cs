@@ -36,6 +36,16 @@ namespace Deployd.Core.AgentConfiguration
             get { return this["Tags"].ToLower().Split(' ', ',', ';'); }
         }
 
+        public string LatestDirectory
+        {
+            get { return this["LatestDirectory"]; }
+        }
+
+        public string CacheDirectory
+        {
+            get { return this["CacheDirectory"]; }
+        }
+
         public string UnpackingLocation
         {
             get { return this["UnpackingLocation"]; }

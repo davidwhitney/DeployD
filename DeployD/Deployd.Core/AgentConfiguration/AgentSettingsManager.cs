@@ -25,6 +25,8 @@ namespace Deployd.Core.AgentConfiguration
                 {"DeploymentEnvironment", "Production"},
                 {"ConfigurationSyncIntervalMs", "60000"},
                 {"PackageSyncIntervalMs", "60000"},
+                {"LatestDirectory", "~\\latest"},
+                {"CacheDirectory", "~\\package_cache"},
                 {"Tags",""}
             };
         }

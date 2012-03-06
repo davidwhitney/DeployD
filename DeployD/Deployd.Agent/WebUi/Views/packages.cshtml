@@ -1,4 +1,5 @@
-﻿<!DOCTYPE html>
+﻿@using Deployd.Agent.WebUi.Models
+<!DOCTYPE html>
 <html>
     <head>
         <title>Deployd.Agent</title>
@@ -7,9 +8,28 @@
         <h1>Deployd.Agent</h1>
         
         <h2>Available Packages</h2>
-        @foreach(var packageId in Model)
+        
+
+
+        @foreach(PackageViewModel package in Model.Packages)
         {
-            <div style="clear:both"><a href="/packages/@packageId">@packageId</a><div style="float:right;margin-right:80px"><form style="display:inline" action="/packages/@packageId/install" method="POST"><input type="submit" value="Install Latest"></input></form></div></div>
+            <div style="clear:both">
+                <a href="/packages/@package.PackageId">@package.PackageId</a><div style="float:right;margin-right:80px"><form style="display:inline" action="/packages/@package.PackageId/install" method="POST"><input type="submit" value="Install Latest"></input></form></div><br/>
+                @if(!string.IsNullOrWhiteSpace(package.LatestAvailableVersion))
+                {
+                    <text>Latest: @package.LatestAvailableVersion<br/></text>
+                }
+                @if (!string.IsNullOrWhiteSpace(package.InstalledVersion))
+                {
+                    <text>Installed: @package.InstalledVersion</text>
+                }
+                else
+                {
+                    <text>Not installed</text>
+                }
+                <br/>
+            </div>
+            
         }
 
     </body>

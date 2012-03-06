@@ -6,12 +6,15 @@ using Deployd.Agent.WebUi.Models;
 using Deployd.Core.Caching;
 using Deployd.Core.Hosting;
 using Nancy;
+using Nancy.Responses;
+using log4net;
 
 namespace Deployd.Agent.WebUi.Modules
 {
     public class HomeModule : NancyModule
     {
         public static Func<IIocContainer> Container { get; set; }
+        private ILog _logger = LogManager.GetLogger("HomeModule");
 
         public HomeModule()
         {
@@ -20,8 +23,28 @@ namespace Deployd.Agent.WebUi.Modules
             Get["/packages"] = x =>
             {
                 var cache = Container().GetType<INuGetPackageCache>();
+                var current = Container().GetType<ICurrentInstalledCache>();
                 var packageList = cache.AvailablePackages;
-                return View["packages.cshtml", packageList];
+
+                var packageListViewModel = new PackageListViewModel();
+                packageListViewModel.Packages = new List<PackageViewModel>();
+                foreach(var packageId in packageList)
+                {
+                    var packageViewModel = new PackageViewModel();
+                    packageViewModel.PackageId = packageId;
+                    var installed = current.GetCurrentInstalledVersion(packageId);
+                    if (installed != null)
+                    {
+                        packageViewModel.InstalledVersion = installed.Version.Version.ToString();
+                    }
+                    var latestAvailable = cache.GetLatestVersion(packageId);
+                    if (latestAvailable != null)
+                    {
+                        packageViewModel.LatestAvailableVersion = latestAvailable.Version.Version.ToString();
+                    }
+                    packageListViewModel.Packages.Add(packageViewModel);
+                }
+                return View["packages.cshtml", packageListViewModel];
             };
 
             Get["/packages/{packageId}"] = x =>
@@ -42,7 +65,17 @@ namespace Deployd.Agent.WebUi.Modules
                 var deploymentService = Container().GetType<IDeploymentService>();
                 deploymentService.Deploy(package);
 
-                return HttpStatusCode.OK;
+                // write installation marker
+                var installationCache = Container().GetType<ICurrentInstalledCache>();
+                try
+                {
+                    installationCache.SetCurrentInstalledVersion(package);
+                } catch( Exception ex)
+                {
+                    _logger.Warn("Could not set current installed version", ex);
+                }
+
+                return Response.AsRedirect("/packages");
             };
 
             Post["/packages/{packageId}/install/{specificVersion}", y => true] = x =>
@@ -55,8 +88,18 @@ namespace Deployd.Agent.WebUi.Modules
                 var deploymentService = Container().GetType<IDeploymentService>();
                 deploymentService.Deploy(package);
 
+                // write installation marker
+                var installationCache = Container().GetType<ICurrentInstalledCache>();
+                try
+                {
+                    installationCache.SetCurrentInstalledVersion(package);
+                }
+                catch (Exception ex)
+                {
+                    _logger.Warn("Could not set current installed version", ex);
+                }
 
-                return HttpStatusCode.OK;
+                return Response.AsRedirect("/packages");
             };
         }
     }

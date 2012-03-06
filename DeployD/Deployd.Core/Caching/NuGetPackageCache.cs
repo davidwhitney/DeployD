@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Deployd.Core.AgentConfiguration;
 using NuGet;
 using log4net;
 using IFileSystem = System.IO.Abstractions.IFileSystem;
@@ -18,7 +19,8 @@ namespace Deployd.Core.Caching
 
         private readonly string _cacheDirectory;
 
-        public NuGetPackageCache(IFileSystem fileSystem) : this(fileSystem, "package_cache")
+        public NuGetPackageCache(IFileSystem fileSystem, IAgentSettings agentSettings)
+            : this(fileSystem, agentSettings.CacheDirectory)
         {
         }
 
@@ -48,17 +50,19 @@ namespace Deployd.Core.Caching
             }
         } 
 
-        public IList<string> AvailablePackageVersions(string packageId)
+        public IEnumerable<string> AvailablePackageVersions(string packageId)
         {
             var files = Directory.GetFiles(PackageCacheLocation(packageId)).ToList();
 
             for (var index = 0; index < files.Count; index++)
             {
-                files[index] = files[index].Replace(_cacheDirectory + "/", "");
-                files[index] = files[index].Replace(packageId + "\\", "");
+                string filename = Path.GetFileNameWithoutExtension(files[index]);
+                if (filename.Contains("-"))
+                {
+                    string version = filename.Split(new[]{'-'}, StringSplitOptions.RemoveEmptyEntries).Last();
+                    yield return version;
+                }
             }
-
-            return files;
         } 
 
         public void Add(IPackage package)
@@ -67,7 +71,7 @@ namespace Deployd.Core.Caching
 
             _fileSystem.EnsureDirectoryExists(packageCache);
 
-            var packagePath = packageCache + "/" + package.Id + "-" + package.Version + ".nupkg";
+            var packagePath = Path.Combine(packageCache, CachedPackageVersionFilename(package.Id, package.Version.ToString()));
 
             if (File.Exists(packagePath))
             {
@@ -86,7 +90,7 @@ namespace Deployd.Core.Caching
 
         private string PackageCacheLocation(string packageId)
         {
-            return _cacheDirectory + "/" + packageId;
+            return Path.Combine(_cacheDirectory, packageId);
         }
 
         public void Add(IEnumerable<IPackage> allAvailablePackages)
@@ -99,14 +103,17 @@ namespace Deployd.Core.Caching
 
         public IPackage GetLatestVersion(string packageId)
         {
-            string location = PackageCacheLocation(packageId);
             var versions = AvailablePackageVersions(packageId);
             
             List<IPackage> foundPackages = new List<IPackage>();
             foreach(var version in versions)
             {
-                var package = new ZipPackage(Path.Combine(PackageCacheLocation(packageId), version));
-                foundPackages.Add(package);
+                string packageFilename = CachedPackageVersionFilename(packageId, version);
+                string packagePath = Path.Combine(PackageCacheLocation(packageId), packageFilename);
+                if (File.Exists(packagePath))
+                {
+                    foundPackages.Add(new ZipPackage(packagePath));
+                }
             }
 
             return foundPackages.OrderByDescending(p => p.Version).First();
@@ -114,12 +121,19 @@ namespace Deployd.Core.Caching
 
         public IPackage GetSpecificVersion(string packageId, string version)
         {
-            if (!File.Exists(Path.Combine(PackageCacheLocation(packageId), version)))
+            string filename = CachedPackageVersionFilename(packageId, version);
+            string packagePath = Path.Combine(PackageCacheLocation(packageId), filename);
+            if (!File.Exists(packagePath))
             {
                 throw new ArgumentOutOfRangeException("version");
             }
 
-            return new ZipPackage(Path.Combine(PackageCacheLocation(packageId), version));
+            return new ZipPackage(packagePath);
+        }
+
+        private static string CachedPackageVersionFilename(string packageId, string version)
+        {
+            return string.Format("{0}-{1}.nupkg", packageId, version);
         }
     }
 }
