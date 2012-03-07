@@ -19,7 +19,7 @@ namespace Deployd.Core.AgentConfiguration
         {
             ConfigurationDefaults = new Dictionary<string, string>
             {
-                {"NuGetRepository", "~\\DebugPackageSource"},
+                {"NuGetRepository", "http://build.justgiving.com:81/nuget"},
                 {"UnpackingLocation", "~\\app_unpack"},
                 {"InstallationDirectory", "~\\app_root"},
                 {"DeploymentEnvironment", "Production"},
