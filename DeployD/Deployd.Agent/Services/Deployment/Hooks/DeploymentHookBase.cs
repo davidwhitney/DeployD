@@ -21,10 +21,9 @@ namespace Deployd.Agent.Services.Deployment.Hooks
         }
 
         public abstract bool HookValidForPackage(DeploymentContext context);
-
         public virtual void BeforeDeploy(DeploymentContext context){}
-
         public virtual void Deploy(DeploymentContext context){}
+        public virtual void AfterDeploy(DeploymentContext context) { }
 
         protected void CopyAllFilesToDestination(DeploymentContext context)
         {
@@ -104,8 +103,6 @@ namespace Deployd.Agent.Services.Deployment.Hooks
                 }
             }
         }
-
-        public virtual void AfterDeploy(DeploymentContext context){}
 
         protected bool EnvironmentIsValidForPackage(DeploymentContext context)
         {

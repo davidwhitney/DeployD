@@ -1,3 +1,4 @@
+using System;
 using System.IO;
 using System.Linq;
 using System.ServiceProcess;
@@ -18,36 +19,40 @@ namespace Deployd.Agent.Services.Deployment.Hooks
 
         public override void BeforeDeploy(DeploymentContext context)
         {
-            if (!EnvironmentIsValidForPackage(context)) return;
+            if (!EnvironmentIsValidForPackage(context))
+            {
+                return;
+            }
 
+            ShutdownRequiredServices(context);
+        }
+
+        private void ShutdownRequiredServices(DeploymentContext context)
+        {
             using (var service = ServiceController.GetServices().SingleOrDefault(s => s.ServiceName == context.Package.Title))
             {
-                // if no such service then pass
                 if (service == null)
-                    return;
-
-                // shut down the service if it's installed
-                // todo: recursively shut down dependent services
-                if (service.Status.Equals(ServiceControllerStatus.Running)
-                    || service.Status.Equals(ServiceControllerStatus.StartPending))
                 {
-                    Logger.InfoFormat("Stopping service {0}", service.ServiceName);
-                    service.Stop();
-
-                    int waitCount = 10; // wait 10 retries
-                    while (service.Status != ServiceControllerStatus.Stopped && --waitCount > 0)
-                    {
-                        System.Threading.Thread.Sleep(100);
-                        service.Refresh();
-                    }
-                    Logger.InfoFormat("service is now {0}", service.Status);
+                    return;
                 }
+
+                // todo: recursively shut down dependent services
+                if (!service.Status.Equals(ServiceControllerStatus.Running) &&
+                    !service.Status.Equals(ServiceControllerStatus.StartPending))
+                {
+                    return;
+                }
+
+                ChangeServiceStateTo(service, ServiceControllerStatus.Stopped, service.Stop);
             }
         }
 
         public override void Deploy(DeploymentContext context)
         {
-            if (!EnvironmentIsValidForPackage(context)) return;
+            if (!EnvironmentIsValidForPackage(context))
+            {
+                return;
+            }
 
             // services are installed in a '\services' subfolder
             context.TargetInstallationFolder = Path.Combine(@"d:\wwwcom\services", context.Package.Id);
@@ -57,37 +62,46 @@ namespace Deployd.Agent.Services.Deployment.Hooks
 
         public override void AfterDeploy(DeploymentContext context)
         {
-            if (!EnvironmentIsValidForPackage(context)) return;
+            if (!EnvironmentIsValidForPackage(context))
+            {
+                return;
+            }
 
             // if no such service then install it
             using (var service = ServiceController.GetServices().SingleOrDefault(s => s.ServiceName == context.Package.Id))
             {
                 if (service == null)
                 {
-                    string pathToExecutable = Path.Combine(context.TargetInstallationFolder,
-                                                           context.Package.Id + ".exe");
+                    var pathToExecutable = Path.Combine(context.TargetInstallationFolder, context.Package.Id + ".exe");
                     Logger.InfoFormat("Installing service {0} from {1}", context.Package.Title, pathToExecutable);
 
                     System.Configuration.Install.ManagedInstallerClass.InstallHelper(new[] {pathToExecutable});
                 }
 
-                // start the service if it's stopped
                 // todo: recursively shut down dependent services
-                if (service.Status.Equals(ServiceControllerStatus.Stopped)
-                    || service.Status.Equals(ServiceControllerStatus.StopPending))
+                if (!service.Status.Equals(ServiceControllerStatus.Stopped) &&
+                    !service.Status.Equals(ServiceControllerStatus.StopPending))
                 {
-                    Logger.InfoFormat("Starting service {0}", service.ServiceName);
-                    service.Start();
-
-                    var waitCount = 10; // wait 10 retries
-                    while(service.Status != ServiceControllerStatus.Running && --waitCount>0)
-                    {
-                        System.Threading.Thread.Sleep(100);
-                        service.Refresh();
-                    }
-                    Logger.InfoFormat("service is now {0}", service.Status);
+                    return;
                 }
+                
+                ChangeServiceStateTo(service, ServiceControllerStatus.Running, service.Start);
             }
+        }
+
+        private void ChangeServiceStateTo(ServiceController service, ServiceControllerStatus verifyMeetsThisStatus, Action switchAction)
+        {
+            Logger.InfoFormat("Stopping service {0}", service.ServiceName);
+            switchAction();
+
+            var retryCount = 10; // wait 10 retries
+            while (service.Status != verifyMeetsThisStatus && --retryCount > 0)
+            {
+                System.Threading.Thread.Sleep(100);
+                service.Refresh();
+            }
+
+            Logger.InfoFormat("service is now {0}", service.Status);            
         }
     }
 }

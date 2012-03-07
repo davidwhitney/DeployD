@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.IO.Abstractions;
 using System.Linq;
 using Deployd.Core.AgentConfiguration;
 
@@ -7,6 +8,7 @@ namespace Deployd.Agent.Services.Deployment.Hooks
 {
     public class MsDeployDeploymentHook : DeploymentHookBase
     {
+        private readonly IFileSystem _fileSystem;
         protected string MsWebDeployPath = string.Empty;
 
         private readonly string[] _knownMsWebDeployPaths = new[]
@@ -17,11 +19,12 @@ namespace Deployd.Agent.Services.Deployment.Hooks
             Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86), @"IIS\Microsoft Web Deploy V2\msdeploy.exe")
         };
 
-        public MsDeployDeploymentHook(IAgentSettings agentSettings) : base(agentSettings)
+        public MsDeployDeploymentHook(IAgentSettings agentSettings, IFileSystem fileSystem) : base(agentSettings)
         {
-            if (_knownMsWebDeployPaths.Any(File.Exists))
+            _fileSystem = fileSystem;
+            if (_knownMsWebDeployPaths.Any(_fileSystem.File.Exists))
             {
-                MsWebDeployPath = _knownMsWebDeployPaths.Last(File.Exists);
+                MsWebDeployPath = _knownMsWebDeployPaths.Last(_fileSystem.File.Exists);
             } 
             else
             {
@@ -50,18 +53,16 @@ namespace Deployd.Agent.Services.Deployment.Hooks
 
         protected void DeployWebsite(string targetMachineName, string sourcePackagePath, string iisApplicationName, params string[] ignoreRegexPaths)
         {
-            string ignore = string.Join(" -skip:objectName=filePath,absolutePath=", ignoreRegexPaths);
+            var ignore = string.Join(" -skip:objectName=filePath,absolutePath=", ignoreRegexPaths);
+            
             if (ignoreRegexPaths.Length > 0)
             {
                 ignore = " -skip:objectName=filePath,absolutePath=" + ignore;
             }
 
             const string msDeployArgsFormat = @"-verb:sync -source:package=""{0}"" -dest:auto,computername=""http://{1}:8090/MsDeployAgentService2/"" {3} -allowUntrusted -setParam:""IIS Web Application Name""=""{2}"" -verbose";
-            string executableArgs = string.Format(msDeployArgsFormat,
-                                                sourcePackagePath,
-                                                targetMachineName,
-                                                iisApplicationName,
-                                                ignore);
+            var executableArgs = string.Format(msDeployArgsFormat, sourcePackagePath, targetMachineName,
+                                               iisApplicationName, ignore);
 
             RunProcess(MsWebDeployPath, executableArgs);
            
