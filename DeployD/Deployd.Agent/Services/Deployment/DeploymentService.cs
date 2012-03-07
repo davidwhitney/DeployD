@@ -18,7 +18,9 @@ namespace Deployd.Agent.Services.Deployment
         protected static readonly ILog Logger = LogManager.GetLogger("DeploymentService"); 
         public ApplicationContext AppContext { get; set; }
 
-        public DeploymentService(IEnumerable<IDeploymentHook> hooks, INuGetPackageCache packageCache, ICurrentInstalledCache currentInstalledCache)
+        public DeploymentService(IEnumerable<IDeploymentHook> hooks, 
+                                 INuGetPackageCache packageCache,
+                                 ICurrentInstalledCache currentInstalledCache)
         {
             _hooks = hooks;
             _packageCache = packageCache;
