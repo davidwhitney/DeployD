@@ -4,7 +4,6 @@ using Deployd.Agent.WebUi.Models;
 using Deployd.Core.Caching;
 using Deployd.Core.Hosting;
 using Nancy;
-using log4net;
 
 namespace Deployd.Agent.WebUi.Modules
 {
@@ -18,26 +17,8 @@ namespace Deployd.Agent.WebUi.Modules
             
             Get["/packages"] = x =>
             {
-                var cache = Container().GetType<INuGetPackageCache>();
-                var current = Container().GetType<ICurrentInstalledCache>();
-
-                var packageListViewModel = new PackageListViewModel();
-                foreach(var packageId in cache.AvailablePackages)
-                {
-                    var packageViewModel = new PackageViewModel {PackageId = packageId};
-                    var installed = current.GetCurrentInstalledVersion(packageId);
-                    if (installed != null)
-                    {
-                        packageViewModel.InstalledVersion = installed.Version.Version.ToString();
-                    }
-                    var latestAvailable = cache.GetLatestVersion(packageId);
-                    if (latestAvailable != null)
-                    {
-                        packageViewModel.LatestAvailableVersion = latestAvailable.Version.Version.ToString();
-                    }
-                    packageListViewModel.Packages.Add(packageViewModel);
-                }
-                return View["packages.cshtml", packageListViewModel];
+                var cache = Container().GetType<IDeploymentService>();
+                return View["packages.cshtml", new PackageListViewModel {Packages = cache.AvailablePackages()}];
             };
 
             Get["/packages/{packageId}"] = x =>

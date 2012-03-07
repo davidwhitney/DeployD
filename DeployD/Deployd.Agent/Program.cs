@@ -2,7 +2,6 @@
 using System.ServiceProcess;
 using Deployd.Agent.Conventions;
 using Deployd.Agent.Services.AgentConfiguration;
-using Deployd.Agent.Services.Deployment;
 using Deployd.Agent.Services.Management;
 using Deployd.Agent.Services.PackageDownloading;
 using Deployd.Core.Hosting;

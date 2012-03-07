@@ -2,7 +2,6 @@
 using System.Reflection;
 using System.ServiceModel;
 using System.ServiceModel.Web;
-using Deployd.Agent.WebUi;
 using Deployd.Agent.WebUi.Modules;
 using Deployd.Core.Hosting;
 using Nancy.Hosting.Wcf;
@@ -34,6 +33,5 @@ namespace Deployd.Agent.Services.Management
         {
             _host.Close();
         }
-
     }
 }

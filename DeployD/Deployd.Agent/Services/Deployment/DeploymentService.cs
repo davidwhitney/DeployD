@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using Deployd.Agent.Services.Deployment.Hooks;
+using Deployd.Agent.WebUi.Models;
 using Deployd.Core.Caching;
 using Deployd.Core.Hosting;
 using NuGet;
@@ -22,6 +23,28 @@ namespace Deployd.Agent.Services.Deployment
             _hooks = hooks;
             _packageCache = packageCache;
             _currentInstalledCache = currentInstalledCache;
+        }
+
+        public IList<LocalPackageInformation> AvailablePackages()
+        {
+            var packageDetails = new List<LocalPackageInformation>();
+            foreach (var packageId in _packageCache.AvailablePackages)
+            {
+                var packageViewModel = new LocalPackageInformation { PackageId = packageId };
+                var installed = _currentInstalledCache.GetCurrentInstalledVersion(packageId);
+                if (installed != null)
+                {
+                    packageViewModel.InstalledVersion = installed.Version.Version.ToString();
+                }
+                var latestAvailable = _packageCache.GetLatestVersion(packageId);
+                if (latestAvailable != null)
+                {
+                    packageViewModel.LatestAvailableVersion = latestAvailable.Version.Version.ToString();
+                }
+                packageDetails.Add(packageViewModel);
+            }
+
+            return packageDetails;
         }
 
         public void InstallPackage(string packageId)
