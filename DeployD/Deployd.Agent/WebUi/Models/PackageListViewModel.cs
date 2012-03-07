@@ -6,6 +6,11 @@ namespace Deployd.Agent.WebUi.Models
     public class PackageListViewModel
     {
         public List<PackageViewModel> Packages { get; set; }
+
+        public PackageListViewModel()
+        {
+            Packages = new List<PackageViewModel>();
+        }
     }
 
     public class PackageViewModel

@@ -33,7 +33,6 @@ namespace Deployd.Agent
                          {
                              _kernel.Get<AgentConfigurationService>(), 
                              _kernel.Get<PackageDownloadingService>(), 
-                             _kernel.Get<DeploymentService>(),
                              _kernel.Get<ManagementInterfaceHost>() 
                          },
                 installationSettings: (serviceInstaller, serviceProcessInstaller) =>

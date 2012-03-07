@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using Deployd.Agent.Services.Deployment.Hooks;
-using Deployd.Core.AgentConfiguration;
+using Deployd.Core.Caching;
 using Deployd.Core.Hosting;
 using NuGet;
 using log4net;
@@ -12,24 +12,26 @@ namespace Deployd.Agent.Services.Deployment
     public class DeploymentService : IDeploymentService
     {
         private readonly IEnumerable<IDeploymentHook> _hooks;
-        private readonly IAgentSettings _agentSettings;
+        private readonly INuGetPackageCache _packageCache;
+        private readonly ICurrentInstalledCache _currentInstalledCache;
         protected static readonly ILog Logger = LogManager.GetLogger("DeploymentService"); 
         public ApplicationContext AppContext { get; set; }
 
-        public DeploymentService(IEnumerable<IDeploymentHook> hooks, IAgentSettings agentSettings)
+        public DeploymentService(IEnumerable<IDeploymentHook> hooks, INuGetPackageCache packageCache, ICurrentInstalledCache currentInstalledCache)
         {
             _hooks = hooks;
-            _agentSettings = agentSettings;
+            _packageCache = packageCache;
+            _currentInstalledCache = currentInstalledCache;
         }
 
-        public void Start(string[] args)
+        public void InstallPackage(string packageId)
         {
-            Console.WriteLine("Started");
+            InstallPackage(packageId, () => _packageCache.GetLatestVersion(packageId));
         }
 
-        public void Stop()
+        public void InstallPackage(string packageId, string specificVersion)
         {
-            Console.WriteLine("Stopped");
+            InstallPackage(packageId, () => _packageCache.GetSpecificVersion(packageId, specificVersion));
         }
 
         public void Deploy(IPackage package)
@@ -59,6 +61,25 @@ namespace Deployd.Agent.Services.Deployment
             AfterDeploy(deploymentContext);
         }
         
+        public void InstallPackage(string packageId, Func<IPackage> selectionCriteria)
+        {
+            var package = selectionCriteria();
+            Deploy(package);
+            WriteInstallMarker(package);
+        }
+
+        private void WriteInstallMarker(IPackage package)
+        {
+            try
+            {
+                _currentInstalledCache.SetCurrentInstalledVersion(package);
+            }
+            catch (Exception ex)
+            {
+                Logger.Warn("Could not set current installed version", ex);
+            }
+        }
+
         protected virtual void BeforeDeploy(DeploymentContext context)
         {
             ForEachHook(context, "BeforeDeploy", hook => hook.BeforeDeploy(context));
