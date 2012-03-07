@@ -49,7 +49,7 @@ namespace Deployd.Agent.Services.Deployment
                 Logger.Fatal("Could not extract package", ex);
             }
 
-            string targetInstallationFolder = Path.Combine(@"d:\wwwcom", package.Title);
+            string targetInstallationFolder = Path.Combine(@"d:\wwwcom", package.Id);
             var deploymentContext = new DeploymentContext(package, outputPath, targetInstallationFolder);
             BeforeDeploy(deploymentContext);
 
@@ -65,6 +65,9 @@ namespace Deployd.Agent.Services.Deployment
                 if (hook.HookValidForPackage(context))
                 {
                     hook.AfterDeploy(context);
+                } else
+                {
+                    Logger.DebugFormat("Skipping AfterDeploy for {0}", hook.GetType());
                 }
             }
         }
@@ -77,6 +80,10 @@ namespace Deployd.Agent.Services.Deployment
                 {
                     hook.Deploy(context);
                 }
+                else
+                {
+                    Logger.DebugFormat("Skipping Deploy for {0}", hook.GetType());
+                }
             }
         }
 
@@ -87,6 +94,10 @@ namespace Deployd.Agent.Services.Deployment
                 if (hook.HookValidForPackage(context))
                 {
                     hook.BeforeDeploy(context);
+                }
+                else
+                {
+                    Logger.DebugFormat("Skipping BeforeDeploy for {0}", hook.GetType());
                 }
             }
 
