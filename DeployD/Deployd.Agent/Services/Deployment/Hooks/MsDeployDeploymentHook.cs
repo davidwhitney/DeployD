@@ -48,7 +48,7 @@ namespace Deployd.Agent.Services.Deployment.Hooks
                 "localhost",
                 Path.Combine(context.WorkingFolder, "Content\\" + context.Package.Id + ".zip"),
                 context.Package.Title,
-                Ignore.AppOffline().And().LogFiles());
+                Ignore.AppOffline().And().LogFiles().And().MaintenanceFile());
         }
 
         protected void DeployWebsite(string targetMachineName, string sourcePackagePath, string iisApplicationName, params string[] ignoreRegexPaths)
@@ -82,6 +82,10 @@ namespace Deployd.Agent.Services.Deployment.Hooks
         {
             return new[] {@".*\.log"};
         }
+        public static string[] MaintenanceFile()
+        {
+            return new[] {@".*\maintenance\.htm"};
+        }
     }
 
 
@@ -95,6 +99,11 @@ namespace Deployd.Agent.Services.Deployment.Hooks
         public static string[] LogFiles(this string[] chain)
         {
             return chain.Union(new[] { @".*\.log" }).ToArray();
+        }
+
+        public static string[] MaintenanceFile(this string[] chain)
+        {
+            return chain.Union(new[] {@".*\.log"}).ToArray();
         }
 
         public static string[] And(this string[] chain)
