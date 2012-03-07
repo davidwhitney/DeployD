@@ -11,7 +11,7 @@ namespace Deployd.Agent.Services.Deployment.Hooks
     public abstract class DeploymentHookBase : IDeploymentHook
     {
         protected readonly IAgentSettings AgentSettings;
-        private ILog _logger = LogManager.GetLogger("DefaultDeploymentHook");
+        protected ILog _logger = LogManager.GetLogger("DefaultDeploymentHook");
 
         protected DeploymentHookBase(IAgentSettings agentSettings)
         {

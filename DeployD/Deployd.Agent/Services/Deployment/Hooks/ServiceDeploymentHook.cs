@@ -2,13 +2,11 @@ using System.IO;
 using System.Linq;
 using System.ServiceProcess;
 using Deployd.Core.AgentConfiguration;
-using log4net;
 
 namespace Deployd.Agent.Services.Deployment.Hooks
 {
     public class ServiceDeploymentHook : DeploymentHookBase
     {
-        private ILog _log = LogManager.GetLogger("ServiceDeployment");
         public override bool HookValidForPackage(DeploymentContext context)
         {
             return context.Package.Tags.ToLower().Contains("service");
@@ -33,7 +31,7 @@ namespace Deployd.Agent.Services.Deployment.Hooks
                 if (service.Status.Equals(ServiceControllerStatus.Running)
                     || service.Status.Equals(ServiceControllerStatus.StartPending))
                 {
-                    _log.InfoFormat("Stopping service {0}", service.ServiceName);
+                    _logger.InfoFormat("Stopping service {0}", service.ServiceName);
                     service.Stop();
 
                     int waitCount = 10; // wait 10 retries
@@ -42,7 +40,7 @@ namespace Deployd.Agent.Services.Deployment.Hooks
                         System.Threading.Thread.Sleep(100);
                         service.Refresh();
                     }
-                    _log.InfoFormat("service is now {0}", service.Status);
+                    _logger.InfoFormat("service is now {0}", service.Status);
                 }
             }
         }
@@ -68,7 +66,7 @@ namespace Deployd.Agent.Services.Deployment.Hooks
                 {
                     string pathToExecutable = Path.Combine(context.TargetInstallationFolder,
                                                            context.Package.Id + ".exe");
-                    _log.InfoFormat("Installing service {0} from {1}", context.Package.Title, pathToExecutable);
+                    _logger.InfoFormat("Installing service {0} from {1}", context.Package.Title, pathToExecutable);
 
                     System.Configuration.Install.ManagedInstallerClass.InstallHelper(new[] {pathToExecutable});
                 }
@@ -78,16 +76,16 @@ namespace Deployd.Agent.Services.Deployment.Hooks
                 if (service.Status.Equals(ServiceControllerStatus.Stopped)
                     || service.Status.Equals(ServiceControllerStatus.StopPending))
                 {
-                    _log.InfoFormat("Starting service {0}", service.ServiceName);
+                    _logger.InfoFormat("Starting service {0}", service.ServiceName);
                     service.Start();
 
-                    int waitCount = 10; // wait 10 retries
+                    var waitCount = 10; // wait 10 retries
                     while(service.Status != ServiceControllerStatus.Running && --waitCount>0)
                     {
                         System.Threading.Thread.Sleep(100);
                         service.Refresh();
                     }
-                    _log.InfoFormat("service is now {0}", service.Status);
+                    _logger.InfoFormat("service is now {0}", service.Status);
                 }
             }
         }

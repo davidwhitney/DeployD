@@ -1,19 +1,14 @@
 using System;
-using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
-using System.Management.Automation;
 using System.Management.Automation.Runspaces;
 using System.Text;
 using Deployd.Core.AgentConfiguration;
-using log4net;
 
 namespace Deployd.Agent.Services.Deployment.Hooks
 {
     public class PowershellDeploymentHook : DeploymentHookBase
     {
-        private static ILog _logger = LogManager.GetLogger("PowershellScriptRunner");
-
         public PowershellDeploymentHook(IAgentSettings agentSettings) : base(agentSettings)
         {
         }
@@ -65,13 +60,13 @@ namespace Deployd.Agent.Services.Deployment.Hooks
 
 
             // create Powershell runspace
-            Runspace runspace = RunspaceFactory.CreateRunspace();
+            var runspace = RunspaceFactory.CreateRunspace();
 
             // open it
             runspace.Open();
 
             // create a popeline and feed it the script text
-            Pipeline pipeline = runspace.CreatePipeline();
+            var pipeline = runspace.CreatePipeline();
 
             // add our service management script
             pipeline.Commands.AddScript(serviceManagementScript);
@@ -84,14 +79,14 @@ namespace Deployd.Agent.Services.Deployment.Hooks
             pipeline.Commands.Add("Out-String");
 
             // execute the script 
-            Collection<PSObject> results = pipeline.Invoke();
+            var results = pipeline.Invoke();
 
             // close the runspace 
             runspace.Close();
 
             // convert the script result into a single string 
-            StringBuilder stringBuilder = new StringBuilder();
-            foreach (PSObject obj in results)
+            var stringBuilder = new StringBuilder();
+            foreach (var obj in results)
             {
                 stringBuilder.AppendLine(obj.ToString());
             }

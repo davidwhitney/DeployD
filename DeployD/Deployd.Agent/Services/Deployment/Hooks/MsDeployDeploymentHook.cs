@@ -1,32 +1,29 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
 using Deployd.Core.AgentConfiguration;
-using log4net;
 
 namespace Deployd.Agent.Services.Deployment.Hooks
 {
     public class MsDeployDeploymentHook : DeploymentHookBase
     {
-        private ILog _logger = LogManager.GetLogger("DefaultDeploymentHook");
         protected string MsWebDeployPath = string.Empty;
 
-        private string[] _knownMsWebDeployPaths = new[]
-                                                      {
-                                                          Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles), @"IIS\Microsoft Web Deploy\msdeploy.exe"),
-                                                          Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86), @"IIS\Microsoft Web Deploy\msdeploy.exe"),
-                                                          Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles), @"IIS\Microsoft Web Deploy V2\msdeploy.exe"),
-                                                          Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86), @"IIS\Microsoft Web Deploy V2\msdeploy.exe"),
-                                                      };
+        private readonly string[] _knownMsWebDeployPaths = new[]
+        {
+            Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles), @"IIS\Microsoft Web Deploy\msdeploy.exe"),
+            Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86), @"IIS\Microsoft Web Deploy\msdeploy.exe"),
+            Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles), @"IIS\Microsoft Web Deploy V2\msdeploy.exe"),
+            Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86), @"IIS\Microsoft Web Deploy V2\msdeploy.exe")
+        };
 
         public MsDeployDeploymentHook(IAgentSettings agentSettings) : base(agentSettings)
         {
-            if (_knownMsWebDeployPaths.Any(p => File.Exists(p)))
+            if (_knownMsWebDeployPaths.Any(File.Exists))
             {
-                MsWebDeployPath = _knownMsWebDeployPaths.Last(p => File.Exists(p));
-            } else
+                MsWebDeployPath = _knownMsWebDeployPaths.Last(File.Exists);
+            } 
+            else
             {
                 if (string.IsNullOrEmpty(MsWebDeployPath))
                 {
@@ -59,8 +56,7 @@ namespace Deployd.Agent.Services.Deployment.Hooks
                 ignore = " -skip:objectName=filePath,absolutePath=" + ignore;
             }
 
-            string msDeployArgsFormat =
-               @"-verb:sync -source:package=""{0}"" -dest:auto,computername=""http://{1}:8090/MsDeployAgentService2/"" {3} -allowUntrusted -setParam:""IIS Web Application Name""=""{2}"" -verbose";
+            const string msDeployArgsFormat = @"-verb:sync -source:package=""{0}"" -dest:auto,computername=""http://{1}:8090/MsDeployAgentService2/"" {3} -allowUntrusted -setParam:""IIS Web Application Name""=""{2}"" -verbose";
             string executableArgs = string.Format(msDeployArgsFormat,
                                                 sourcePackagePath,
                                                 targetMachineName,

@@ -1,19 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
+﻿using System.IO;
+using System.IO.Abstractions;
 using System.Linq;
-using System.Text;
 using Deployd.Core.AgentConfiguration;
-using log4net;
 
 namespace Deployd.Agent.Services.Deployment.Hooks
 {
     public class AppOfflineDeploymentHook : DeploymentHookBase
     {
-        private ILog _logger = LogManager.GetLogger("WebsiteDeploymentHook");
-        public AppOfflineDeploymentHook(IAgentSettings agentSettings) : base(agentSettings)
+        private readonly IFileSystem _fileSystem;
+
+        public AppOfflineDeploymentHook(IFileSystem fileSystem, IAgentSettings agentSettings) : base(agentSettings)
         {
+            _fileSystem = fileSystem;
         }
 
         public override bool HookValidForPackage(DeploymentContext context)
@@ -41,14 +39,14 @@ namespace Deployd.Agent.Services.Deployment.Hooks
             }
 
             _logger.Info("Copying app_offline.htm to destination");
-            if (!Directory.Exists(Path.GetDirectoryName(destinationFilePath)))
+            if (!_fileSystem.Directory.Exists(Path.GetDirectoryName(destinationFilePath)))
             {
-                Directory.CreateDirectory(Path.GetDirectoryName(destinationFilePath));
+                _fileSystem.Directory.CreateDirectory(Path.GetDirectoryName(destinationFilePath));
             }
 
-            if (!File.Exists(destinationFilePath))
+            if (!_fileSystem.File.Exists(destinationFilePath))
             {
-                File.Copy(tempFilePath, destinationFilePath);
+                _fileSystem.File.Copy(tempFilePath, destinationFilePath);
             }
 
             // wait for the app to unload
@@ -60,10 +58,11 @@ namespace Deployd.Agent.Services.Deployment.Hooks
         {
             // delete the app_offline.htm file
             _logger.Info("Removing app_offline.htm to destination");
-            string appOfflineFilePath = Path.Combine(context.TargetInstallationFolder, "app_offline.htm");
-            if (File.Exists(appOfflineFilePath))
+            var appOfflineFilePath = Path.Combine(context.TargetInstallationFolder, "app_offline.htm");
+            
+            if (_fileSystem.File.Exists(appOfflineFilePath))
             {
-                File.Delete(appOfflineFilePath);
+                _fileSystem.File.Delete(appOfflineFilePath);
             }
         }
     }
