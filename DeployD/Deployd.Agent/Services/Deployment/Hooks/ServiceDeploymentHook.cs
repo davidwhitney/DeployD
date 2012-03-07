@@ -31,7 +31,7 @@ namespace Deployd.Agent.Services.Deployment.Hooks
                 if (service.Status.Equals(ServiceControllerStatus.Running)
                     || service.Status.Equals(ServiceControllerStatus.StartPending))
                 {
-                    _logger.InfoFormat("Stopping service {0}", service.ServiceName);
+                    Logger.InfoFormat("Stopping service {0}", service.ServiceName);
                     service.Stop();
 
                     int waitCount = 10; // wait 10 retries
@@ -40,7 +40,7 @@ namespace Deployd.Agent.Services.Deployment.Hooks
                         System.Threading.Thread.Sleep(100);
                         service.Refresh();
                     }
-                    _logger.InfoFormat("service is now {0}", service.Status);
+                    Logger.InfoFormat("service is now {0}", service.Status);
                 }
             }
         }
@@ -66,7 +66,7 @@ namespace Deployd.Agent.Services.Deployment.Hooks
                 {
                     string pathToExecutable = Path.Combine(context.TargetInstallationFolder,
                                                            context.Package.Id + ".exe");
-                    _logger.InfoFormat("Installing service {0} from {1}", context.Package.Title, pathToExecutable);
+                    Logger.InfoFormat("Installing service {0} from {1}", context.Package.Title, pathToExecutable);
 
                     System.Configuration.Install.ManagedInstallerClass.InstallHelper(new[] {pathToExecutable});
                 }
@@ -76,7 +76,7 @@ namespace Deployd.Agent.Services.Deployment.Hooks
                 if (service.Status.Equals(ServiceControllerStatus.Stopped)
                     || service.Status.Equals(ServiceControllerStatus.StopPending))
                 {
-                    _logger.InfoFormat("Starting service {0}", service.ServiceName);
+                    Logger.InfoFormat("Starting service {0}", service.ServiceName);
                     service.Start();
 
                     var waitCount = 10; // wait 10 retries
@@ -85,7 +85,7 @@ namespace Deployd.Agent.Services.Deployment.Hooks
                         System.Threading.Thread.Sleep(100);
                         service.Refresh();
                     }
-                    _logger.InfoFormat("service is now {0}", service.Status);
+                    Logger.InfoFormat("service is now {0}", service.Status);
                 }
             }
         }

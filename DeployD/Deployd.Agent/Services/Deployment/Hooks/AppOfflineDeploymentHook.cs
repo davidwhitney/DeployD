@@ -8,6 +8,8 @@ namespace Deployd.Agent.Services.Deployment.Hooks
     public class AppOfflineDeploymentHook : DeploymentHookBase
     {
         private readonly IFileSystem _fileSystem;
+        private const string APP_ONLINE_FILE = "app_online.htm";
+        private const string APP_OFFLINE_FILE = "app_offline.htm";
 
         public AppOfflineDeploymentHook(IFileSystem fileSystem, IAgentSettings agentSettings) : base(agentSettings)
         {
@@ -22,23 +24,23 @@ namespace Deployd.Agent.Services.Deployment.Hooks
         public override void BeforeDeploy(DeploymentContext context)
         {
             // find an app_online.htm file in the package
-            var appOnline = context.Package.GetFiles().SingleOrDefault(f => f.Path.EndsWith("app_online.htm"));
+            var appOnline = context.Package.GetFiles().SingleOrDefault(f => f.Path.EndsWith(APP_ONLINE_FILE));
 
-            if (appOnline==null)
+            if (appOnline == null)
             {
                 return;
             }
 
-            string tempFilePath = Path.Combine(context.WorkingFolder, appOnline.Path);
-            string destinationFilePath = Path.Combine(context.TargetInstallationFolder, "app_offline.htm");
+            var tempFilePath = Path.Combine(context.WorkingFolder, appOnline.Path);
+            var destinationFilePath = Path.Combine(context.TargetInstallationFolder, APP_OFFLINE_FILE);
 
-            // copy the app_online file to app_offline.htm in target folder
             if (!File.Exists(tempFilePath))
             {
                 return;
             }
 
-            _logger.Info("Copying app_offline.htm to destination");
+            Logger.Info("Copying app_offline.htm to destination");
+            
             if (!_fileSystem.Directory.Exists(Path.GetDirectoryName(destinationFilePath)))
             {
                 _fileSystem.Directory.CreateDirectory(Path.GetDirectoryName(destinationFilePath));
@@ -49,16 +51,19 @@ namespace Deployd.Agent.Services.Deployment.Hooks
                 _fileSystem.File.Copy(tempFilePath, destinationFilePath);
             }
 
-            // wait for the app to unload
+            WaitForAppToUnload();
+        }
+
+        private static void WaitForAppToUnload()
+        {
             System.Threading.Thread.Sleep(1000);
         }
 
-
         public override void AfterDeploy(DeploymentContext context)
         {
-            // delete the app_offline.htm file
-            _logger.Info("Removing app_offline.htm to destination");
-            var appOfflineFilePath = Path.Combine(context.TargetInstallationFolder, "app_offline.htm");
+            Logger.Info("Removing app_offline.htm to destination");
+
+            var appOfflineFilePath = Path.Combine(context.TargetInstallationFolder, APP_OFFLINE_FILE);
             
             if (_fileSystem.File.Exists(appOfflineFilePath))
             {

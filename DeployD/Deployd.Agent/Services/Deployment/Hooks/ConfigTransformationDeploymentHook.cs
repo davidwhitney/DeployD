@@ -67,12 +67,12 @@ namespace Deployd.Agent.Services.Deployment.Hooks
                 var transformFilePath = Path.Combine(context.WorkingFolder, Path.Combine(Path.GetDirectoryName(configFile.Path), expectedTransformFileName));
                 var outputPath = Path.Combine(context.TargetInstallationFolder, configFile.Path);
 
-                _logger.DebugFormat("looking for {0}", transformFilePath);
+                Logger.DebugFormat("looking for {0}", transformFilePath);
                 
                 if (File.Exists(transformFilePath))
                 {
                     // todo: perform transform here
-                    _logger.InfoFormat(@"Transform ""{0}"" using ""{1}"" to ""{2}""", baseConfigurationPath, transformFilePath, outputPath);
+                    Logger.InfoFormat(@"Transform ""{0}"" using ""{1}"" to ""{2}""", baseConfigurationPath, transformFilePath, outputPath);
                     var transformArgs = string.Format(@"--source=""{0}"" --transform=""{1}"" --destination=""{2}""", 
                         baseConfigurationPath,
                         transformFilePath,
@@ -81,7 +81,7 @@ namespace Deployd.Agent.Services.Deployment.Hooks
                 } 
                 else
                 {
-                    _logger.DebugFormat("No transform found for {0}", baseConfigurationPath);
+                    Logger.DebugFormat("No transform found for {0}", baseConfigurationPath);
                 }
             }
         }

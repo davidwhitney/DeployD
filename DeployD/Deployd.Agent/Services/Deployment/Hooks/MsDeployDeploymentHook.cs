@@ -27,7 +27,7 @@ namespace Deployd.Agent.Services.Deployment.Hooks
             {
                 if (string.IsNullOrEmpty(MsWebDeployPath))
                 {
-                    _logger.Fatal("Web Deploy could not be located. Ensure that Microsoft Web Deploy has been installed. Locations searched: " +
+                    Logger.Fatal("Web Deploy could not be located. Ensure that Microsoft Web Deploy has been installed. Locations searched: " +
                     string.Join("\r\n", _knownMsWebDeployPaths));
                 }
             }

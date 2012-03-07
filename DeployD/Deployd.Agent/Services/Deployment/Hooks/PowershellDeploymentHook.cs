@@ -39,7 +39,7 @@ namespace Deployd.Agent.Services.Deployment.Hooks
             if (file == null)
                 return false;
 
-            _logger.DebugFormat("Found script {0}, executing...", scriptPath);
+            Logger.DebugFormat("Found script {0}, executing...", scriptPath);
 
             try
             {
@@ -47,7 +47,7 @@ namespace Deployd.Agent.Services.Deployment.Hooks
                 
             } catch (Exception ex)
             {
-                _logger.Fatal("Failed executing powershell script " + file.Path, ex);
+                Logger.Fatal("Failed executing powershell script " + file.Path, ex);
             }
             return true;
         }
@@ -93,7 +93,7 @@ namespace Deployd.Agent.Services.Deployment.Hooks
 
             // return the results of the script that has 
             // now been converted to text 
-            _logger.Info(stringBuilder.ToString());
+            Logger.Info(stringBuilder.ToString());
 
         }
     }
