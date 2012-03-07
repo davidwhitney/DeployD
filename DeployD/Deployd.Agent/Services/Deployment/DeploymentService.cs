@@ -40,67 +40,53 @@ namespace Deployd.Agent.Services.Deployment
                 Logger.DebugFormat("package supports {0}", framework.FullName);
             }
 
-            string outputPath = @"d:\temp\" + package.GetFullName();
+            var outputPath = @"d:\temp\" + package.GetFullName();
+            
             try
             {
                 new PackageExtractor().Extract(package, outputPath);
-            } catch (Exception ex)
+            } 
+            catch (Exception ex)
             {
                 Logger.Fatal("Could not extract package", ex);
             }
 
-            string targetInstallationFolder = Path.Combine(@"d:\wwwcom", package.Id);
+            var targetInstallationFolder = Path.Combine(@"d:\wwwcom", package.Id);
             var deploymentContext = new DeploymentContext(package, outputPath, targetInstallationFolder);
+            
             BeforeDeploy(deploymentContext);
-
             PerformDeploy(deploymentContext);
-
             AfterDeploy(deploymentContext);
+        }
+        
+        protected virtual void BeforeDeploy(DeploymentContext context)
+        {
+            ForEachHook(context, "BeforeDeploy", hook => hook.BeforeDeploy(context));
         }
 
         protected virtual void AfterDeploy(DeploymentContext context)
         {
-            foreach(var hook in _hooks)
-            {
-                if (hook.HookValidForPackage(context))
-                {
-                    hook.AfterDeploy(context);
-                } else
-                {
-                    Logger.DebugFormat("Skipping AfterDeploy for {0}", hook.GetType());
-                }
-            }
+            ForEachHook(context, "AfterDeploy", hook => hook.AfterDeploy(context));
         }
 
         protected virtual void PerformDeploy(DeploymentContext context)
         {
-            foreach (var hook in _hooks)
-            {
-                if (hook.HookValidForPackage(context))
-                {
-                    hook.Deploy(context);
-                }
-                else
-                {
-                    Logger.DebugFormat("Skipping Deploy for {0}", hook.GetType());
-                }
-            }
+            ForEachHook(context, "PerformDepoy", hook => hook.Deploy(context));
         }
-
-        protected virtual void BeforeDeploy(DeploymentContext context)
+        
+        private void ForEachHook(DeploymentContext context, string comment, Action<IDeploymentHook> action)
         {
             foreach (var hook in _hooks)
             {
                 if (hook.HookValidForPackage(context))
                 {
-                    hook.BeforeDeploy(context);
+                    action(hook);
                 }
                 else
                 {
-                    Logger.DebugFormat("Skipping BeforeDeploy for {0}", hook.GetType());
+                    Logger.DebugFormat("Skipping {0} for {1}", comment, hook.GetType());
                 }
             }
-
         }
     }
 }
