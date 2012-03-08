@@ -1,6 +1,7 @@
 using System;
 using System.Diagnostics;
 using System.IO;
+using System.IO.Abstractions;
 using System.Linq;
 using Deployd.Core.AgentConfiguration;
 using log4net;
@@ -13,11 +14,13 @@ namespace Deployd.Agent.Services.Deployment.Hooks
     public abstract class DeploymentHookBase : IDeploymentHook
     {
         protected readonly IAgentSettings AgentSettings;
+        private readonly IFileSystem _fileSystem;
         protected ILog Logger = LogManager.GetLogger("DefaultDeploymentHook");
 
-        protected DeploymentHookBase(IAgentSettings agentSettings)
+        protected DeploymentHookBase(IAgentSettings agentSettings, IFileSystem fileSystem)
         {
             AgentSettings = agentSettings;
+            _fileSystem = fileSystem;
         }
 
         public abstract bool HookValidForPackage(DeploymentContext context);
@@ -47,28 +50,9 @@ namespace Deployd.Agent.Services.Deployment.Hooks
             // wait 1 second for processes to release locks on destination files
             System.Threading.Thread.Sleep(1000);
 
-            int retryCount = 10;
-            bool cleaned = false;
-
-            while (!cleaned && retryCount-- > 0)
-            {
-                try
-                {
-                    Directory.Delete(context.TargetInstallationFolder, true);
-                    cleaned = true;
-                }
-                catch (Exception ex)
-                {
-                    if (retryCount == 0)
-                    {
-                        Logger.Fatal("Failed to clean destination");
-                        throw;
-                    }
-                    Logger.Warn("Could not clean destination", ex);
-                    Logger.WarnFormat("Will retry {0} more times", retryCount);
-                    System.Threading.Thread.Sleep(1000);
-                }
-            }
+            new TryThis(() => _fileSystem.Directory.Delete(context.TargetInstallationFolder, true))
+                .UpTo(10).Times
+                .Go();
         }
 
         private void RecursiveCopy(DirectoryInfo from, string to)
@@ -91,16 +75,10 @@ namespace Deployd.Agent.Services.Deployment.Hooks
                 var destinationFile = Path.Combine(to, files[fileIndex].Name);
                 Logger.InfoFormat("Copying {0}", destinationFile);
 
-                try
-                {
-                    files[fileIndex].CopyTo(destinationFile, true);
-                }
-                catch (IOException exception)
-                {
-                    Logger.Warn("Copy failed", exception);
-                    System.Threading.Thread.Sleep(5000);
-                    fileIndex--;
-                }
+                var index = fileIndex;
+                new TryThis(() => files[index].CopyTo(destinationFile, true))
+                    .UpTo(10).Times
+                    .Go();
             }
         }
 
