@@ -46,6 +46,11 @@ namespace Deployd.Agent.Services.PackageDownloading
             var packages = _agentConfigurationManager.GetWatchedPackages(_settings.DeploymentEnvironment);
             foreach (var latestPackageOfType in packages.Select(packageId => AllPackagesQuery.GetLatestPackage(packageId)))
             {
+                if (latestPackageOfType == null)
+                {
+                    continue;
+                }
+
                 AgentCache.Add(latestPackageOfType);
             }
         }

@@ -72,6 +72,8 @@ namespace Deployd.Core.Caching
             _fileSystem.EnsureDirectoryExists(packageCache);
 
             var packagePath = Path.Combine(packageCache, CachedPackageVersionFilename(package.Id, package.Version.ToString()));
+            
+            Logger.DebugFormat("Evaluating packageId: '{0}' - ver '{1}', cached item already exists.", package.Id, package.Version);
 
             if (File.Exists(packagePath))
             {
@@ -79,6 +81,7 @@ namespace Deployd.Core.Caching
                 return;
             }
 
+            Logger.InfoFormat("Downloading {0} to {1}.", package.Id, package);
             File.WriteAllBytes(packagePath, package.GetStream().ReadAllBytes());
             Logger.InfoFormat("Cached {0} to {1}.", package.Id, package);
         }

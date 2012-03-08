@@ -18,9 +18,11 @@ namespace Deployd.Core.Queries
             Logger.InfoFormat("Nuget feed: {0}", feedLocation.Source);
         }
 
-        public IList<IPackage> GetLatestPackage(string packageId)
+        public IPackage GetLatestPackage(string packageId)
         {
-            return _packageRepository.GetPackages().Where(x => x.Id == packageId && x.IsLatestVersion).ToList();
+            var all = _packageRepository.GetPackages().Where(x => x.Id == packageId && x.IsLatestVersion).ToList();
+            all.Reverse();
+            return all.FirstOrDefault();
         }
     }
 }

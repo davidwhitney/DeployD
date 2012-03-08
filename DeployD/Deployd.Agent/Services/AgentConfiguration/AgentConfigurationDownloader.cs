@@ -23,7 +23,7 @@ namespace Deployd.Agent.Services.AgentConfiguration
 
         public void DownloadAgentConfiguration()
         {
-            var configPackage = _packageQuery.GetLatestPackage(DEPLOYD_CONFIGURATION_PACKAGE_NAME).FirstOrDefault();
+            var configPackage = _packageQuery.GetLatestPackage(DEPLOYD_CONFIGURATION_PACKAGE_NAME);
 
             if (configPackage == null)
             {

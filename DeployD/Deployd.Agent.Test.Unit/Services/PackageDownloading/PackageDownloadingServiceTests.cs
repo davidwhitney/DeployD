@@ -35,7 +35,7 @@ namespace Deployd.Agent.Test.Unit.Services.PackageDownloading
         [Test]
         public void LocallyCachePackages_CallsPackageRepoForPackageList()
         {
-            var items = new List<IPackage>();
+            IPackage items = null;
             _packageRepoMock.Setup(x => x.GetLatestPackage(PACKAGE_ID)).Returns(items);
 
             _pds.FetchPackages();
@@ -46,7 +46,7 @@ namespace Deployd.Agent.Test.Unit.Services.PackageDownloading
         [Test]
         public void Start_WhenInvoked_UsesTimerToCallDownloadConfiguration()
         {
-            var items = new List<IPackage>();
+            IPackage items = null;
             _packageRepoMock.Setup(x => x.GetLatestPackage(PACKAGE_ID)).Returns(items);
 
             _pds.Start(new string[0]);
