@@ -10,7 +10,7 @@ namespace Deployd.Agent.Services.Deployment.Hooks
 
     public interface ISayTimes
     {
-        ITryThisNow Times { get; };
+        ITryThisNow Times { get; }
     }
 
     public class TryThis : ITryThisNow, ISayTimes
