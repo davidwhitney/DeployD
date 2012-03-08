@@ -30,6 +30,11 @@ namespace Deployd.Agent.Services.Deployment.Hooks
             // this is where file copy will occur
             var sourceFolder = new DirectoryInfo(Path.Combine(context.WorkingFolder, "content"));
 
+			if (!Directory.Exists(context.TargetInstallationFolder))
+			{
+				Directory.CreateDirectory(context.TargetInstallationFolder);
+			}
+			
             CleanDestinationFolder(context);
 
             try
