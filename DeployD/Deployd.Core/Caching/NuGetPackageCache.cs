@@ -108,18 +108,19 @@ namespace Deployd.Core.Caching
         {
             var versions = AvailablePackageVersions(packageId);
             
-            List<IPackage> foundPackages = new List<IPackage>();
+            var foundPackages = new List<IPackage>();
             foreach(var version in versions)
             {
-                string packageFilename = CachedPackageVersionFilename(packageId, version);
-                string packagePath = Path.Combine(PackageCacheLocation(packageId), packageFilename);
+                var packageFilename = CachedPackageVersionFilename(packageId, version);
+                var packagePath = Path.Combine(PackageCacheLocation(packageId), packageFilename);
+                
                 if (File.Exists(packagePath))
                 {
                     foundPackages.Add(new ZipPackage(packagePath));
                 }
             }
 
-            return foundPackages.OrderByDescending(p => p.Version).First();
+            return foundPackages.OrderByDescending(p => p.Version).FirstOrDefault();
         }
 
         public IPackage GetSpecificVersion(string packageId, string version)
