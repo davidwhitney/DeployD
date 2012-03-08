@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.IO.Abstractions;
 using System.Linq;
 using System.ServiceProcess;
 using Deployd.Core.AgentConfiguration;
@@ -13,7 +14,8 @@ namespace Deployd.Agent.Services.Deployment.Hooks
             return context.Package.Tags.ToLower().Contains("service");
         }
 
-        public ServiceDeploymentHook(IAgentSettings agentSettings) : base(agentSettings)
+        public ServiceDeploymentHook(IFileSystem fileSystem, IAgentSettings agentSettings)
+            : base(agentSettings, fileSystem)
         {
         }
 

@@ -12,7 +12,7 @@ namespace Deployd.Agent.Services.Deployment.Hooks
     {
         private readonly IFileSystem _fileSystem;
 
-        public PowershellDeploymentHook(IAgentSettings agentSettings, IFileSystem fileSystem) : base(agentSettings)
+        public PowershellDeploymentHook(IAgentSettings agentSettings, IFileSystem fileSystem) : base(agentSettings, fileSystem)
         {
             _fileSystem = fileSystem;
         }

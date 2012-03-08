@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.IO.Abstractions;
 using System.Linq;
 using Deployd.Core.AgentConfiguration;
 
@@ -8,7 +9,7 @@ namespace Deployd.Agent.Services.Deployment.Hooks
 {
     public class ConfigTransformationDeploymentHook : DeploymentHookBase
     {
-        public ConfigTransformationDeploymentHook(IAgentSettings agentSettings) : base(agentSettings)
+        public ConfigTransformationDeploymentHook(IFileSystem fileSystem, IAgentSettings agentSettings) : base(agentSettings, fileSystem)
         {
         }
 

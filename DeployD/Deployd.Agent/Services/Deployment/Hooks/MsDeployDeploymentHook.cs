@@ -19,7 +19,7 @@ namespace Deployd.Agent.Services.Deployment.Hooks
             Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86), @"IIS\Microsoft Web Deploy V2\msdeploy.exe")
         };
 
-        public MsDeployDeploymentHook(IAgentSettings agentSettings, IFileSystem fileSystem) : base(agentSettings)
+        public MsDeployDeploymentHook(IAgentSettings agentSettings, IFileSystem fileSystem) : base(agentSettings, fileSystem)
         {
             _fileSystem = fileSystem;
             if (_knownMsWebDeployPaths.Any(_fileSystem.File.Exists))
