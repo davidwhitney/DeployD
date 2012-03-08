@@ -110,6 +110,7 @@
     <Compile Include="Services\Deployment\Hooks\PowershellDeploymentHook.cs" />
     <Compile Include="Services\Deployment\Hooks\ServiceDeploymentHook.cs" />
     <Compile Include="Services\Deployment\Hooks\AppOfflineDeploymentHook.cs" />
+    <Compile Include="Services\Deployment\Hooks\TryThis.cs" />
     <Compile Include="Services\Deployment\IDeploymentService.cs" />
     <Compile Include="Services\Deployment\PackageExtractor.cs" />
     <Compile Include="Services\Management\ManagementInterfaceHost.cs" />
