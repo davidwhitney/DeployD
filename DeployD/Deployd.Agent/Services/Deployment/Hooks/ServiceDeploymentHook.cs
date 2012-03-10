@@ -52,7 +52,7 @@ namespace Deployd.Agent.Services.Deployment.Hooks
             if (!EnvironmentIsValidForPackage(context)) return;
 
             // services are installed in a '\services' subfolder
-            context.TargetInstallationFolder = Path.Combine(@"d:\wwwcom\services", context.Package.Title);
+            context.TargetInstallationFolder = Path.Combine(@"d:\wwwcom\services", context.Package.Id);
             
             CopyAllFilesToDestination(context);
         }
@@ -62,12 +62,12 @@ namespace Deployd.Agent.Services.Deployment.Hooks
             if (!EnvironmentIsValidForPackage(context)) return;
 
             // if no such service then install it
-            using (var service = ServiceController.GetServices().SingleOrDefault(s => s.ServiceName == context.Package.Title))
+            using (var service = ServiceController.GetServices().SingleOrDefault(s => s.ServiceName == context.Package.Id))
             {
                 if (service == null)
                 {
                     string pathToExecutable = Path.Combine(context.TargetInstallationFolder,
-                                                           context.Package.Title + ".exe");
+                                                           context.Package.Id + ".exe");
                     _log.InfoFormat("Installing service {0} from {1}", context.Package.Title, pathToExecutable);
 
                     System.Configuration.Install.ManagedInstallerClass.InstallHelper(new[] {pathToExecutable});

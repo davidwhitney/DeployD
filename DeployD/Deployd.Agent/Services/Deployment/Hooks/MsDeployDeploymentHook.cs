@@ -11,6 +11,7 @@ namespace Deployd.Agent.Services.Deployment.Hooks
     public class MsDeployDeploymentHook : DeploymentHookBase
     {
         private ILog _logger = LogManager.GetLogger("DefaultDeploymentHook");
+        protected string MsWebDeployPath = string.Empty;
 
         private string[] _knownMsWebDeployPaths = new[]
                                                       {
@@ -22,35 +23,93 @@ namespace Deployd.Agent.Services.Deployment.Hooks
 
         public MsDeployDeploymentHook(IAgentSettings agentSettings) : base(agentSettings)
         {
+            if (_knownMsWebDeployPaths.Any(p => File.Exists(p)))
+            {
+                MsWebDeployPath = _knownMsWebDeployPaths.Last(p => File.Exists(p));
+            } else
+            {
+                if (string.IsNullOrEmpty(MsWebDeployPath))
+                {
+                    _logger.Fatal("Web Deploy could not be located. Ensure that Microsoft Web Deploy has been installed. Locations searched: " +
+                    string.Join("\r\n", _knownMsWebDeployPaths));
+                }
+            }
         }
 
         public override bool HookValidForPackage(DeploymentContext context)
         {
-            return context.Package.Tags.ToLower().Split(' ', ',', ';').Contains("website");
+            return context.Package.Tags.ToLower().Split(' ', ',', ';').Contains("website")
+                && !string.IsNullOrEmpty(MsWebDeployPath);
         }
 
         public override void Deploy(DeploymentContext context)
         {
-            if (!_knownMsWebDeployPaths.Any(p => File.Exists(p)))
-            {
-                _logger.Fatal("Web Deploy could not be located. Ensure that Microsoft Web Deploy has been installed. Locations searched: " +
-                string.Join("\r\n", _knownMsWebDeployPaths));
+            DeployWebsite(
+                "localhost",
+                Path.Combine(context.WorkingFolder, "Content\\" + context.Package.Id + ".zip"),
+                context.Package.Title,
+                Ignore.AppOffline().And().LogFiles().And().MaintenanceFile());
+        }
 
-                return;
+        protected void DeployWebsite(string targetMachineName, string sourcePackagePath, string iisApplicationName, params string[] ignoreRegexPaths)
+        {
+            string ignore = string.Join(" -skip:objectName=filePath,absolutePath=", ignoreRegexPaths);
+            if (ignoreRegexPaths.Length > 0)
+            {
+                ignore = " -skip:objectName=filePath,absolutePath=" + ignore;
             }
 
-            _logger.Info("Execute msdeploy here");
-
             string msDeployArgsFormat =
-                @"-verb:sync -source:package=""{0}"" -dest:auto,computername=""http://localhost:8090/MsDeployAgentService2/"" -skip:objectName=filePath,absolutePath=.*app_offline\.htm -skip:objectName=filePath,absolutePath=.*\.log -allowUntrusted -setParam:""IIS Web Application Name""=""{1}"" -verbose";
+               @"-verb:sync -source:package=""{0}"" -dest:auto,computername=""http://{1}:8090/MsDeployAgentService2/"" {3} -allowUntrusted -setParam:""IIS Web Application Name""=""{2}"" -verbose";
             string executableArgs = string.Format(msDeployArgsFormat,
-                                                Path.Combine(context.WorkingFolder, "Content\\" + context.Package.Title + ".zip"),
-                                                context.Package.Title);
+                                                sourcePackagePath,
+                                                targetMachineName,
+                                                iisApplicationName,
+                                                ignore);
 
-            string executablePath = _knownMsWebDeployPaths
-                .Last(p => File.Exists(p));
-
-            RunProcess(executablePath, executableArgs);
+            RunProcess(MsWebDeployPath, executableArgs);
+           
         }
+    }
+
+    public class Ignore
+    {
+        public static string[] AppOffline()
+        {
+            return new[] {@".*app_offline\.htm"};
+        }
+        public static string[] LogFiles()
+        {
+            return new[] {@".*\.log"};
+        }
+        public static string[] MaintenanceFile()
+        {
+            return new[] {@".*\maintenance\.htm"};
+        }
+    }
+
+
+    public static class IgnoreExtensions
+    {
+        public static string[] AppOffline(this string[] chain)
+        {
+            return chain.Union(new[] {@".*app_offline\.htm"}).ToArray();
+        }
+
+        public static string[] LogFiles(this string[] chain)
+        {
+            return chain.Union(new[] { @".*\.log" }).ToArray();
+        }
+
+        public static string[] MaintenanceFile(this string[] chain)
+        {
+            return chain.Union(new[] {@".*\.log"}).ToArray();
+        }
+
+        public static string[] And(this string[] chain)
+        {
+            return chain;
+        }
+
     }
 }

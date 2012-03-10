@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using NuGet;
+using log4net;
 
 namespace Deployd.Core.Queries
 {
@@ -8,11 +9,13 @@ namespace Deployd.Core.Queries
     {
         private readonly IPackageRepositoryFactory _packageRepositoryFactory;
         private readonly IPackageRepository _packageRepository;
+        private ILog Logger = LogManager.GetLogger("RetrievePackageQuery");
 
         public RetrievePackageQuery(IPackageRepositoryFactory packageRepositoryFactory, FeedLocation feedLocation)
         {
             _packageRepositoryFactory = packageRepositoryFactory;
             _packageRepository = _packageRepositoryFactory.CreateRepository(feedLocation.Source);
+            Logger.InfoFormat("Nuget feed: {0}", feedLocation.Source);
         }
 
         public IList<IPackage> GetLatestPackage(string packageId)
