@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -41,36 +42,50 @@ namespace Deployd.Agent.Services.InstallationService
 
         public void CheckForNewInstallations()
         {
+            var alreadyRunning = new List<InstallationTask>();
+
             while (PendingInstalls.Count > 0)
             {
                 var nextPendingInstall = PendingInstalls.Dequeue();
-                RunningInstalls.Add(nextPendingInstall);
                 
-                nextPendingInstall.Task = new Task<InstallationResult>(() =>
+                if (InstallationIsAlreadyRunningFor(nextPendingInstall.PackageId, nextPendingInstall.Version))
                 {
-                    Logger.Info("Task started.");
-
-                    if (string.IsNullOrWhiteSpace(nextPendingInstall.Version))
-                    {
-                        _deploymentService.InstallPackage(nextPendingInstall.PackageId,
-                                                          Guid.NewGuid().ToString(), new CancellationTokenSource(),
-                                                          progressReport => nextPendingInstall.ProgressReports.Add(progressReport));
-
-                    }
-                    else
-                    {
-                        _deploymentService.InstallPackage(nextPendingInstall.PackageId, nextPendingInstall.Version,
-                                                          Guid.NewGuid().ToString(), new CancellationTokenSource(),
-                                                          progressReport => nextPendingInstall.ProgressReports.Add(progressReport));
-                    }
-
-                    return new InstallationResult();
-                });
-
-                nextPendingInstall.Task.ContinueWith(RemoveFromRunningInstallationList);
-
-                nextPendingInstall.Task.Start();
+                    alreadyRunning.Add(nextPendingInstall);
+                    continue;
+                }
+                
+                RunningInstalls.Add(nextPendingInstall);
+                StartInstall(nextPendingInstall);
             }
+
+            ReQueueSkippedInstalls(alreadyRunning);
+        }
+
+        private void ReQueueSkippedInstalls(IEnumerable<InstallationTask> alreadyRunning)
+        {
+            foreach (var installationTask in alreadyRunning)
+            {
+                PendingInstalls.Enqueue(installationTask);
+            }
+        }
+
+        private bool InstallationIsAlreadyRunningFor(string packageId, string version)
+        {
+            return RunningInstalls.Any(x => x.PackageId == packageId && x.Version == version);
+        }
+
+        private void StartInstall(InstallationTask nextPendingInstall)
+        {
+            nextPendingInstall.Task = new Task<InstallationResult>(() =>
+            {
+                _deploymentService.InstallPackage(nextPendingInstall.PackageId, nextPendingInstall.Version, Guid.NewGuid().ToString(), new CancellationTokenSource(),
+                                                    progressReport =>nextPendingInstall.ProgressReports.Add(progressReport));
+                return new InstallationResult();
+            });
+
+            nextPendingInstall.Task.ContinueWith(RemoveFromRunningInstallationList);
+
+            nextPendingInstall.Task.Start();
         }
 
         private void RemoveFromRunningInstallationList(Task<InstallationResult> completedInstallationTask)
