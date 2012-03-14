@@ -29,11 +29,11 @@ namespace Deployd.Agent.WebUi.Modules
                             new PackageListViewModel
                                 {
                                     Packages = cache.AvailablePackages.Select(name => new LocalPackageInformation()
-                                                                                          {
-                                                                                              PackageId = name,
-                                                                                              InstalledVersion = installCache.GetCurrentInstalledVersion(name).ToString(),
-                                                                                              LatestAvailableVersion = cache.GetLatestVersion(name).ToString()
-                                                                                          }).ToArray(),
+                                            {
+                                                PackageId = name,
+                                                InstalledVersion = installCache.GetCurrentInstalledVersion(name).ToString(),
+                                                LatestAvailableVersion = cache.GetLatestVersion(name).ToString()
+                                            }).ToArray(),
                                     CurrentTasks = installationManager.GetAllTasks()
                                         .Select(t => new InstallTaskViewModel()
                                                         {

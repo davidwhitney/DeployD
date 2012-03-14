@@ -5,8 +5,13 @@
         <meta http-equiv="refresh" content="3">
     </head>
     <body>
-        <h1>Installations</h1>
+        <h1>Deployd.Agent - @Environment.MachineName</h1>
         
+        <ul>
+            <li><a href="/packages">Packages</a></li>
+            <li><a href="/installations">Installations</a></li>
+        </ul>
+
         <h2>Task Queue</h2>
         
         @foreach (var task in Model.TaskQueue)
