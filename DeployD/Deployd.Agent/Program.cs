@@ -2,6 +2,7 @@
 using System.ServiceProcess;
 using Deployd.Agent.Conventions;
 using Deployd.Agent.Services.AgentConfiguration;
+using Deployd.Agent.Services.InstallationService;
 using Deployd.Agent.Services.Management;
 using Deployd.Agent.Services.PackageDownloading;
 using Deployd.Core.Hosting;
@@ -32,7 +33,8 @@ namespace Deployd.Agent
                          {
                              _kernel.Get<AgentConfigurationService>(), 
                              _kernel.Get<PackageDownloadingService>(), 
-                             _kernel.Get<ManagementInterfaceHost>() 
+                             _kernel.Get<ManagementInterfaceHost>(),
+                             _kernel.Get<PackageInstallationService>() 
                          },
                 installationSettings: (serviceInstaller, serviceProcessInstaller) =>
                 {

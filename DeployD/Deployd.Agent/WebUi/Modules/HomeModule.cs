@@ -44,6 +44,14 @@ namespace Deployd.Agent.WebUi.Modules
                         }];
             };
 
+            Get["/installations"] = x =>
+            {
+                var taskQueue = Container().GetType<InstallationTaskQueue>();
+                var runningTasks = Container().GetType<RunningInstallationTaskList>();
+                var viewModel = new InstallationsViewModel {TaskQueue = taskQueue, RunningTasks = runningTasks};
+                return View["installations.cshtml", viewModel];
+            };
+
             Get["/packages/{packageId}"] = x =>
             {
                 var cache = Container().GetType<INuGetPackageCache>();
@@ -52,18 +60,16 @@ namespace Deployd.Agent.WebUi.Modules
             };
 
             Post["/packages/{packageId}/install", y => true] = x =>
-                                                                   {
-                var installationManager = Container().GetType<IInstallationManager>();
-                installationManager.StartInstall(x.packageId);
-                
+            {
+                var installationManager = Container().GetType<InstallationTaskQueue>();
+                installationManager.Add(x.packageId);
                 return Response.AsRedirect("/packages");
             };
 
-
             Post["/packages/{packageId}/install/{specificVersion}", y => true] = x =>
             {
-                var installationManager = Container().GetType<IInstallationManager>();
-                installationManager.StartInstall(x.packageId, x.specificVersion);
+                var installationManager = Container().GetType<InstallationTaskQueue>();
+                installationManager.Add(x.packageId, x.specificVersion);
                 return Response.AsRedirect("/packages");
             };
         }

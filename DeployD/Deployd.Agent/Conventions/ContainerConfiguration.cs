@@ -31,6 +31,8 @@ namespace Deployd.Agent.Conventions
             Bind<ICurrentInstalledCache>().To<CurrentInstalledCache>();
 
             Bind<IInstallationManager>().To<InstallationManager>().InSingletonScope();
+            Bind<RunningInstallationTaskList>().ToSelf().InSingletonScope();
+            Bind<InstallationTaskQueue>().ToSelf().InSingletonScope();
 
             Bind<IDeploymentHook>().To<PowershellDeploymentHook>();
             Bind<IDeploymentHook>().To<ServiceDeploymentHook>();

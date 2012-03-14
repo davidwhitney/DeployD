@@ -108,10 +108,13 @@
     </Compile>
     <Compile Include="Hosting\WcfService.cs" />
     <Compile Include="Hosting\WindowsServiceRunner.cs" />
+    <Compile Include="Installation\IInstallationManager.cs" />
     <Compile Include="Installation\InstallationManager.cs" />
     <Compile Include="Installation\InstallationResult.cs" />
     <Compile Include="Installation\InstallationTask.cs" />
+    <Compile Include="Installation\InstallationTaskQueue.cs" />
     <Compile Include="Installation\ProgressReport.cs" />
+    <Compile Include="Installation\RunningInstallationTaskList.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Queries\IRetrievePackageQuery.cs" />
     <Compile Include="Queries\FeedLocation.cs" />

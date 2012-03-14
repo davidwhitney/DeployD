@@ -1,0 +1,24 @@
+﻿<!DOCTYPE html>
+<html>
+    <head>
+        <title>Deployd.Agent</title>
+        <meta http-equiv="refresh" content="3">
+    </head>
+    <body>
+        <h1>Installations</h1>
+        
+        <h2>Task Queue</h2>
+        
+        @foreach (var task in Model.TaskQueue)
+        {
+            <p>@task.PackageId @task.Version</p>
+        }
+        
+        <h2>Running Tasks</h2>
+
+        @foreach (var task in Model.RunningTasks)
+        {
+            <p>@task.PackageId @task.Version @task.LastMessage</p>
+        }
+    </body>
+</html>

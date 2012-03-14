@@ -8,14 +8,6 @@ using log4net;
 
 namespace Deployd.Core.Installation
 {
-    public interface IInstallationManager
-    {
-        void StartInstall(string packageId, string version);
-        void StartInstall(string packageId);
-        List<InstallationTask> GetAllTasks();
-        InstallationTask GetTaskById(string installationTaskId);
-    }
-
     public class InstallationManager : IInstallationManager
     {
         private ILog logger = LogManager.GetLogger("InstallationManager");
@@ -27,7 +19,7 @@ namespace Deployd.Core.Installation
         private void ReportProgress(ProgressReport report)
         {
             logger.Info(report.Message);
-
+            
             var task = GetTaskById(report.InstallationTaskId);
             if (task != null)
             {
@@ -41,20 +33,7 @@ namespace Deployd.Core.Installation
             _progressReportAction = ReportProgress;
         }
 
-        public void StartInstall(string packageId)
-        {
-            var cancellationToken = new CancellationTokenSource();
-            string taskId = Guid.NewGuid().ToString();
-            var task = new TaskFactory<InstallationResult>().StartNew(() =>
-            {
-                _deploymentService.InstallPackage(packageId,taskId, cancellationToken, _progressReportAction);
-                return new InstallationResult();
-            });
-
-            InstallationTasks.Add(new InstallationTask(packageId, null, taskId, task, cancellationToken));
-        }
-
-        public void StartInstall(string packageId, string version)
+        public void StartInstall(string packageId, string version = null)
         {
             var cancellationToken = new CancellationTokenSource();
             string taskId = Guid.NewGuid().ToString();
@@ -64,6 +43,8 @@ namespace Deployd.Core.Installation
                         return new InstallationResult();
                     }
                 );
+
+            task.Start();
 
             InstallationTasks.Add(new InstallationTask(packageId, version, taskId, task, cancellationToken));
         }
