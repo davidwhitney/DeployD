@@ -24,10 +24,16 @@ namespace Deployd.Agent.WebUi.Modules
             {
                 var cache = Container().GetType<INuGetPackageCache>();
                 var installationManager = Container().GetType<IInstallationManager>();
+                var installCache = Container().GetType<ICurrentInstalledCache>();
                 var model =
                             new PackageListViewModel
                                 {
-                                    Packages = cache.AvailablePackages.Select(name => new LocalPackageInformation() { PackageId = name }).ToArray(),
+                                    Packages = cache.AvailablePackages.Select(name => new LocalPackageInformation()
+                                                                                          {
+                                                                                              PackageId = name,
+                                                                                              InstalledVersion = installCache.GetCurrentInstalledVersion(name).ToString(),
+                                                                                              LatestAvailableVersion = cache.GetLatestVersion(name).ToString()
+                                                                                          }).ToArray(),
                                     CurrentTasks = installationManager.GetAllTasks()
                                         .Select(t => new InstallTaskViewModel()
                                                         {
