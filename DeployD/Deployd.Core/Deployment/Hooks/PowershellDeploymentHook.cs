@@ -6,7 +6,7 @@ using System.Management.Automation.Runspaces;
 using System.Text;
 using Deployd.Core.AgentConfiguration;
 
-namespace Deployd.Agent.Services.Deployment.Hooks
+namespace Deployd.Core.Deployment.Hooks
 {
     public class PowershellDeploymentHook : DeploymentHookBase
     {

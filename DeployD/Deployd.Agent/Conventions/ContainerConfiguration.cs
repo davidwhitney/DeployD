@@ -1,9 +1,10 @@
 using System;
-using Deployd.Agent.Services.Deployment.Hooks;
 using Deployd.Core.AgentConfiguration;
 using Deployd.Core.Caching;
-using Deployd.Agent.Services.Deployment;
 using Deployd.Agent.Services.AgentConfiguration;
+using Deployd.Core.Deployment;
+using Deployd.Core.Deployment.Hooks;
+using Deployd.Core.Installation;
 using Deployd.Core.Queries;
 using Ninject.Modules;
 using NuGet;
@@ -28,6 +29,8 @@ namespace Deployd.Agent.Conventions
             Bind<IDeploymentService>().To<DeploymentService>();
 
             Bind<ICurrentInstalledCache>().To<CurrentInstalledCache>();
+
+            Bind<IInstallationManager>().To<InstallationManager>().InSingletonScope();
 
             Bind<IDeploymentHook>().To<PowershellDeploymentHook>();
             Bind<IDeploymentHook>().To<ServiceDeploymentHook>();

@@ -1,4 +1,4 @@
-namespace Deployd.Agent.Services.Deployment.Hooks
+namespace Deployd.Core.Deployment.Hooks
 {
     public interface IDeploymentHook
     {

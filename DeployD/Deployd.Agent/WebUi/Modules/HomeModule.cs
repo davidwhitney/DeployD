@@ -1,15 +1,24 @@
 ﻿using System;
-using Deployd.Agent.Services.Deployment;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using Deployd.Agent.WebUi.Models;
 using Deployd.Core.Caching;
+using Deployd.Core.Deployment;
 using Deployd.Core.Hosting;
+using Deployd.Core.Installation;
+using MS.Internal.Xml.XPath;
 using Nancy;
+using log4net;
 
 namespace Deployd.Agent.WebUi.Modules
 {
     public class HomeModule : NancyModule
     {
+        private ILog _log = LogManager.GetLogger("HomeModule");
         public static Func<IIocContainer> Container { get; set; }
+        public static readonly List<InstallationTask> InstallationTasks = new List<InstallationTask>();
 
         public HomeModule()
         {
@@ -17,8 +26,22 @@ namespace Deployd.Agent.WebUi.Modules
             
             Get["/packages"] = x =>
             {
-                var cache = Container().GetType<IDeploymentService>();
-                return View["packages.cshtml", new PackageListViewModel {Packages = cache.AvailablePackages()}];
+                var cache = Container().GetType<INuGetPackageCache>();
+                var installationManager = Container().GetType<IInstallationManager>();
+                return View["packages.cshtml", 
+                    new PackageListViewModel
+                        {
+                            Packages = cache.AvailablePackages.Select(name=>new LocalPackageInformation(){PackageId=name}).ToArray(),
+                            CurrentTasks = installationManager.GetAllTasks()
+                            .Select(t=>new InstallTaskViewModel()
+                            {
+                                Messages = t.ProgressReports.Select(pr=>pr.Message).ToArray(), 
+                                Status=Enum.GetName(typeof(TaskStatus), t.Task.Status),
+                                PackageId=t.PackageId,
+                                Version=t.Version,
+                                LastMessage = t.ProgressReports.Count > 0 ? t.ProgressReports.LastOrDefault().Message : ""
+                            }).ToList()
+                        }];
             };
 
             Get["/packages/{packageId}"] = x =>
@@ -29,18 +52,25 @@ namespace Deployd.Agent.WebUi.Modules
             };
 
             Post["/packages/{packageId}/install", y => true] = x =>
-            {
-                var deploymentService = Container().GetType<IDeploymentService>();
-                deploymentService.InstallPackage(x.packageId);
+                                                                   {
+                var installationManager = Container().GetType<IInstallationManager>();
+                installationManager.StartInstall(x.packageId);
+                
                 return Response.AsRedirect("/packages");
             };
 
+
             Post["/packages/{packageId}/install/{specificVersion}", y => true] = x =>
             {
-                var deploymentService = Container().GetType<IDeploymentService>();
-                deploymentService.InstallPackage(x.packageId, x.specificVersion);
+                var installationManager = Container().GetType<IInstallationManager>();
+                installationManager.StartInstall(x.packageId, x.specificVersion);
                 return Response.AsRedirect("/packages");
             };
+        }
+
+        private void ReportProgress(ProgressReport progressReport)
+        {
+            _log.Info("Installer report: " + progressReport.Message);
         }
     }
 }

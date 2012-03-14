@@ -2,7 +2,7 @@ using System.IO;
 using NuGet;
 using log4net;
 
-namespace Deployd.Agent.Services.Deployment
+namespace Deployd.Core.Deployment
 {
     public class PackageExtractor
     {

@@ -1,10 +1,11 @@
 ﻿using System;
 using Deployd.Agent.Conventions;
 using Deployd.Agent.Services.AgentConfiguration;
-using Deployd.Agent.Services.Deployment;
-using Deployd.Agent.Services.Deployment.Hooks;
 using Deployd.Core.AgentConfiguration;
 using Deployd.Core.Caching;
+using Deployd.Core.Deployment;
+using Deployd.Core.Deployment.Hooks;
+using Deployd.Core.Installation;
 using Deployd.Core.Queries;
 using NUnit.Framework;
 using Ninject;
@@ -35,6 +36,7 @@ namespace Deployd.Agent.Test.Unit.Conventions
         [TestCase(typeof(IAgentConfigurationDownloader))]
         [TestCase(typeof(IDeploymentHook))]
         [TestCase(typeof(IDeploymentService))]
+        [TestCase(typeof(IInstallationManager))]
         [TestCase(typeof(System.IO.Abstractions.IFileSystem))]
         public void GetType_CanInstantiateBoundDependency_DoesNotThrow(Type type)
         {

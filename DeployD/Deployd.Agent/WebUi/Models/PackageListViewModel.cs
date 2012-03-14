@@ -1,10 +1,13 @@
 using System.Collections.Generic;
+using Deployd.Core.Installation;
 
 namespace Deployd.Agent.WebUi.Models
 {
     public class PackageListViewModel
     {
         public IList<LocalPackageInformation> Packages { get; set; }
+
+        public IList<InstallTaskViewModel> CurrentTasks { get; set; }
 
         public PackageListViewModel()
         {

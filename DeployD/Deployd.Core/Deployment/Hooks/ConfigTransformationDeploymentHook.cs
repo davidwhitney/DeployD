@@ -1,11 +1,11 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Abstractions;
 using System.Linq;
 using Deployd.Core.AgentConfiguration;
 
-namespace Deployd.Agent.Services.Deployment.Hooks
+namespace Deployd.Core.Deployment.Hooks
 {
     public class ConfigTransformationDeploymentHook : DeploymentHookBase
     {

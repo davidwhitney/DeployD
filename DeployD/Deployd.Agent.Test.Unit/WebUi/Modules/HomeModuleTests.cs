@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using Deployd.Agent.Services.Deployment;
+using System.Threading;
 using Deployd.Agent.WebUi;
 using Deployd.Agent.WebUi.Modules;
 using Deployd.Core.Caching;
+using Deployd.Core.Deployment;
 using Deployd.Core.Hosting;
+using Deployd.Core.Installation;
 using Moq;
 using NUnit.Framework;
 using Nancy;
@@ -25,7 +27,8 @@ namespace Deployd.Agent.Test.Unit.WebUi.Modules
             _containerStub = new ContainerStub
                                  {
                                      NuGetPackageCacheMock = new Mock<INuGetPackageCache>(),
-                                     DeploymentServiceMock = new Mock<IDeploymentService>()
+                                     DeploymentServiceMock = new Mock<IDeploymentService>(),
+                                     InstallationManagerMock = new Mock<IInstallationManager>()
                                  };
 
             HomeModule.Container = () => _containerStub;
@@ -44,6 +47,7 @@ namespace Deployd.Agent.Test.Unit.WebUi.Modules
         public void Get_Packages_ReturnsMarkupWithPackagesFromCache()
         {
             _containerStub.NuGetPackageCacheMock.Setup(x => x.AvailablePackages).Returns(new List<string>{"package1", "package2"});
+            _containerStub.InstallationManagerMock.Setup(x => x.GetAllTasks()).Returns(new List<InstallationTask>());
             
             var result = _browser.Get("/packages", with => with.HttpRequest());
 
@@ -72,8 +76,9 @@ namespace Deployd.Agent.Test.Unit.WebUi.Modules
 
             var result = _browser.Post("/packages/mypackage/install", with => with.HttpRequest());
 
-            Assert.That(result.StatusCode, Is.EqualTo(HttpStatusCode.OK));
-            _containerStub.DeploymentServiceMock.Verify(x=>x.Deploy(mockPackage.Object));
+            Assert.That(result.StatusCode, Is.EqualTo(HttpStatusCode.SeeOther));
+            //_containerStub.DeploymentServiceMock.Verify(x=>x.Deploy(It.IsAny<string>(), mockPackage.Object, It.IsAny<CancellationTokenSource>(), It.IsAny<Action<ProgressReport>>()));
+            _containerStub.InstallationManagerMock.Verify(x=>x.StartInstall("mypackage"));
 
         }
 
@@ -82,13 +87,15 @@ namespace Deployd.Agent.Test.Unit.WebUi.Modules
         {
             var result = _browser.Post("/packages/mypackage/install/mypackage-1.0.0.0", with => with.HttpRequest());
 
-            Assert.That(result.StatusCode, Is.EqualTo(HttpStatusCode.OK));
+            Assert.That(result.StatusCode, Is.EqualTo(HttpStatusCode.SeeOther));
+            _containerStub.InstallationManagerMock.Verify(x => x.StartInstall("mypackage", "mypackage-1.0.0.0"));
         }
 
         public class ContainerStub : IIocContainer
         {
             public Mock<INuGetPackageCache> NuGetPackageCacheMock { get; set; }
             public Mock<IDeploymentService> DeploymentServiceMock { get; set; }
+            public Mock<IInstallationManager> InstallationManagerMock { get; set; }
 
             public T GetType<T>()
             {
@@ -100,6 +107,11 @@ namespace Deployd.Agent.Test.Unit.WebUi.Modules
                 if (typeof(T) == typeof(IDeploymentService))
                 {
                     return (T)DeploymentServiceMock.Object;
+                }
+
+                if (typeof(T) == typeof(IInstallationManager))
+                {
+                    return (T)InstallationManagerMock.Object;
                 }
 
                 throw new NotImplementedException();
