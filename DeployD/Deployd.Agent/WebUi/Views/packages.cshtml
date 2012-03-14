@@ -30,6 +30,11 @@
         {
             <div style="clear:both">
                 <a href="/packages/@package.PackageId">@package.PackageId</a><div style="float:right;margin-right:80px"><form style="display:inline" action="/packages/@package.PackageId/install" method="POST"><input type="submit" value="Install Latest"></input></form></div><br/>
+                @if (package.CurrentTask != null)
+                {
+                    <text>@package.CurrentTask.Status: @package.CurrentTask.LastMessage<br/></text>
+                }
+
                 @if(!string.IsNullOrWhiteSpace(package.LatestAvailableVersion))
                 {
                     <text>Latest: @package.LatestAvailableVersion<br/></text>

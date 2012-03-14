@@ -11,7 +11,7 @@
         </form>
 
         <h2>Available Package Versions for @Model.PackageName</h2>
-        @foreach(var package in Model)
+        @foreach(var package in Model.CachedVersions)
         {
             @package <br/>
             

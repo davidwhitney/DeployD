@@ -24,6 +24,8 @@ namespace Deployd.Agent.WebUi.Models
         public string PackageId { get; set; }
         public string InstalledVersion { get; set; }
         public string LatestAvailableVersion { get; set; }
-        public List<string> AvailableVersions { get; set; } 
+        public List<string> AvailableVersions { get; set; }
+
+        public InstallTaskViewModel CurrentTask { get; set; }
     }
 }
