@@ -142,6 +142,10 @@
     <Compile Include="WebUi\Models\InstallationsViewModel.cs" />
     <Compile Include="WebUi\Models\InstallTaskViewModel.cs" />
     <Compile Include="WebUi\Models\PackageListViewModel.cs" />
+    <Compile Include="WebUi\CustomFormatterExtensions.cs" />
+    <Compile Include="WebUi\Modules\InstallationsModule.cs" />
+    <Compile Include="WebUi\NancyModuleExtensions.cs" />
+    <Compile Include="WebUi\Modules\PackagesModule.cs" />
     <Compile Include="WebUi\NancyConventionsBootstrapper.cs" />
     <Compile Include="WebUi\Modules\HomeModule.cs" />
     <Compile Include="WebUi\Models\PackageVersionsViewModel.cs" />

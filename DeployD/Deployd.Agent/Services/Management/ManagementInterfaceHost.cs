@@ -21,6 +21,9 @@ namespace Deployd.Agent.Services.Management
         public void Start(string[] args)
         {
             HomeModule.Container = AppContext.Container;
+            PackagesModule.Container = AppContext.Container;
+            InstallationsModule.Container = AppContext.Container;
+
             WebUiAddress = new Uri("http://localhost:9999/");
             _host = new WebServiceHost(new NancyWcfGenericService(), WebUiAddress);
             _host.AddServiceEndpoint(typeof(NancyWcfGenericService), new WebHttpBinding(), "");
