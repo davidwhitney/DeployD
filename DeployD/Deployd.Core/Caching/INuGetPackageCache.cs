@@ -6,6 +6,7 @@ namespace Deployd.Core.Caching
 {
     public interface INuGetPackageCache
     {
+        IEnumerable<IPackage> AllCachedPackages();
         IList<string> AvailablePackages { get; }
         IEnumerable<string> AvailablePackageVersions(string packageId);
         void Add(IPackage package);

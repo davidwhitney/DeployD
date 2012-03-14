@@ -1,5 +1,7 @@
 using System.Collections.Generic;
+using System.Linq;
 using Deployd.Core.Installation;
+using NuGet;
 
 namespace Deployd.Agent.WebUi.Models
 {
@@ -8,6 +10,8 @@ namespace Deployd.Agent.WebUi.Models
         public IList<LocalPackageInformation> Packages { get; set; }
 
         public IList<InstallTaskViewModel> CurrentTasks { get; set; }
+
+        public IEnumerable<string> AvailableVersions { get; set; }
 
         public PackageListViewModel()
         {

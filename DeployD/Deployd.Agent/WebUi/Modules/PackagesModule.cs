@@ -7,6 +7,7 @@ using Deployd.Core.Caching;
 using Deployd.Core.Hosting;
 using Deployd.Core.Installation;
 using Nancy;
+using NuGet;
 using log4net;
 
 namespace Deployd.Agent.WebUi.Modules
@@ -35,7 +36,8 @@ namespace Deployd.Agent.WebUi.Modules
                                                             PackageId = t.PackageId,
                                                             Version = t.Version,
                                                             LastMessage = t.ProgressReports.Count > 0 ? t.ProgressReports.LastOrDefault().Message : ""
-                                                        }).ToList()
+                                                        }).ToList(),
+                                                        AvailableVersions = cache.AllCachedPackages().Select(p=>p.Version.ToString()).Distinct().OrderByDescending(s=>s)
                                 };
 
 
@@ -62,6 +64,35 @@ namespace Deployd.Agent.WebUi.Modules
             {
                 var installationManager = Container().GetType<InstallationTaskQueue>();
                 installationManager.Add(x.packageId, x.specificVersion);
+                return Response.AsRedirect("/packages");
+            };
+
+            Post["/UpdateAllTo", y => true] = x =>
+                                                  {
+                string specificVersion =Response.Context.Request.Form["specificVersion"];
+                var cache = Container().GetType<INuGetPackageCache>();
+                var queue = Container().GetType<InstallationTaskQueue>();
+                var packagesByVersion = cache.AllCachedPackages().Where(p => p.Version.Equals(new SemanticVersion(specificVersion)));
+
+                foreach (var packageVersions in packagesByVersion)
+                {
+                    queue.Add(packageVersions.Id, packageVersions.Version.ToString());
+                }
+
+                return Response.AsRedirect("/packages");
+            };
+
+            Post["/UpdateAllTo/{specificVersion}", y => true] = x =>
+            {
+                var cache = Container().GetType<INuGetPackageCache>();
+                var queue = Container().GetType<InstallationTaskQueue>();
+                var packagesByVersion = cache.AllCachedPackages().Where(p=>p.Version.Equals(new SemanticVersion(x.specificVersion)));
+
+                foreach (var packageVersions in packagesByVersion)
+                {
+                    queue.Add(packageVersions.Id, packageVersions.Version.ToString());
+                }
+
                 return Response.AsRedirect("/packages");
             };
         }

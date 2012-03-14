@@ -35,6 +35,23 @@ namespace Deployd.Core.Caching
             _fileSystem.EnsureDirectoryExists(_cacheDirectory);
         }
 
+        public IEnumerable<IPackage> AllCachedPackages()
+        {
+            var cacheDir = new DirectoryInfo(_cacheDirectory);
+            if (!cacheDir.Exists)
+                cacheDir.Create();
+
+            var subDirs = cacheDir.GetDirectories();
+            foreach(var subDir in subDirs)
+            {
+                var packageFiles = subDir.GetFiles("*.nupkg");
+                foreach(var packageFile in packageFiles)
+                {
+                    yield return new ZipPackage(packageFile.FullName);
+                }
+            }
+        }
+
         public IList<string> AvailablePackages
         {
             get
