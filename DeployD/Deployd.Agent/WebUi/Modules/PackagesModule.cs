@@ -79,7 +79,14 @@ namespace Deployd.Agent.WebUi.Modules
             Post["/{packageId}/install", y => true] = x =>
             {
                 var installationManager = Container().GetType<InstallationTaskQueue>();
-                installationManager.Add(x.packageId);
+                SemanticVersion version=null;
+                string versionString = null;
+                if (SemanticVersion.TryParse(Request.Form["specificVersion"], out version))
+                {
+                    versionString = version.ToString();
+                }
+
+                installationManager.Add(x.packageId, versionString);
                 return Response.AsRedirect("/packages");
             };
 

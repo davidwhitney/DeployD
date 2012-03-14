@@ -67,19 +67,21 @@ namespace Deployd.Core.Caching
             }
         } 
 
-        public IEnumerable<string> AvailablePackageVersions(string packageId)
+        public IList<string> AvailablePackageVersions(string packageId)
         {
             var files = Directory.GetFiles(PackageCacheLocation(packageId)).ToList();
-
+            List<string> versions = new List<string>();
             for (var index = 0; index < files.Count; index++)
             {
                 string filename = Path.GetFileNameWithoutExtension(files[index]);
                 if (filename.Contains("-"))
                 {
                     string version = filename.Split(new[]{'-'}, StringSplitOptions.RemoveEmptyEntries).Last();
-                    yield return version;
+                    versions.Add(version);
                 }
             }
+
+            return versions.OrderByDescending(s=>s).ToList();
         } 
 
         public void Add(IPackage package)

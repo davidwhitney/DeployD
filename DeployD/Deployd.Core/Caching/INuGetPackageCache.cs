@@ -8,7 +8,7 @@ namespace Deployd.Core.Caching
     {
         IEnumerable<IPackage> AllCachedPackages();
         IList<string> AvailablePackages { get; }
-        IEnumerable<string> AvailablePackageVersions(string packageId);
+        IList<string> AvailablePackageVersions(string packageId);
         void Add(IPackage package);
         void Add(IEnumerable<IPackage> allAvailablePackages);
         IPackage GetLatestVersion(string packageId);

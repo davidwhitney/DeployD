@@ -11,14 +11,14 @@
         </form>
 
         <h2>Available Package Versions for @Model.PackageName</h2>
-        @foreach(var package in Model.CachedVersions)
-        {
-            @package <br/>
-            
-            <form action="/packages/@Model.PackageName/install/@package" method="POST">
-                <input type="submit" value="Install"></input>
-            </form>
-        }
+        <form method="post" action="/packages/@Model.PackageName/install">
+            <input type="submit" value="Update to:"/> <select name="specificVersion">
+            @foreach(string version in Model.CachedVersions)
+            {
+                <option>@version</option>
+            }
+        </select>
+        </form>
 
     </body>
 </html>
