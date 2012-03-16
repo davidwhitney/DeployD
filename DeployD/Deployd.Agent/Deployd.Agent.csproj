@@ -64,7 +64,7 @@
     <GenerateManifests>true</GenerateManifests>
   </PropertyGroup>
   <PropertyGroup>
-    <SignManifests>true</SignManifests>
+    <SignManifests>false</SignManifests>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="log4net">
@@ -167,7 +167,6 @@
     <None Include="DebugPackageSource\justgiving-sdk-1.5.4.nupkg">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="Deployd.Agent_TemporaryKey.pfx" />
     <None Include="packages.config" />
     <Content Include="Scripts\PS\Services.ps1">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
