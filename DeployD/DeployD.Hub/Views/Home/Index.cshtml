@@ -12,7 +12,7 @@
 <h2>Hub</h2>
 
 
-<Table width="100%">
+<Table width="100%" id="grid">
     <tr>
         <td>Application</td>
         <td>Server1</td>
@@ -105,5 +105,13 @@
     }
     
     <input type="submit" value="Deploy"/>&nbsp;<a href="#" class="cancel">Cancel</a>
+    </form>
+</fieldset>
+
+<fieldset>
+    <legend>Register Agent</legend>
+    <form id="registerAgentForm" action="/api/agent/register" method="post">
+        <label for="hostname"><input type="text" name="hostname"/></label>
+        <input type="submit" value="Register"/>
     </form>
 </fieldset>

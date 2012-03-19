@@ -74,15 +74,20 @@
   <ItemGroup>
     <Compile Include="App_Start\NinjectMVC3.cs" />
     <Compile Include="Areas\Api\ApiAreaRegistration.cs" />
+    <Compile Include="Areas\Api\Code\AgentRemoteService.cs" />
     <Compile Include="Areas\Api\Code\ApiHttpChannel.cs" />
+    <Compile Include="Areas\Api\Code\IAgentRemoteService.cs" />
     <Compile Include="Areas\Api\Code\IAgentStore.cs" />
     <Compile Include="Areas\Api\Code\IApiHttpChannel.cs" />
+    <Compile Include="Areas\Api\Code\IPackageStore.cs" />
     <Compile Include="Areas\Api\Code\IRepresentationBuilder.cs" />
     <Compile Include="Areas\Api\Code\JsonRepresentationBuilder.cs" />
     <Compile Include="Areas\Api\Code\LocalAgentStore.cs" />
+    <Compile Include="Areas\Api\Code\LocalPackageStore.cs" />
     <Compile Include="Areas\Api\Code\XmlRepresentationBuilder.cs" />
     <Compile Include="Areas\Api\Controllers\AgentController.cs" />
     <Compile Include="Areas\Api\Controllers\InstallationController.cs" />
+    <Compile Include="Areas\Api\Controllers\PackageController.cs" />
     <Compile Include="Areas\Api\Models\AgentViewModel.cs" />
     <Compile Include="Areas\Api\Models\PackageViewModel.cs" />
     <Compile Include="Controllers\HomeController.cs" />

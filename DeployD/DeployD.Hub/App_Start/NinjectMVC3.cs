@@ -53,7 +53,9 @@ namespace DeployD.Hub.App_Start
             kernel.Bind<IApiHttpChannel>().To<ApiHttpChannel>();
             kernel.Bind<IRepresentationBuilder>().To<XmlRepresentationBuilder>();
             kernel.Bind<IRepresentationBuilder>().To<JsonRepresentationBuilder>();
-            kernel.Bind<IAgentStore>().To<LocalAgentStore>();
+            kernel.Bind<IAgentStore>().To<LocalAgentStore>().InSingletonScope();
+            kernel.Bind<IPackageStore>().To<LocalPackageStore>().InSingletonScope();
+            kernel.Bind<IAgentRemoteService>().To<AgentRemoteService>();
         }        
     }
 }

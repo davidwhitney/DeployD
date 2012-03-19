@@ -8,6 +8,13 @@ namespace DeployD.Hub.Areas.Api.Code
 {
     public class LocalAgentStore : IAgentStore
     {
+        private readonly IAgentRemoteService _agentRemoteService;
+
+        public LocalAgentStore(IAgentRemoteService agentRemoteService)
+        {
+            _agentRemoteService = agentRemoteService;
+        }
+
         private readonly List<AgentViewModel> _agents = new List<AgentViewModel>();
         public IEnumerable<AgentViewModel> ListAgents()
         {
@@ -16,6 +23,7 @@ namespace DeployD.Hub.Areas.Api.Code
 
         public void RegisterAgent(AgentViewModel agent)
         {
+            agent.packages = _agentRemoteService.ListPackages(agent.hostname);
             _agents.Add(agent);
         }
 
