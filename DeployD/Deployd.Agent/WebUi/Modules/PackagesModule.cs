@@ -32,8 +32,9 @@ namespace Deployd.Agent.WebUi.Modules
                                     Packages = cache.AvailablePackages.Select(name => new LocalPackageInformation()
                                             {
                                                 PackageId = name,
-                                                InstalledVersion = installCache.GetCurrentInstalledVersion(name).ToString(),
-                                                LatestAvailableVersion = cache.GetLatestVersion(name).ToString(),
+                                                InstalledVersion = installCache.GetCurrentInstalledVersion(name) != null ? installCache.GetCurrentInstalledVersion(name).Version.ToString() : "",
+                                                LatestAvailableVersion = cache.GetLatestVersion(name) != null ? cache.GetLatestVersion(name).Version.ToString() : "",
+                                                AvailableVersions = cache.AvailablePackageVersions(name).ToList(),
                                                 CurrentTask = runningTasks.Count > 0 ? runningTasks
                                                     .Where(t => t.PackageId == name)
                                                     .Select(t => new InstallTaskViewModel()

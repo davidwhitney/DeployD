@@ -1,23 +1,38 @@
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using DeployD.Hub.Areas.Api.Models;
 
 namespace DeployD.Hub.Areas.Api.Code
 {
     public class LocalPackageStore : IPackageStore
     {
-        private readonly List<PackageViewModel> _packages = new List<PackageViewModel>();
+        private readonly IAgentRemoteService _agentRemoteService;
+        private readonly IAgentStore _agentStore;
+        private List<PackageViewModel> _packages=null;
+        private DateTime _lastRefresh = DateTime.Now;
 
-        public LocalPackageStore()
+        public LocalPackageStore(IAgentRemoteService agentRemoteService, IAgentStore agentStore)
         {
-            _packages.Add(new PackageViewModel(){id="GG.Web.Website", availableVersions = new[]{"1.0.0.0","1.0.0.1","1.0.0.2"}});
-            _packages.Add(new PackageViewModel() { id = "GG.Api.Services", availableVersions = new[] { "1.0.0.0", "1.0.0.1", "1.0.0.2" } });
-            _packages.Add(new PackageViewModel() { id = "GG.PaymentProcessing.Agent", availableVersions = new[] { "1.0.0.0", "1.0.0.1", "1.0.0.2" } });
-            _packages.Add(new PackageViewModel() { id = "GG.Search.Indexing.Service", availableVersions = new[] { "1.0.0.0", "1.0.0.1", "1.0.0.2" } });
-            _packages.Add(new PackageViewModel() { id = "GG.Api.Services.Sms", availableVersions = new[] { "1.0.0.0", "1.0.0.1", "1.0.0.2" } });
+            _agentRemoteService = agentRemoteService;
+            _agentStore = agentStore;
         }
 
         public IEnumerable<PackageViewModel> ListAll()
         {
+            if ((_packages == null)
+                || DateTime.Now.Subtract(_lastRefresh).TotalMinutes > 1)
+            {
+                List<AgentViewModel> agents = _agentStore.ListAgents().ToList();
+                if (agents.Count == 0)
+                    return null;
+                _packages = new List<PackageViewModel>();
+                foreach(var agent in agents)
+                {
+                    _packages.AddRange(agent.packages);
+                }
+            }
+
             return _packages;
         }
     }

@@ -1,4 +1,6 @@
 using System.Collections.Generic;
+using System.IO;
+using System.Net;
 using DeployD.Hub.Areas.Api.Models;
 
 namespace DeployD.Hub.Areas.Api.Code
@@ -7,13 +9,25 @@ namespace DeployD.Hub.Areas.Api.Code
     {
         public IEnumerable<PackageViewModel> ListPackages(string hostname)
         {
-            // todo: fake
-            return new List<PackageViewModel>()
-                       {
-                           new PackageViewModel(){
-                                                     id="GG.Web.Website", availableVersions = new string[]{"1.0.0.0","1.0.0.1","1.0.0.2","1.0.0.3"},installed=false},
-                                                     new PackageViewModel(){id="GG.Api.Services", availableVersions = new string[]{"1.0.0.0"}, installed=true, installedVersion = "1.0.0.0"}
-                       };
+            HttpWebRequest request = HttpWebRequest.Create(string.Format("http://{0}:9999/packages", hostname)) as HttpWebRequest;
+            request.Accept = "application/json";
+            string responseContent = "";
+            string contentType = "";
+            using (var response = request.GetResponse() as HttpWebResponse)
+            using (var stream = response.GetResponseStream())
+            using (var streamReader = new StreamReader(stream, System.Text.Encoding.UTF8))
+            {
+                responseContent = streamReader.ReadToEnd();
+                contentType = response.Headers["Content-Type"];
+            }
+
+            var packages = System.Web.Helpers.Json.Decode<PackageListViewModel>(responseContent);
+            return packages.Packages;
         }
+    }
+
+    public class PackageListViewModel
+    {
+        public List<PackageViewModel> Packages { get; set; } 
     }
 }

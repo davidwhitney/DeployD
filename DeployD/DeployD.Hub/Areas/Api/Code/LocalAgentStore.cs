@@ -18,6 +18,7 @@ namespace DeployD.Hub.Areas.Api.Code
         private readonly List<AgentViewModel> _agents = new List<AgentViewModel>();
         public IEnumerable<AgentViewModel> ListAgents()
         {
+            UpdateAgents();
             return _agents;
         }
 
@@ -25,6 +26,11 @@ namespace DeployD.Hub.Areas.Api.Code
         {
             agent.packages = _agentRemoteService.ListPackages(agent.hostname);
             _agents.Add(agent);
+        }
+
+        private void UpdateAgents()
+        {
+            _agents.ForEach(a => a.packages = _agentRemoteService.ListPackages(a.hostname));
         }
 
         public void UnregisterAgent(string hostname)

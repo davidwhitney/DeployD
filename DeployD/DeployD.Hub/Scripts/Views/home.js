@@ -3,13 +3,22 @@ var _packages;
 $(document).ready(function () {
     $('#deployDialog').hide();
 
+    BindEvents();
     LoadAgents();
+    
 });
 
 function LoadAgents() {
     $.getJSON('/api/agent/list',
         function (response, status) {
             _agents = response;
+
+            if (_agents) {
+                for (var aIndex = 0; aIndex < _agents.length; aIndex++) {
+                    $('#agentList').append($('<input type="checkbox" name="agents" id="' + _agents[aIndex].hostname + '" /><label for="' + _agents[aIndex].hostname + '">' + _agents[aIndex].hostname + '</label>'));
+                }
+            }
+
             LoadPackages();
         });
 }
@@ -33,6 +42,10 @@ function BuildGrid(agents, packages) {
 
     grid.html('');
 
+    if (!packages || !agents) {
+        return;
+    }
+
     var table = $('<table></table>');
     var header = $('<tr></tr>');
     header.append($('<td>Packages</td>'));
@@ -44,14 +57,14 @@ function BuildGrid(agents, packages) {
 
     for (var i = 0; i < packages.length;i++) {
         var row = $('<tr></tr>');
-        row.append($('<td><a href="#" class="package">' + packages[i].id + '</a></td>'));
+        row.append($('<td><a href="#" class="package">' + packages[i].packageId + '</a></td>'));
         for (var j = 0; j < agents.length; j++) {
             if (!agents[j].packages) {
                 row.append($('<td>n/i</td>'));
             } else {
                 var has = false;
                 for(var k=0;k<agents[j].packages.length;k++) {
-                    if (agents[j].packages[k].id==packages[i].id) {
+                    if (agents[j].packages[k].packageId == packages[i].packageId) {
                         if (!agents[j].packages[k].installed) {
                             row.append($('<td>n/i</td>'));
                         } else {
@@ -80,8 +93,7 @@ function BindEvents() {
     });
 
     $('.package').click(function () {
-        $('#deployDialog').show();
-        $('#packageIdSelect').val($(this).text());
+        ShowInstallationForm($(this).text());
     });
 
     $('#startInstallationForm').submit(function () {
@@ -112,4 +124,24 @@ function BindEvents() {
             });
         return false;
     });
+}
+
+function ShowInstallationForm(packageId) {
+    $('#deployDialog').show();
+
+    $('#packageIdSelect').html('');
+    $('#versionSelect').html('');
+    for (var pIndex in _packages) {
+        $('#packageIdSelect').append($('<option value="' + _packages[pIndex].packageId + '">' + _packages[pIndex].packageId + '</option>'));
+
+        var package = _packages[pIndex];
+        if (package.packageId==packageId) {
+            for (var vIndex = 0; vIndex < package.availableVersions.length;vIndex++ ) {
+                $('#versionSelect').append($('<option value="' + package.availableVersions[vIndex] + '">' + package.availableVersions[vIndex] + '</option>'));
+            }
+        }
+    }
+
+    $('#packageIdSelect').val(packageId);
+    $('#versionSelect :nth-child(1)').attr('selected', 'selected');
 }
