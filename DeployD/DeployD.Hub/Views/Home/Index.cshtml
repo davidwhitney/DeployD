@@ -63,6 +63,7 @@
 
 <fieldset id="deployDialog">
     <legend>Deploy</legend>
+    <form id="startInstallationForm" action="/api/installation/start" method="POST">
     Package: <select id="packageIdSelect" name="packageId">
                  <option>GG.Web.Website</option>
                  <option>GG.Api.Services</option>
@@ -98,10 +99,11 @@
     
     @foreach (var agent in agents)
     {
-        <input type="checkbox" name="hostname" id="@agent" value="true"/>
+        <input type="checkbox" name="hostname" id="@agent" value="@agent"/>
         <label for="@agent">@agent</label>
         <br/>
     }
     
     <input type="submit" value="Deploy"/>&nbsp;<a href="#" class="cancel">Cancel</a>
+    </form>
 </fieldset>
