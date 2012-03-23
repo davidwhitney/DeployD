@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Web.Mvc;
 using DeployD.Hub.Areas.Api.Code;
@@ -19,17 +20,36 @@ namespace DeployD.Hub.Areas.Api.Controllers
 
         //
         // GET: /Api/Agent/
-
-        public ActionResult List()
+        [ActionName("Index")]
+        [HttpGet]
+        public ActionResult Index(string id) // list
         {
-            return _httpChannel.RepresentationOf(_agentStore.ListAgents(), HttpContext);
+            if (string.IsNullOrWhiteSpace(id))
+            {
+                return _httpChannel.RepresentationOf(_agentStore.ListAgents(), HttpContext);
+            }
+            else
+            {
+                return
+                    _httpChannel.RepresentationOf(_agentStore.ListAgents().SingleOrDefault(a => a.id == id), HttpContext);
+            }
         }
 
-        public ActionResult Register(string hostname)
+        [AcceptVerbs("PUT")]
+        [ActionName("Index")]
+        public ActionResult IndexPost(string id)
         {
-            _agentStore.RegisterAgent(new AgentViewModel(){hostname=hostname});
+            _agentStore.RegisterAgent(new AgentViewModel() { id = id });
 
             return new HttpStatusCodeResult((int) HttpStatusCode.Created);
+        }
+
+        [AcceptVerbs("DELETE")]
+        [ActionName("Index")]
+        public ActionResult IndexDelete(string id)
+        {
+            _agentStore.UnregisterAgent(id);
+            return new HttpStatusCodeResult((int)HttpStatusCode.OK);
         }
     }
 }

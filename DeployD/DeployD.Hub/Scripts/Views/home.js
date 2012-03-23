@@ -1,147 +1,114 @@
-﻿var _agents;
-var _packages;
-$(document).ready(function () {
-    $('#deployDialog').hide();
-
-    BindEvents();
-    LoadAgents();
-    
-});
-
-function LoadAgents() {
-    $.getJSON('/api/agent/list',
-        function (response, status) {
-            _agents = response;
-
-            if (_agents) {
-                for (var aIndex = 0; aIndex < _agents.length; aIndex++) {
-                    $('#agentList').append($('<input type="checkbox" name="agents" id="' + _agents[aIndex].hostname + '" /><label for="' + _agents[aIndex].hostname + '">' + _agents[aIndex].hostname + '</label>'));
-                }
-            }
-
-            LoadPackages();
-        });
-}
-
-function LoadPackages() {
-    $.getJSON('/api/package/list',
-        function (response, status) {
-            _packages = response;
-            BuildGrid(_agents, _packages);
-        });
-}
-
-function resetInstallationForm() {
-    $('input:checked[type=checkbox][name=hostname]').attr('checked', false);
-    $('#packageIdSelect :nth-child(1)').attr('selected', 'selected');
-    $('#versionSelect :nth-child(1)').attr('selected', 'selected');
-}
-
-function BuildGrid(agents, packages) {
-    var grid = $('#grid');
-
-    grid.html('');
-
-    if (!packages || !agents) {
-        return;
-    }
-
-    var table = $('<table></table>');
-    var header = $('<tr></tr>');
-    header.append($('<td>Packages</td>'));
-    for(var i=0;i<agents.length;i++) {
-        header.append($('<td>' + agents[i].hostname + '</td>'));
-    }
-
-    table.append(header);
-
-    for (var i = 0; i < packages.length;i++) {
-        var row = $('<tr></tr>');
-        row.append($('<td><a href="#" class="package">' + packages[i].packageId + '</a></td>'));
-        for (var j = 0; j < agents.length; j++) {
-            if (!agents[j].packages) {
-                row.append($('<td>n/i</td>'));
-            } else {
-                var has = false;
-                for(var k=0;k<agents[j].packages.length;k++) {
-                    if (agents[j].packages[k].packageId == packages[i].packageId) {
-                        if (!agents[j].packages[k].installed) {
-                            row.append($('<td>n/i</td>'));
-                        } else {
-                            row.append($('<td>'+agents[j].packages[k].installedVersion+'</td>'));
-                        }
-                        has = true;
-                        break;
-                    }
-                }
-                if (!has) {
-                    row.append($('<td>n/i</td>'));
-                }
-            }
+﻿(function ($) {
+    var PackageModel = Backbone.Model.extend({
+        defaults: {
+            id: 'package.id',
+            version: '1.0.0.0',
+            something: 'something'
         }
-        table.append(row);
-    };
-
-    grid.html(table);
-
-    BindEvents();
-}
-
-function BindEvents() {
-    $('.cancel').click(function () {
-        $(this).parent().hide();
     });
 
-    $('.package').click(function () {
-        ShowInstallationForm($(this).text());
+    function makePackage(id) {
+        var package = new PackageModel();
+        package.set({ id: id });
+        return package;
+    }
+
+    /* MODELS */
+    var Agent = Backbone.Model.extend({
+        defaults: {
+            id: 'agent.hostname.',
+            tags: 'the, agent, tags',
+            packages: [makePackage('package.1'), makePackage('package.2'), makePackage('package.3')]
+        },
+        urlRoot: 'api/agent'
     });
 
-    $('#startInstallationForm').submit(function () {
-        $('#deployDialog').hide();
-
-        var agents = "";
-        $('input:checked[type=checkbox][name=hostname]').each(function (index, element) {
-            agents += "&agents=" + $(element).val();
-        });
-
-        $.post('/api/installation/start',
-            "packageId=" + $('#packageIdSelect').val()
-                + "&version=" + $('#versionSelect').val()
-                    + agents,
-                function () {
-                    resetInstallationForm();
-                });
-
-        return false;
+    var AgentList = Backbone.Collection.extend({
+        model: Agent,
+        url: 'api/agent'
     });
 
-    $('#registerAgentForm').submit(function () {
-        $.post('/api/agent/register',
-            'hostname=' + $('#registerAgentForm input[name=hostname]').val(),
-            function () {
-                $('#registerAgentForm input[name=hostname]').val('');
-                LoadAgents();
+    /* VIEWS */
+    var AgentView = Backbone.View.extend({
+        tagName: 'li',
+        events: {
+            'click a.unregister-agent': 'unregister'
+        },
+        initialize: function () {
+            _.bindAll(this, 'render');
+
+            this.model.bind('change', this.render);
+            this.model.bind('destroy', this.render);
+            this.model.bind('add', this.render);
+        },
+        render: function () {
+            var viewModel = {
+                hostname: this.model.get('id'),
+                tags: this.model.get('tags'),
+                packages: this.model.get('packages')
+            };
+            var template = _.template($("#agent-row-template").html(), viewModel);
+            $(this.el).html(template);
+            return this;
+        },
+        unregister: function () {
+            this.model.destroy();
+        }
+    });
+
+    var ListView = Backbone.View.extend({
+        el: $('body'),
+
+        events: {
+            'click button#add': 'addItem'
+        },
+
+        initialize: function () {
+            _.bindAll(this, 'render');
+
+            this.collection = new AgentList();
+            this.collection.bind('add', this.appendItem);
+            this.collection.bind('change', this.render);
+            this.collection.bind('destroy', this.render);
+            this.collection.fetch({ add: true });
+
+            this.counter = 0;
+            this.render();
+        },
+
+        render: function () {
+            var self = this;
+            $(this.el).html('');
+            $(this.el).append("<input name='hostname' id='new-agent-hostname' type='textbox' />");
+            $(this.el).append("<button id='add'>Add Agent</button>");
+            $(this.el).append("<ul></ul>");
+            _(this.collection.models).each(function (item) {
+                self.appendItem(item);
+            }, this);
+        },
+
+        addItem: function () {
+            this.counter++;
+
+            var item = new Agent();
+            item.set({
+                id: $('#new-agent-hostname').val()
             });
-        return false;
-    });
-}
+            item.save();
+            this.collection.add(item);
+            this.render();
+        },
 
-function ShowInstallationForm(packageId) {
-    $('#deployDialog').show();
-
-    $('#packageIdSelect').html('');
-    $('#versionSelect').html('');
-    for (var pIndex in _packages) {
-        $('#packageIdSelect').append($('<option value="' + _packages[pIndex].packageId + '">' + _packages[pIndex].packageId + '</option>'));
-
-        var package = _packages[pIndex];
-        if (package.packageId==packageId) {
-            for (var vIndex = 0; vIndex < package.availableVersions.length;vIndex++ ) {
-                $('#versionSelect').append($('<option value="' + package.availableVersions[vIndex] + '">' + package.availableVersions[vIndex] + '</option>'));
-            }
+        appendItem: function (item) {
+            var agentView = new AgentView({
+                model: item
+            });
+            $('ul', this.el).append(agentView.render().el);
         }
-    }
+    });
 
-    $('#packageIdSelect').val(packageId);
-    $('#versionSelect :nth-child(1)').attr('selected', 'selected');
-}
+    var listView = new ListView();
+})(jQuery);
+
+$(document).ready(function () {
+});
