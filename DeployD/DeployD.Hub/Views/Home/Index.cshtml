@@ -25,9 +25,12 @@
 </script>
 
 <script type="text/template" id="agent-row-template">
-	<li id="<%=hostname%>"> <%=contacted%>
+	<li id="<%=hostname%>">
     <input type="checkbox" id="select-<%=hostname%>" data-value="<%=hostname%>" name="select-agent" <%if (selected){%> checked<%}%> />
-        <label for="select-<%=hostname%>"><%=hostname%></label> (<%=tags%>) <a class="unregister-agent" href="javascript:void(0);">unregister</a>
+        <label for="select-<%=hostname%>">
+            <%=hostname%>
+            <%if (!contacted) {%> (!) <%}%>
+        </label> (<%=environment%>) <a class="unregister-agent" href="javascript:void(0);">unregister</a>
         <%if (packages&&packages.length==0) {%>
             No packages
         <%} else {%>

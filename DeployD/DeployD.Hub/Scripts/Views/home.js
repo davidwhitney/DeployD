@@ -168,7 +168,7 @@ var _updateInterval = 6000;
 
     var listView = new ListView();
     listView.collection.fetch();
-    listView.render();
+    listView.render({add:true});
 
     setInterval(function () { 
         listView.collection.fetch();

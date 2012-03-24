@@ -1,5 +1,6 @@
 using DeployD.Hub.Areas.Api.Code;
 using Ninject.Parameters;
+using log4net;
 
 [assembly: WebActivator.PreApplicationStartMethod(typeof(DeployD.Hub.App_Start.NinjectMVC3), "Start")]
 [assembly: WebActivator.ApplicationShutdownMethodAttribute(typeof(DeployD.Hub.App_Start.NinjectMVC3), "Stop")]
@@ -56,6 +57,7 @@ namespace DeployD.Hub.App_Start
             kernel.Bind<IAgentStore>().To<LocalAgentStore>().InSingletonScope();
             kernel.Bind<IPackageStore>().To<LocalPackageStore>().InSingletonScope();
             kernel.Bind<IAgentRemoteService>().To<AgentRemoteService>();
+            kernel.Bind<ILog>().ToMethod(context => LogManager.GetLogger(context.Request.Target.Name));
         }        
     }
 }
