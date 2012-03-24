@@ -2,7 +2,7 @@
 var _agentTemplate;
 var _taskTemplate;
 var _packageTemplate;
-var _updateInterval = 15000;
+var _updateInterval = 3000;
 
 (function ($) {
     var PackageModel = Backbone.Model.extend({
@@ -32,6 +32,7 @@ var _updateInterval = 15000;
     /* VIEWS */
     var AgentView = Backbone.View.extend({
         tagName: 'li',
+        selected: false,
         events: {
             'click a.unregister-agent': 'unregister'
         },
@@ -48,7 +49,8 @@ var _updateInterval = 15000;
                 tags: this.model.get('tags'),
                 packages: this.model.get('packages'),
                 currentTasks: this.model.get('currentTasks'),
-                availableVersions: this.model.get('availableVersions')
+                availableVersions: this.model.get('availableVersions'),
+                selected: this.selected
             };
             var template = _.template(_agentTemplate, viewModel);
             $(this.el).html(template);
@@ -88,11 +90,11 @@ var _updateInterval = 15000;
 
         render: function () {
             var self = this;
-            $('ul#agents', this.el).html('');
+            //$('ul#agents', this.el).html('');
 
             var versionList = new Array();
             _(this.collection.models).each(function (item) {
-                self.appendItem(item);
+                self.updateOrAppend(item);
 
                 var agentVersions = item.get('availableVersions');
 
@@ -138,11 +140,25 @@ var _updateInterval = 15000;
             });
         },
 
-        appendItem: function (item) {
+        updateOrAppend: function (item) {
             var agentView = new AgentView({
-                model: item
+                model: item,
+                selected: false
             });
-            $('ul#agents', this.el).append(agentView.render().el);
+
+            var agentElement = $('ul#agents li#' + item.id, this.el);
+            
+            if (agentElement.length==0) {
+                $('ul#agents', this.el).append(agentView.render().el);
+            } else {
+                var selected = $('input:checked', agentElement);
+                if(selected.length > 0) {
+                    agentView.selected = true;
+                }
+                $(agentElement).replaceWith(agentView.render().el);
+            }
+
+            
         }
     });
 
