@@ -2,7 +2,7 @@
 var _agentTemplate;
 var _taskTemplate;
 var _packageTemplate;
-var _updateInterval = 3000;
+var _updateInterval = 6000;
 
 (function ($) {
     var PackageModel = Backbone.Model.extend({
@@ -19,7 +19,9 @@ var _updateInterval = 3000;
             id: '',
             tags: '',
             packages: [],
-            currentTasks: []
+            currentTasks: [],
+            environment: 'unknown',
+            contacted: false
         },
         urlRoot: 'api/agent'
     });
@@ -50,7 +52,9 @@ var _updateInterval = 3000;
                 packages: this.model.get('packages'),
                 currentTasks: this.model.get('currentTasks'),
                 availableVersions: this.model.get('availableVersions'),
-                selected: this.selected
+                environment: this.model.get('environment'),
+                selected: this.selected,
+                contacted: this.model.get('contacted')
             };
             var template = _.template(_agentTemplate, viewModel);
             $(this.el).html(template);

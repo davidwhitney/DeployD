@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Deployd.Core.AgentConfiguration;
 using Deployd.Core.Queries;
 using NuGet;
 
@@ -13,12 +14,15 @@ namespace Deployd.Agent.Services.AgentConfiguration
 
         private readonly IAgentConfigurationManager _agentConfigurationManager;
         private readonly IRetrievePackageQuery _packageQuery;
+        private readonly IAgentSettingsManager _agentSettingsManager;
 
         public AgentConfigurationDownloader(IAgentConfigurationManager agentConfigurationManager,
-                                            IRetrievePackageQuery packageQuery)
+                                            IRetrievePackageQuery packageQuery,
+            IAgentSettingsManager agentSettingsManager)
         {
             _agentConfigurationManager = agentConfigurationManager;
             _packageQuery = packageQuery;
+            _agentSettingsManager = agentSettingsManager;
         }
 
         public void DownloadAgentConfiguration()
@@ -43,6 +47,7 @@ namespace Deployd.Agent.Services.AgentConfiguration
             }
 
             _agentConfigurationManager.SaveToDisk(configBytes);
+            _agentSettingsManager.UnloadSettings();
         }
 
         private static IPackageFile ExtractAgentConfigurationFile(string targetFile, IEnumerable<IPackageFile> files)

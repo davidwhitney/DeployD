@@ -20,6 +20,7 @@ namespace DeployD.Hub.Areas.Api.Code
             agent.currentTasks = agentStatus.currentTasks;
             agent.availableVersions = agentStatus.availableVersions;
             agent.environment = agentStatus.environment;
+            agent.contacted = true;
         }
 
         public LocalAgentStore(IAgentRemoteService agentRemoteService)

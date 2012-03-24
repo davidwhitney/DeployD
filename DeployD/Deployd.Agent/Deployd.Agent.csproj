@@ -139,8 +139,10 @@
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="WebUi\Models\AgentStatusViewModel.cs" />
     <Compile Include="WebUi\Models\InstallationsViewModel.cs" />
     <Compile Include="WebUi\Models\InstallTaskViewModel.cs" />
+    <Compile Include="WebUi\Models\LocalPackageInformation.cs" />
     <Compile Include="WebUi\Models\PackageListViewModel.cs" />
     <Compile Include="WebUi\CustomFormatterExtensions.cs" />
     <Compile Include="WebUi\Modules\InstallationsModule.cs" />

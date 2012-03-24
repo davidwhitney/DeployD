@@ -24,10 +24,16 @@ namespace Deployd.Agent.Services.Management
             PackagesModule.Container = AppContext.Container;
             InstallationsModule.Container = AppContext.Container;
 
-            WebUiAddress = new Uri("http://localhost:9999/");
-            _host = new WebServiceHost(new NancyWcfGenericService(), WebUiAddress);
-            _host.AddServiceEndpoint(typeof(NancyWcfGenericService), new WebHttpBinding(), "");
-            _host.Open();
+            try
+            {
+                WebUiAddress = new Uri("http://localhost:9999/");
+                _host = new WebServiceHost(new NancyWcfGenericService(), WebUiAddress);
+                _host.AddServiceEndpoint(typeof (NancyWcfGenericService), new WebHttpBinding(), "");
+                _host.Open();
+            } catch (Exception ex)
+            {
+                Logger.Fatal("could not start listening", ex);
+            }
 
             Logger.Info("Hosting Web interface on: " + WebUiAddress);
         }

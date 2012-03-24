@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Deployd.Agent.WebUi.Models;
+using Deployd.Core.AgentConfiguration;
 using Deployd.Core.Caching;
 using Deployd.Core.Hosting;
 using Deployd.Core.Installation;
@@ -13,12 +14,14 @@ namespace Deployd.Agent.WebUi.Modules
 {
     public class HomeModule : NancyModule
     {
+        private readonly IAgentSettings _agentSettings;
         private ILog _log = LogManager.GetLogger("HomeModule");
         public static Func<IIocContainer> Container { get; set; }
         public static readonly List<InstallationTask> InstallationTasks = new List<InstallationTask>();
 
         public HomeModule()
         {
+            _agentSettings = Container().GetType<IAgentSettings>();
             Get["/"] = x => View["index.cshtml"];
 
             Get["/sitrep"] = (x) =>
@@ -29,7 +32,7 @@ namespace Deployd.Agent.WebUi.Modules
                                      var installCache = Container().GetType<ICurrentInstalledCache>();
 
                                      var model =
-                                                 new PackageListViewModel
+                                                 new AgentStatusViewModel
                                                  {
                                                      Packages = cache.AvailablePackages.Select(name => new LocalPackageInformation()
                                                      {
@@ -58,7 +61,8 @@ namespace Deployd.Agent.WebUi.Modules
                                                              Version = t.Version,
                                                              LastMessage = t.ProgressReports.Count > 0 ? t.ProgressReports.LastOrDefault().Message : ""
                                                          }).ToList(),
-                                                     AvailableVersions = cache.AllCachedPackages().Select(p => p.Version.ToString()).Distinct().OrderByDescending(s => s)
+                                                     AvailableVersions = cache.AllCachedPackages().Select(p => p.Version.ToString()).Distinct().OrderByDescending(s => s),
+                                                     Environment = _agentSettings.DeploymentEnvironment
                                                  };
 
 

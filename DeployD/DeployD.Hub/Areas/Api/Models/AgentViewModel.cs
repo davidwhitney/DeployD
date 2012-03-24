@@ -12,5 +12,6 @@ namespace DeployD.Hub.Areas.Api.Models
         public List<string> availableVersions { get; set; }
         public List<InstallTaskViewModel> currentTasks { get; set; }
         public string environment { get; set; }
+        public bool contacted { get; set; }
     }
 }
