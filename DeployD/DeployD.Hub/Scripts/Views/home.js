@@ -1,24 +1,25 @@
-﻿(function ($) {
+﻿var _appTemplate;
+var _agentTemplate;
+var _taskTemplate;
+var _packageTemplate;
+var _updateInterval = 15000;
+
+(function ($) {
     var PackageModel = Backbone.Model.extend({
         defaults: {
-            id: 'package.id',
-            version: '1.0.0.0',
-            something: 'something'
+            id: '',
+            version: '',
+            something: ''
         }
     });
-
-    function makePackage(id) {
-        var package = new PackageModel();
-        package.set({ id: id });
-        return package;
-    }
 
     /* MODELS */
     var Agent = Backbone.Model.extend({
         defaults: {
-            id: 'agent.hostname.',
-            tags: 'the, agent, tags',
-            packages: [makePackage('package.1'), makePackage('package.2'), makePackage('package.3')]
+            id: '',
+            tags: '',
+            packages: [],
+            currentTasks: []
         },
         urlRoot: 'api/agent'
     });
@@ -45,9 +46,11 @@
             var viewModel = {
                 hostname: this.model.get('id'),
                 tags: this.model.get('tags'),
-                packages: this.model.get('packages')
+                packages: this.model.get('packages'),
+                currentTasks: this.model.get('currentTasks'),
+                availableVersions: this.model.get('availableVersions')
             };
-            var template = _.template($("#agent-row-template").html(), viewModel);
+            var template = _.template(_agentTemplate, viewModel);
             $(this.el).html(template);
             return this;
         },
@@ -60,7 +63,8 @@
         el: $('body'),
 
         events: {
-            'click button#add': 'addItem'
+            'click button#add': 'addItem',
+            'click button#updateSelected': 'updateSelected'
         },
 
         initialize: function () {
@@ -72,23 +76,43 @@
             this.collection.bind('destroy', this.render);
             this.collection.fetch({ add: true });
 
-            this.counter = 0;
+            $(this.el).append("<input name='hostname' id='new-agent-hostname' type='textbox' />");
+            $(this.el).append("<button id='add'>Add Agent</button>");
+
+            $(this.el).append('<p>Update selected to: <select id="allVersions" /> <button id="updateSelected">Update Selected</button></p>');
+            $(this.el).append("<ul id='agents'></ul>");
+
             this.render();
+
         },
 
         render: function () {
             var self = this;
-            $(this.el).html('');
-            $(this.el).append("<input name='hostname' id='new-agent-hostname' type='textbox' />");
-            $(this.el).append("<button id='add'>Add Agent</button>");
-            $(this.el).append("<ul></ul>");
+            $('ul#agents', this.el).html('');
+
+            var versionList = new Array();
             _(this.collection.models).each(function (item) {
                 self.appendItem(item);
+
+                var agentVersions = item.get('availableVersions');
+
+                _(agentVersions).each(function(version) {
+                    if (versionList.indexOf(version)==-1)
+                        versionList.push(version);
+                });
+                
             }, this);
+
+            $('select#allVersions').html('');
+            _(versionList).each(function(version) {
+                $('select#allVersions').append('<option>' + version + '</option>');
+            });
+            
+
+
         },
 
         addItem: function () {
-            this.counter++;
 
             var item = new Agent();
             item.set({
@@ -98,17 +122,44 @@
             this.collection.add(item);
             this.render();
         },
+        
+        updateSelected: function () {
+            var version = $('#allVersions').val();
+            var selectedAgents = $('input:checked[type=checkbox][name="select-agent"]');
+            var hostnames = '';
+            _(selectedAgents).each(function(input) {
+                hostnames += '&agentHostnames=' + $(input).attr('data-value');
+            });
+            $.post('/api/agent/updateall',
+                'version=' + version + hostnames,
+            function () {
+                listView.collection.fetch();
+                listView.render();
+            });
+        },
 
         appendItem: function (item) {
             var agentView = new AgentView({
                 model: item
             });
-            $('ul', this.el).append(agentView.render().el);
+            $('ul#agents', this.el).append(agentView.render().el);
         }
     });
 
     var listView = new ListView();
+    listView.collection.fetch();
+    listView.render();
+
+    setInterval(function () { 
+        listView.collection.fetch();
+        listView.render(); }, _updateInterval);
+    
 })(jQuery);
 
 $(document).ready(function () {
+    _appTemplate = $('#app-template').html();
+    _agentTemplate = $('#agent-row-template').html();
+    _taskTemplate = $('#task-template').html();
+    _packageTemplate = $('#package-cell-template').html();
+    
 });

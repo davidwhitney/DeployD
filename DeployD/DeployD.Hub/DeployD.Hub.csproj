@@ -89,6 +89,7 @@
     <Compile Include="Areas\Api\Controllers\InstallationController.cs" />
     <Compile Include="Areas\Api\Controllers\PackageController.cs" />
     <Compile Include="Areas\Api\Models\AgentViewModel.cs" />
+    <Compile Include="Areas\Api\Models\InstallTaskViewModel.cs" />
     <Compile Include="Areas\Api\Models\PackageViewModel.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Global.asax.cs">
@@ -159,6 +160,12 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Views\Home\Index.cshtml" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Deployd.Core\Deployd.Core.csproj">
+      <Project>{86CDB912-81EA-45E1-B8DB-B09DE466540F}</Project>
+      <Name>Deployd.Core</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v10.0\WebApplications\Microsoft.WebApplication.targets" />

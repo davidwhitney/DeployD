@@ -5,6 +5,8 @@ namespace DeployD.Hub.Areas.Api.Code
 {
     public interface IAgentRemoteService
     {
-        IEnumerable<PackageViewModel> ListPackages(string hostname);
+        List<PackageViewModel> ListPackages(string hostname);
+        AgentViewModel GetAgentStatus(string hostname);
+        void StartUpdatingAllPackages(string hostname, string version);
     }
 }

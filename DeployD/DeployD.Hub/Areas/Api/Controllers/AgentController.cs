@@ -11,11 +11,13 @@ namespace DeployD.Hub.Areas.Api.Controllers
     {
         private readonly IApiHttpChannel _httpChannel;
         private readonly IAgentStore _agentStore;
+        private readonly IAgentRemoteService _agentRemoteService;
 
-        public AgentController(IApiHttpChannel httpChannel, IAgentStore agentStore)
+        public AgentController(IApiHttpChannel httpChannel, IAgentStore agentStore, IAgentRemoteService agentRemoteService)
         {
             _httpChannel = httpChannel;
             _agentStore = agentStore;
+            _agentRemoteService = agentRemoteService;
         }
 
         //
@@ -50,6 +52,21 @@ namespace DeployD.Hub.Areas.Api.Controllers
         {
             _agentStore.UnregisterAgent(id);
             return new HttpStatusCodeResult((int)HttpStatusCode.OK);
+        }
+
+        [AcceptVerbs("POST")]
+        [ActionName("UpdateAll")]
+        public ActionResult UpdateAll(string version, string[] agentHostnames)
+        {
+            foreach (var hostname in agentHostnames)
+            {
+                _agentRemoteService.StartUpdatingAllPackages(hostname, version);
+            }
+            Response.Write("update all to version " + version);
+
+            
+
+            return new HttpStatusCodeResult((int)HttpStatusCode.Accepted);
         }
     }
 }

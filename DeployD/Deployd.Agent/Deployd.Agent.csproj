@@ -172,6 +172,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <None Include="web.config" />
+    <None Include="WebUi\Views\sitrep.cshtml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="WebUi\Views\layout.cshtml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
