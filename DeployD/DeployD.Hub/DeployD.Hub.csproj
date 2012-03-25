@@ -116,6 +116,8 @@
     <Content Include="Content\themes\base\images\ui-icons_888888_256x240.png" />
     <Content Include="Content\themes\base\images\ui-icons_cd0a0a_256x240.png" />
     <Content Include="Scripts\backbone.js" />
+    <Content Include="Scripts\jsinq-query.js" />
+    <Content Include="Scripts\jsinq.js" />
     <Content Include="Scripts\underscore.js" />
     <Content Include="Scripts\Views\home.js" />
     <Content Include="Web.config" />

@@ -40,8 +40,7 @@ namespace Deployd.Agent.WebUi.Modules
                                                          InstalledVersion = installCache.GetCurrentInstalledVersion(name) != null ? installCache.GetCurrentInstalledVersion(name).Version.ToString() : "",
                                                          LatestAvailableVersion = cache.GetLatestVersion(name) != null ? cache.GetLatestVersion(name).Version.ToString() : "",
                                                          AvailableVersions = cache.AvailablePackageVersions(name).ToList(),
-                                                         CurrentTask = runningTasks.Count > 0 ? runningTasks
-                                                             .Where(t => t.PackageId == name)
+                                                         CurrentTask = runningTasks.Where(t => t.PackageId == name)
                                                              .Select(t => new InstallTaskViewModel()
                                                              {
                                                                  Messages = t.ProgressReports.Select(pr => pr.Message).ToArray(),
@@ -50,17 +49,7 @@ namespace Deployd.Agent.WebUi.Modules
                                                                  Version = t.Version,
                                                                  LastMessage = t.ProgressReports.Count > 0 ? t.ProgressReports.LastOrDefault().Message : ""
                                                              }).FirstOrDefault()
-                                                             : null
                                                      }).ToArray(),
-                                                     CurrentTasks = runningTasks
-                                                         .Select(t => new InstallTaskViewModel()
-                                                         {
-                                                             Messages = t.ProgressReports.Select(pr => pr.Message).ToArray(),
-                                                             Status = Enum.GetName(typeof(TaskStatus), t.Task.Status),
-                                                             PackageId = t.PackageId,
-                                                             Version = t.Version,
-                                                             LastMessage = t.ProgressReports.Count > 0 ? t.ProgressReports.LastOrDefault().Message : ""
-                                                         }).ToList(),
                                                      AvailableVersions = cache.AllCachedPackages().Select(p => p.Version.ToString()).Distinct().OrderByDescending(s => s),
                                                      Environment = _agentSettings.DeploymentEnvironment
                                                  };

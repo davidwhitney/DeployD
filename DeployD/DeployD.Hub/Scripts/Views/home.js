@@ -2,7 +2,7 @@
 var _agentTemplate;
 var _taskTemplate;
 var _packageTemplate;
-var _updateInterval = 6000;
+var _updateInterval = 3000;
 
 (function ($) {
     var PackageModel = Backbone.Model.extend({
@@ -109,11 +109,12 @@ var _updateInterval = 6000;
                 
             }, this);
 
+            var selected = $('select#allVersions').val();
             $('select#allVersions').html('');
             _(versionList).each(function(version) {
                 $('select#allVersions').append('<option>' + version + '</option>');
             });
-            
+            $('select#allVersions').val(selected);
 
 
         },
@@ -180,6 +181,6 @@ $(document).ready(function () {
     _appTemplate = $('#app-template').html();
     _agentTemplate = $('#agent-row-template').html();
     _taskTemplate = $('#task-template').html();
-    _packageTemplate = $('#package-cell-template').html();
+    _packageTemplate = $('#package-template').html();
     
 });

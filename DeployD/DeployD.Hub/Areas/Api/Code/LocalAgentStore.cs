@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Web;
@@ -17,9 +18,14 @@ namespace DeployD.Hub.Areas.Api.Code
 
         public LocalAgentStore(IAgentRemoteService agentRemoteService, ILog logger)
         {
+            int updateInterval;
+            if (!int.TryParse(ConfigurationManager.AppSettings["UpdateInterval"], out updateInterval))
+            {
+                updateInterval = 5000;
+            }
             _agentRemoteService = agentRemoteService;
             _logger = logger;
-            UpdateTask = new TimedSingleExecutionTask(10000, UpdateAgents, true);
+            UpdateTask = new TimedSingleExecutionTask(updateInterval, UpdateAgents, true);
             UpdateTask.Start(null);
         }
 
