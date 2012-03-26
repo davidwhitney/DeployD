@@ -18,11 +18,11 @@ namespace Deployd.Agent.WebUi.Converters
                 var package = new LocalPackageInformation
                                   {
                                       PackageId = packageId,
-                                      LatestAvailableVersion = cache.GetLatestVersion(packageId).ToString()
+                                      LatestAvailableVersion = cache.GetLatestVersion(packageId).Version.ToString()
                                   };
 
                 var installedPackage = installCache.GetCurrentInstalledVersion(packageId);
-                package.InstalledVersion = installedPackage == null ? "" : installedPackage.ToString();
+                package.InstalledVersion = installedPackage == null ? "0.0.0.0" : installedPackage.Version.ToString();
 
                 package.CurrentTask = runningTasks.Count > 0 ? runningTasks
                            .Where(t => t.PackageId == packageId)
