@@ -8,5 +8,6 @@ namespace DeployD.Hub.Areas.Api.Code
         List<PackageViewModel> ListPackages(string hostname);
         AgentViewModel GetAgentStatus(string hostname);
         void StartUpdatingAllPackages(string hostname, string version);
+        void StartUpdate(string hostname, string packageId, string version);
     }
 }

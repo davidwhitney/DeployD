@@ -12,26 +12,25 @@
   <script src="/Scripts/underscore.js"></script>
 <script src="/Scripts/backbone.js"></script>
 <script type="text/javascript" src="/Scripts/jsinq.js"></script>
-    <script src="/Scripts/Views/home.js" type="text/javascript"></script>
-    
-<script type="text/template" id="app-template">
-    <input name='hostname' id='new-agent-hostname' type='textbox' />
-    <button id='add'>Add Agent</button>
-    <ul>
-    <%_.each(models, function(agent) {%>
-        <%=_.template(_agentTemplate, agent)%> 
-    <%});%>
-    </ul>
+<script src="/Scripts/Views/home.js" type="text/javascript"></script>
 
+
+<div id="app"></div>
+
+<script type="text/template" id="app-template">
+    <input name='hostname' id='new-agent-hostname' type='textbox' /> <button id='add'>Add Agent</button>
+    <div id="version-select"></div>
+    <ul id="agents">
+    </ul>
 </script>
 
 <script type="text/template" id="agent-row-template">
 	<li id="<%=hostname%>">
-    <input type="checkbox" id="select-<%=hostname%>" data-value="<%=hostname%>" name="select-agent" <%if (selected){%> checked<%}%> />
+    <input type="checkbox" id="select-<%=hostname%>" data-value="<%=hostname%>" name="select-agent"  />
         <label for="select-<%=hostname%>">
             <%=hostname%>
             <%if (!contacted) {%> (!) <%}%>
-        </label> (<%=environment%>) <a class="unregister-agent" href="javascript:void(0);">unregister</a>
+        </label> (<%=environment%>) <a class="manage-agent" data-id="<%=hostname%>" href="javascript:void(0);">manage</a> <a class="unregister-agent" href="javascript:void(0);">unregister</a>
         <%if (packages&&packages.length==0) {%>
             No packages
         <%} else {%>
@@ -61,4 +60,27 @@
     </li>
 </script>
 
-<app></app>
+<script type="text/template" id="manage-agent-template">
+    <div class="dialog">
+    <h2><%=hostname%></h2> <a href="javascript:void(0);" class="close-dialog">close</a>
+    <ul>
+        <form id="apply-versions-form" method="POST" action="/api/agent/<%=hostname%>/applyVersions">
+    <%_.each(packages, function(package) {%>
+        <li><%=package.packageId%><%if (package.installed) {%>(<%=package.installedVersion%>)<%} else {%>Not installed<%}%>
+            <select name="<%=package.packageId%>">
+                <%_.each(package.availableVersions, function(version) {%>
+                    <option value="<%=version%>"><%=version%></option>
+                <%});%>
+            </select>
+        <%if (package.currentTask!= null) {%>-> <%=package.currentTask.version%>: <%=package.currentTask.status%>, <%=package.currentTask.lastMessage%><%}%>
+        </li>
+    <%});%>
+        <input type="submit" value="Apply Versions to <%=hostname%>" />
+    </form>
+    </ul>
+    </div>
+</script>
+
+<script type="text/template" id="update-agents-template">
+    Update selected agents to version <select name="allVersions"><option value="latest">latest</option><%_.each(models, function(version){%><option value="<%=version.id%>"><%=version.id%></option><%});%></select><button id="updateSelected">Update Selected</button>
+</script>

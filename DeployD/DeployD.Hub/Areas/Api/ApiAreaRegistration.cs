@@ -16,10 +16,9 @@ namespace DeployD.Hub.Areas.Api
         public override void RegisterArea(AreaRegistrationContext context)
         {
             context.MapRoute("AgentMethod",
-                "Api/agent/{id}",
+                "Api/agent/{id}/{action}",
                 new { controller = "Agent", action = "Index" },
-                new {httpMethod = new HttpMethodConstraint("GET","PUT","DELETE")});
-
+                new {httpMethod = new HttpMethodConstraint("GET","PUT","DELETE","POST")});
 
             context.MapRoute(
                 "Api_default",

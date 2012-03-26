@@ -61,6 +61,19 @@ namespace DeployD.Hub.Areas.Api.Code
             
             
         }
+
+        public void StartUpdate(string hostname, string packageId, string version)
+        {
+            string url = string.Format("http://{0}:9999/packages/{1}/install/{2}", hostname, packageId, version);
+            HttpWebRequest request = HttpWebRequest.Create(url) as HttpWebRequest;
+            request.Method = "POST";
+            request.ContentLength = 0;
+
+            request.Accept = "application/json";
+            using (var response = request.GetResponse() as HttpWebResponse)
+            {
+            }
+        }
     }
 
     public class PackageListViewModel

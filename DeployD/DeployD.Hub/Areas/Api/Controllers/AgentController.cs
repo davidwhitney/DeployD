@@ -68,5 +68,35 @@ namespace DeployD.Hub.Areas.Api.Controllers
 
             return new HttpStatusCodeResult((int)HttpStatusCode.Accepted);
         }
+
+        [AcceptVerbs("POST")]
+        [ActionName("applyVersions")]
+        public ActionResult ApplyVersions(string id)
+        {
+            Response.Write("apply versions to " + id + "\n");
+            var agentPackages = _agentRemoteService.ListPackages(id);
+            foreach(var package in agentPackages)
+            {
+                string requestedVersion = Request.Form[package.packageId];
+                if (!string.IsNullOrWhiteSpace(requestedVersion))
+                {
+                    Response.Write(string.Format("install version {0} of {1}\n", requestedVersion, package.packageId));
+                    if (!package.availableVersions.Contains(requestedVersion))
+                    {
+                        Response.Write(string.Format("version {0} of {1} is not known\n", requestedVersion, package.packageId));
+                    }
+                    else if (package.installed && package.installedVersion == requestedVersion)
+                    {
+                        Response.Write("version is already installed\n");
+                    } else
+                    {
+                        _agentRemoteService.StartUpdate(id, package.packageId, requestedVersion);
+                    }
+                }
+            }
+
+            return new HttpStatusCodeResult((int)HttpStatusCode.Accepted);
+
+        }
     }
 }
