@@ -7,7 +7,9 @@
 @section scripts
 {
 }
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.0/jquery.min.js"></script>
+<link href="/Content/themes/base/jquery-ui.css" rel="stylesheet"/>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.0/jquery.min.js"></script>
+<script src="/scripts/jquery-ui.min.js"></script>
   <script src="http://ajax.cdnjs.com/ajax/libs/json2/20110223/json2.js"></script>
   <script src="/Scripts/underscore.js"></script>
 <script src="/Scripts/backbone.js"></script>
@@ -62,7 +64,7 @@
 
 <script type="text/template" id="manage-agent-template">
     <div class="dialog">
-    <h2><%=hostname%></h2> <a href="javascript:void(0);" class="close-dialog">close</a>
+    <h2><%=hostname%></h2>
     <ul>
         <form id="apply-versions-form" method="POST" action="/api/agent/<%=hostname%>/applyVersions">
     <%_.each(packages, function(package) {%>

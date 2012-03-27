@@ -4,7 +4,7 @@ var _taskTemplate;
 var _packageTemplate;
 var _manageAgentDialogTemplate;
 var _updateAgentsTemplate;
-var _updateInterval = 3000;
+var _updateInterval = 10000;
 var listView=null;
 
 (function ($) {
@@ -63,7 +63,9 @@ var listView=null;
             this.render();
             console.log('agent updated');
         },
-        render: function () {
+        render: function (target) {
+            var checked = $('input:checked', this.$el).length > 0;
+
             var viewModel = {
                 hostname: this.model.get('id'),
                 tags: this.model.get('tags'),
@@ -84,6 +86,11 @@ var listView=null;
             var template = _.template(_agentTemplate, viewModel);
 
             this.$el = $(template);
+            target.append(this.$el);
+            
+            if (checked) {
+                $('input[type=checkbox]', this.$el).attr('checked','checked');
+            }
 
             return this;
         },
@@ -124,7 +131,11 @@ var listView=null;
             };
             var dialogContent = _.template(_manageAgentDialogTemplate, viewModel);
            this.$el.html(dialogContent);
-           this.$el.show();
+           this.$el.dialog({autoOpen: false,
+			height: 500,
+			width: 600,
+			modal: true});
+           this.$el.dialog("open");
            this.delegateEvents();
 
        },
@@ -153,10 +164,21 @@ var listView=null;
        initialize: function () {
            
        },
-       render:function () {
+       render:function (container) {
+           var selector = $('select[name=allVersions]', this.$el);
+           var selectedValue='';
+           if (selector.length==0) {
+               selectedValue = selector.val();
+           }
            var content = _.template(_updateAgentsTemplate, listView.versionCollection);
-           this.$el.html(content);
-           return this;
+            selector.val(selectedValue);
+            this.$el.html(content);
+           
+           if (container && container.html() == "") {
+               container.append(this.$el);
+           }
+
+            return this;
        }
     });
 
@@ -176,8 +198,6 @@ var listView=null;
 
             this.updateToVersionView = new UpdateToVersionView();
             this.versionCollection = new VersionList();
-            this.versionCollection.bind('add', this.addVersion);
-            this.versionCollection.bind('remove', this.removeVersion);
             this.versionCollection.fetch({ add: true });
 
             this.collection = new AgentList();
@@ -245,7 +265,7 @@ var listView=null;
                 if (matchingAgents.length == 1) {
                     dv.model = matchingAgents[0];
                 }
-                $('ul', self.el).append(dv.render().$el);
+                dv.render($('ul', self.el));
                 dv.delegateEvents();
             });
 
@@ -292,25 +312,16 @@ var listView=null;
                 this.agentViews.push(agentView);
             }
         },
-        addVersion: function (version) {
-            if (!version.get("version"))
-                return;
-            
-            listView.versionCollection.add(version);
-            console.log('add version ' + version.get("version"));
-        },
-        removeVersion: function (version) {
-            listView.versionCollection.remove(version);
-            console.log('remove version ' + version.get("version"));
-        },
         updateVersionSelectionView: function () {
-            $('div#version-select',this.$el).replaceWith(this.updateToVersionView.render().$el);
+            this.updateToVersionView.render($('div#version-select',this.$el));
             console.log('draw version selection thing');
         },
         updateAll: function () {
+
          this.collection.fetch({ success: listView.render });
             //this.versionCollection.clear();
          this.versionCollection.fetch();
+
         }
     });
 
@@ -323,9 +334,9 @@ var listView=null;
     });
     $('body').append(updateLink);
 
-    /*setInterval(function () { 
-        listView.collection.fetch({ success: listView.render }); }, 
-        _updateInterval);*/
+    setInterval(function () { 
+        listView.updateAll(); }, 
+        _updateInterval);
     
 })(jQuery);
 
