@@ -26,7 +26,7 @@ namespace Deployd.Agent.WebUi.Modules
 
             Get["/sitrep"] = (x) =>
                                  {
-                                     _log.Info(string.Format("{0} asked for status", Request.UserHostAddress));
+                                     _log.DebugFormat("{0} asked for status", Request.UserHostAddress);
                                      var cache = Container().GetType<INuGetPackageCache>();
                                      var runningTasks = Container().GetType<RunningInstallationTaskList>();
                                      var installCache = Container().GetType<ICurrentInstalledCache>();

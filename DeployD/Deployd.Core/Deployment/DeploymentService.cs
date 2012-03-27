@@ -59,7 +59,7 @@ namespace Deployd.Core.Deployment
 
         public void InstallPackage(string packageId, string specificVersion, string taskId, CancellationTokenSource cancellationToken, Action<ProgressReport> reportProgress)
         {
-            var packageSelector = specificVersion == null
+            var packageSelector = specificVersion == null || specificVersion == "latest"
                                        ? (Func<IPackage>) (() => _packageCache.GetLatestVersion(packageId))
                                        : (() => _packageCache.GetSpecificVersion(packageId, specificVersion));
 

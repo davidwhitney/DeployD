@@ -82,5 +82,5 @@
 </script>
 
 <script type="text/template" id="update-agents-template">
-    Update selected agents to version <select name="allVersions"><option value="latest">latest</option><%_.each(models, function(version){%><option value="<%=version.id%>"><%=version.id%></option><%});%></select><button id="updateSelected">Update Selected</button>
+    Update selected agents to version <select name="allVersions"><option value="latest">latest</option><%_.each(models, function(version){%><option value="<%=version.get("version")%>"><%=version.get("version")%></option><%});%></select><button id="updateSelected">Update Selected</button>
 </script>

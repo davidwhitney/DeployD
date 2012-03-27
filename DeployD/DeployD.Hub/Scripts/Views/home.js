@@ -30,9 +30,7 @@ var listView=null;
         urlRoot: 'api/agent'
     });
 
-    var Version = Backbone.Model.extend({
-        defaults: { id: '1.0.0.0' }
-    });
+    var Version = Backbone.Model.extend();
 
     var AgentList = Backbone.Collection.extend({
         model: Agent,
@@ -40,7 +38,8 @@ var listView=null;
     });
 
     var VersionList = Backbone.Collection.extend({
-       model: Version         
+       model: Version,
+       url: 'api/versionlist'
     });
 
     /* VIEWS */
@@ -148,14 +147,15 @@ var listView=null;
        }
     });
 
-    var UpdateAgentsView = Backbone.View.extend({
+    var UpdateToVersionView = Backbone.View.extend({
        tagName: 'div',
        id:'update-agents',
        initialize: function () {
            
        },
        render:function () {
-           this.$el.html(_.template(_updateAgentsTemplate, listView.versionCollection));
+           var content = _.template(_updateAgentsTemplate, listView.versionCollection);
+           this.$el.html(content);
            return this;
        }
     });
@@ -174,7 +174,11 @@ var listView=null;
 
             this.agentViews = [];
 
+            this.updateToVersionView = new UpdateToVersionView();
             this.versionCollection = new VersionList();
+            this.versionCollection.bind('add', this.addVersion);
+            this.versionCollection.bind('remove', this.removeVersion);
+            this.versionCollection.fetch({ add: true });
 
             this.collection = new AgentList();
             this.collection.bind('change', this.change);
@@ -190,7 +194,6 @@ var listView=null;
               }));
             });
 
-            this.updateAgentsView = new UpdateAgentsView();
         },
         add: function(agent) {
             var that = this;
@@ -203,17 +206,6 @@ var listView=null;
             if (this._rendered) {
                 $(this.el).append(dv.render().el);
             }
-            
-            // update versions list
-            _(agent.get("packages")).each(function(package) {
-                _(package.availableVersions).each(function(version) {
-                    if (that.versionCollection.where({id:version}).length==0) {
-                        var versionModel = new Version();
-                        versionModel.id = version;
-                        that.versionCollection.add(versionModel);
-                    }
-                });
-            });
         },
         remove: function (agent) {
             var viewToRemove = _(this.agentViews).select(function(cv) { return cv.model === agent; })[0];
@@ -233,7 +225,7 @@ var listView=null;
             $(this.el).empty();
 
             $(this.el).append(_appTemplate);
-            $('div#version-select',this.$el).replaceWith(this.updateAgentsView.render().$el);
+            
 
             _(this.collection.models).each(function(agent) {
                 console.log('collection has agent ' + agent.id);
@@ -255,14 +247,9 @@ var listView=null;
                 }
                 $('ul', self.el).append(dv.render().$el);
                 dv.delegateEvents();
-                
-                agentId=manageAgentDialog.model.get("id");
-                self.collection.where({ id: agentId });
-                if (matchingAgents.length == 1) {
-                    manageAgentDialog.model = matchingAgents[0];
-                    manageAgentDialog.render();
-                }
             });
+
+            this.updateVersionSelectionView();
         },
 
         addItem: function () {
@@ -304,6 +291,26 @@ var listView=null;
                 });
                 this.agentViews.push(agentView);
             }
+        },
+        addVersion: function (version) {
+            if (!version.get("version"))
+                return;
+            
+            listView.versionCollection.add(version);
+            console.log('add version ' + version.get("version"));
+        },
+        removeVersion: function (version) {
+            listView.versionCollection.remove(version);
+            console.log('remove version ' + version.get("version"));
+        },
+        updateVersionSelectionView: function () {
+            $('div#version-select',this.$el).replaceWith(this.updateToVersionView.render().$el);
+            console.log('draw version selection thing');
+        },
+        updateAll: function () {
+         this.collection.fetch({ success: listView.render });
+            //this.versionCollection.clear();
+         this.versionCollection.fetch();
         }
     });
 
@@ -312,7 +319,7 @@ var listView=null;
     var manageAgentDialog = new ManageAgentDialogView();
 
     var updateLink = $('<a>update</a>').click(function() {
-         listView.collection.fetch({ success: listView.render });
+        listView.updateAll();
     });
     $('body').append(updateLink);
 
