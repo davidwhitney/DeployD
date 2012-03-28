@@ -63,6 +63,11 @@ namespace Deployd.Core.AgentConfiguration
             ConfigureDefaults(settings, agentSettings);
             EnsurePathsExist(agentSettings);
 
+            foreach(var setting in agentSettings)
+            {
+                _log.DebugFormat("{0} = {1}", setting.Key, setting.Value);
+            }
+
             return agentSettings;
         }
 

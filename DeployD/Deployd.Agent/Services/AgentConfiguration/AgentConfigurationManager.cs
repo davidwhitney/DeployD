@@ -1,14 +1,19 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Xml.Serialization;
+using Deployd.Core;
 using Deployd.Core.AgentConfiguration;
+using log4net;
 
 namespace Deployd.Agent.Services.AgentConfiguration
 {
     public class AgentConfigurationManager : IAgentConfigurationManager
     {
+        private static string _baseUrl = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData), "DeployD.Agent");
         private readonly object _fileLock;
+        private ILog _logger = LogManager.GetLogger(typeof (AgentConfigurationManager));
 
         public AgentConfigurationManager()
         {
@@ -52,9 +57,17 @@ namespace Deployd.Agent.Services.AgentConfiguration
 
         public void SaveToDisk(byte[] configuration, string fileName = ConfigurationFiles.AGENT_CONFIGURATION_FILE)
         {
-            lock (_fileLock)
+            _logger.DebugFormat("saving configuration file to {0}", fileName.MapVirtualPath());
+            string configurationPath = Path.Combine(ConfigurationFiles.AGENT_CONFIGURATION_FILE_LOCATION.MapVirtualPath(), fileName);
+            try
             {
-                File.WriteAllBytes(fileName, configuration);
+                lock (_fileLock)
+                {
+                    File.WriteAllBytes(configurationPath, configuration);
+                }
+            } catch (Exception ex)
+            {
+                _logger.Error("Could not save configuration file " + fileName.MapVirtualPath(), ex);
             }
         }
     }
