@@ -23,13 +23,13 @@ namespace DeployD.Hub.Areas.Api.Code
             if ((_packages == null)
                 || DateTime.Now.Subtract(_lastRefresh).TotalMinutes > 1)
             {
-                List<AgentViewModel> agents = _agentStore.ListAgents().ToList();
+                List<AgentRecord> agents = _agentStore.ListAgents().ToList();
                 if (agents.Count == 0)
                     return null;
                 _packages = new List<PackageViewModel>();
                 foreach(var agent in agents)
                 {
-                    _packages.AddRange(agent.packages);
+                    _packages.AddRange(agent.Packages);
                 }
             }
 

@@ -3,6 +3,7 @@ using System.IO;
 using System.Net;
 using System.Text;
 using DeployD.Hub.Areas.Api.Models;
+using DeployD.Hub.Areas.Api.Models.Dto;
 
 namespace DeployD.Hub.Areas.Api.Code
 {
@@ -14,6 +15,11 @@ namespace DeployD.Hub.Areas.Api.Code
 
             var packages = Get<PackageListViewModel>(url);
             return packages.Packages;
+        }
+
+        public AgentStatusReport GetAgentStatus(string hostname)
+        {
+            return Get<AgentStatusReport>(string.Format("http://{0}:9999/sitrep", hostname));
         }
 
         private static T Get<T>(string url)
@@ -31,11 +37,6 @@ namespace DeployD.Hub.Areas.Api.Code
             }
             var decoded = System.Web.Helpers.Json.Decode<T>(responseContent);
             return decoded;
-        }
-
-        public AgentViewModel GetAgentStatus(string hostname)
-        {
-            return Get<AgentViewModel>(string.Format("http://{0}:9999/sitrep", hostname));
         }
 
         public void StartUpdatingAllPackages(string hostname, string version)

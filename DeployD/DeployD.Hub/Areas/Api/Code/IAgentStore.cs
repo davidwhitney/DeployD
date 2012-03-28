@@ -5,8 +5,8 @@ namespace DeployD.Hub.Areas.Api.Code
 {
     public interface IAgentStore
     {
-        List<AgentViewModel> ListAgents();
-        void RegisterAgent(AgentViewModel agent);
+        List<AgentRecord> ListAgents();
+        void RegisterAgent(string hostname);
         void UnregisterAgent(string hostname);
     }
 }

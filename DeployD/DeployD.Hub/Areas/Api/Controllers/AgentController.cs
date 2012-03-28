@@ -1,6 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Web;
 using System.Web.Mvc;
 using DeployD.Hub.Areas.Api.Code;
 using DeployD.Hub.Areas.Api.Models;
@@ -18,30 +20,44 @@ namespace DeployD.Hub.Areas.Api.Controllers
             _httpChannel = httpChannel;
             _agentStore = agentStore;
             _agentRemoteService = agentRemoteService;
+
+            AutoMapper.Mapper.CreateMap<List<AgentRecord>, List<AgentViewModel>>();
+            AutoMapper.Mapper.CreateMap<AgentRecord, AgentViewModel>();
+            AutoMapper.Mapper.CreateMap<PackageRecord, PackageViewModel>();
         }
 
         //
         // GET: /Api/Agent/
+        [ActionName("List")]
+        [HttpGet]
+        public ActionResult List() // list
+        {
+            List<AgentRecord> agents = _agentStore.ListAgents();
+            var viewModel = agents.Select(AutoMapper.Mapper.Map<AgentRecord, AgentViewModel>).ToList();
+
+            return _httpChannel.RepresentationOf(viewModel, HttpContext);
+        }
+
         [ActionName("Index")]
         [HttpGet]
         public ActionResult Index(string id) // list
         {
             if (string.IsNullOrWhiteSpace(id))
             {
-                return _httpChannel.RepresentationOf(_agentStore.ListAgents(), HttpContext);
+                throw new HttpException((int)HttpStatusCode.BadRequest, "Invalid parameter", new ArgumentException("Invalid hostname", "id"));
             }
-            else
-            {
-                return
-                    _httpChannel.RepresentationOf(_agentStore.ListAgents().SingleOrDefault(a => a.id == id), HttpContext);
-            }
+
+            AgentRecord agentRecord = _agentStore.ListAgents().SingleOrDefault(a => a.Hostname == id);
+            var viewModel = AutoMapper.Mapper.Map<AgentRecord, AgentViewModel>(agentRecord);
+
+            return _httpChannel.RepresentationOf(viewModel, HttpContext);
         }
 
         [AcceptVerbs("PUT")]
         [ActionName("Index")]
         public ActionResult IndexPost(string id)
         {
-            _agentStore.RegisterAgent(new AgentViewModel() { id = id });
+            _agentStore.RegisterAgent(id);
 
             return new HttpStatusCodeResult((int) HttpStatusCode.Created);
         }

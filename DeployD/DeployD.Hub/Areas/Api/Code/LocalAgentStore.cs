@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Web;
 using DeployD.Hub.Areas.Api.Models;
+using DeployD.Hub.Areas.Api.Models.Dto;
 using Deployd.Core;
 using log4net;
 
@@ -29,22 +30,22 @@ namespace DeployD.Hub.Areas.Api.Code
             UpdateTask.Start(null);
         }
 
-        private void UpdateAgentStatus(AgentViewModel agent)
+        private void UpdateAgentStatus(AgentRecord agent)
         {
-            AgentViewModel agentStatus = null;
+            AgentStatusReport agentStatus = null;
             try
             {
-                agentStatus = _agentRemoteService.GetAgentStatus(agent.id);
-                agent.packages = agentStatus.packages;
-                agent.currentTasks = agentStatus.currentTasks;
-                agent.availableVersions = agentStatus.availableVersions;
-                agent.environment = agentStatus.environment;
-                agent.contacted = true;
+                agentStatus = _agentRemoteService.GetAgentStatus(agent.Hostname);
+                agent.Packages = agentStatus.packages;
+                agent.CurrentTasks = agentStatus.currentTasks;
+                agent.AvailableVersions = agentStatus.availableVersions;
+                agent.Environment = agentStatus.environment;
+                agent.Contacted = true;
             }
             catch (Exception ex)
             {
                 _logger.Warn("Failed to get agent status", ex);
-                agent.contacted = false;
+                agent.Contacted = false;
             }
         }
 
@@ -54,15 +55,16 @@ namespace DeployD.Hub.Areas.Api.Code
             UpdateTask.Stop();
         }
 
-        private readonly List<AgentViewModel> _agents = new List<AgentViewModel>();
-        public List<AgentViewModel> ListAgents()
+        private readonly List<AgentRecord> _agents = new List<AgentRecord>();
+        public List<AgentRecord> ListAgents()
         {
             UpdateAgents();
             return _agents;
         }
 
-        public void RegisterAgent(AgentViewModel agent)
+        public void RegisterAgent(string hostname)
         {
+            AgentRecord agent = new AgentRecord() { Hostname = hostname };
             new TaskFactory().StartNew(() => UpdateAgentStatus(agent));
             _agents.Add(agent);
         }
@@ -74,17 +76,12 @@ namespace DeployD.Hub.Areas.Api.Code
 
         public void UnregisterAgent(string hostname)
         {
-            if (!_agents.Any(a=>a.id==hostname))
+            if (!_agents.Any(a=>a.Hostname==hostname))
             {
                 throw new IndexOutOfRangeException("No agent found with given hostname");
             }
 
-            _agents.RemoveAll(a=>a.id==hostname);
+            _agents.RemoveAll(a=>a.Hostname==hostname);
         }
-    }
-
-    public class GetPackageListResult
-    {
-        public IEnumerable<PackageViewModel> Packages { get; set; }
     }
 }
