@@ -11,22 +11,24 @@ using log4net;
 
 namespace DeployD.Hub.Areas.Api.Code
 {
-    public class LocalAgentStore : IAgentStore
+    public class AgentManager : IAgentManager
     {
+        private readonly IAgentRepository _agentRepository;
         private readonly IAgentRemoteService _agentRemoteService;
         private readonly ILog _logger;
         public TimedSingleExecutionTask UpdateTask { get; private set; }
 
-        public LocalAgentStore(IAgentRemoteService agentRemoteService, ILog logger)
+        public AgentManager(IAgentRepository agentRepository, IAgentRemoteService agentRemoteService, ILog logger)
         {
             int updateInterval;
             if (!int.TryParse(ConfigurationManager.AppSettings["UpdateInterval"], out updateInterval))
             {
                 updateInterval = 5000;
             }
+            _agentRepository = agentRepository;
             _agentRemoteService = agentRemoteService;
             _logger = logger;
-            UpdateTask = new TimedSingleExecutionTask(updateInterval, UpdateAgents, true);
+            UpdateTask = new TimedSingleExecutionTask(updateInterval, StartUpdateOnAllAgents, true);
             UpdateTask.Start(null);
         }
 
@@ -41,6 +43,7 @@ namespace DeployD.Hub.Areas.Api.Code
                 agent.AvailableVersions = agentStatus.availableVersions;
                 agent.Environment = agentStatus.environment;
                 agent.Contacted = true;
+                _agentRepository.SaveOrUpdate(agent);
             }
             catch (Exception ex)
             {
@@ -50,38 +53,31 @@ namespace DeployD.Hub.Areas.Api.Code
         }
 
 
-        ~LocalAgentStore()
+        ~AgentManager()
         {
             UpdateTask.Stop();
         }
 
-        private readonly List<AgentRecord> _agents = new List<AgentRecord>();
         public List<AgentRecord> ListAgents()
         {
-            UpdateAgents();
-            return _agents;
+            return _agentRepository.List();
         }
 
-        public void RegisterAgent(string hostname)
+        public void RegisterAgentAndGetStatus(string hostname)
         {
             AgentRecord agent = new AgentRecord() { Hostname = hostname };
             new TaskFactory().StartNew(() => UpdateAgentStatus(agent));
-            _agents.Add(agent);
+            _agentRepository.SaveOrUpdate(agent);
         }
 
-        private void UpdateAgents()
+        public void StartUpdateOnAllAgents()
         {
-            _agents.ForEach(a => new TaskFactory().StartNew(() => UpdateAgentStatus(a)));
+            _agentRepository.List().ForEach(a => new TaskFactory().StartNew(() => UpdateAgentStatus(a)));
         }
 
         public void UnregisterAgent(string hostname)
         {
-            if (!_agents.Any(a=>a.Hostname==hostname))
-            {
-                throw new IndexOutOfRangeException("No agent found with given hostname");
-            }
-
-            _agents.RemoveAll(a=>a.Hostname==hostname);
+            _agentRepository.Remove(hostname);
         }
     }
 }

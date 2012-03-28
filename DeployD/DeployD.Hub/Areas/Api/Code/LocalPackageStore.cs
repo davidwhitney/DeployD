@@ -8,14 +8,14 @@ namespace DeployD.Hub.Areas.Api.Code
     public class LocalPackageStore : IPackageStore
     {
         private readonly IAgentRemoteService _agentRemoteService;
-        private readonly IAgentStore _agentStore;
+        private readonly IAgentManager _agentManager;
         private List<PackageViewModel> _packages=null;
         private DateTime _lastRefresh = DateTime.Now;
 
-        public LocalPackageStore(IAgentRemoteService agentRemoteService, IAgentStore agentStore)
+        public LocalPackageStore(IAgentRemoteService agentRemoteService, IAgentManager agentManager)
         {
             _agentRemoteService = agentRemoteService;
-            _agentStore = agentStore;
+            _agentManager = agentManager;
         }
 
         public IEnumerable<PackageViewModel> ListAll()
@@ -23,7 +23,7 @@ namespace DeployD.Hub.Areas.Api.Code
             if ((_packages == null)
                 || DateTime.Now.Subtract(_lastRefresh).TotalMinutes > 1)
             {
-                List<AgentRecord> agents = _agentStore.ListAgents().ToList();
+                List<AgentRecord> agents = _agentManager.ListAgents().ToList();
                 if (agents.Count == 0)
                     return null;
                 _packages = new List<PackageViewModel>();

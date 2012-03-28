@@ -1,5 +1,7 @@
 using DeployD.Hub.Areas.Api.Code;
 using Ninject.Parameters;
+using Raven.Client;
+using Raven.Client.Embedded;
 using log4net;
 
 [assembly: WebActivator.PreApplicationStartMethod(typeof(DeployD.Hub.App_Start.NinjectMVC3), "Start")]
@@ -54,10 +56,25 @@ namespace DeployD.Hub.App_Start
             kernel.Bind<IApiHttpChannel>().To<ApiHttpChannel>();
             kernel.Bind<IRepresentationBuilder>().To<XmlRepresentationBuilder>();
             kernel.Bind<IRepresentationBuilder>().To<JsonRepresentationBuilder>();
-            kernel.Bind<IAgentStore>().To<LocalAgentStore>().InSingletonScope();
+            kernel.Bind<IAgentRepository>().To<InMemoryAgentRepository>().InSingletonScope();
+            kernel.Bind<IAgentManager>().To<AgentManager>();
             kernel.Bind<IPackageStore>().To<LocalPackageStore>().InSingletonScope();
             kernel.Bind<IAgentRemoteService>().To<AgentRemoteService>();
             kernel.Bind<ILog>().ToMethod(context => LogManager.GetLogger(context.Request.Target.Name));
+
+            kernel.Bind<IDocumentStore>()
+                .ToMethod(ctx =>
+                              {
+                                  var documentStore = new EmbeddableDocumentStore()
+                                {
+                                    DataDirectory =System.Web.Hosting.HostingEnvironment.MapPath("~/App_Data/Database"),
+                                    UseEmbeddedHttpServer = true
+                                };
+                                  Raven.Database.Server.NonAdminHttp.EnsureCanListenToWhenInNonAdminContext(8080);
+                                  documentStore.Initialize();
+
+                                  return documentStore;
+                              }).InSingletonScope();
         }        
     }
 }

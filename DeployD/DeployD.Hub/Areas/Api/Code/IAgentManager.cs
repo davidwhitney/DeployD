@@ -3,10 +3,11 @@ using DeployD.Hub.Areas.Api.Models;
 
 namespace DeployD.Hub.Areas.Api.Code
 {
-    public interface IAgentStore
+    public interface IAgentManager
     {
         List<AgentRecord> ListAgents();
-        void RegisterAgent(string hostname);
+        void StartUpdateOnAllAgents();
+        void RegisterAgentAndGetStatus(string hostname);
         void UnregisterAgent(string hostname);
     }
 }

@@ -12,18 +12,17 @@ namespace DeployD.Hub.Areas.Api.Controllers
     public class AgentController : Controller
     {
         private readonly IApiHttpChannel _httpChannel;
-        private readonly IAgentStore _agentStore;
+        private readonly IAgentManager _agentManager;
         private readonly IAgentRemoteService _agentRemoteService;
 
-        public AgentController(IApiHttpChannel httpChannel, IAgentStore agentStore, IAgentRemoteService agentRemoteService)
+        public AgentController(IApiHttpChannel httpChannel, IAgentManager agentManager, IAgentRemoteService agentRemoteService)
         {
             _httpChannel = httpChannel;
-            _agentStore = agentStore;
+            _agentManager = agentManager;
             _agentRemoteService = agentRemoteService;
 
-            AutoMapper.Mapper.CreateMap<List<AgentRecord>, List<AgentViewModel>>();
-            AutoMapper.Mapper.CreateMap<AgentRecord, AgentViewModel>();
-            AutoMapper.Mapper.CreateMap<PackageRecord, PackageViewModel>();
+            AutoMapper.Mapper.CreateMap<AgentRecord, AgentViewModel>().ForMember(viewModel=>viewModel.id, mo=>mo.MapFrom(record=>record.Hostname));
+            AutoMapper.Mapper.CreateMap<PackageRecord, PackageViewModel>().ForMember(viewModel => viewModel.packageId, mo => mo.MapFrom(record => record.PackageId));
         }
 
         //
@@ -32,7 +31,8 @@ namespace DeployD.Hub.Areas.Api.Controllers
         [HttpGet]
         public ActionResult List() // list
         {
-            List<AgentRecord> agents = _agentStore.ListAgents();
+            _agentManager.StartUpdateOnAllAgents();
+            List<AgentRecord> agents = _agentManager.ListAgents();
             var viewModel = agents.Select(AutoMapper.Mapper.Map<AgentRecord, AgentViewModel>).ToList();
 
             return _httpChannel.RepresentationOf(viewModel, HttpContext);
@@ -47,7 +47,7 @@ namespace DeployD.Hub.Areas.Api.Controllers
                 throw new HttpException((int)HttpStatusCode.BadRequest, "Invalid parameter", new ArgumentException("Invalid hostname", "id"));
             }
 
-            AgentRecord agentRecord = _agentStore.ListAgents().SingleOrDefault(a => a.Hostname == id);
+            AgentRecord agentRecord = _agentManager.ListAgents().SingleOrDefault(a => a.Hostname == id);
             var viewModel = AutoMapper.Mapper.Map<AgentRecord, AgentViewModel>(agentRecord);
 
             return _httpChannel.RepresentationOf(viewModel, HttpContext);
@@ -57,7 +57,7 @@ namespace DeployD.Hub.Areas.Api.Controllers
         [ActionName("Index")]
         public ActionResult IndexPost(string id)
         {
-            _agentStore.RegisterAgent(id);
+            _agentManager.RegisterAgentAndGetStatus(id);
 
             return new HttpStatusCodeResult((int) HttpStatusCode.Created);
         }
@@ -66,7 +66,7 @@ namespace DeployD.Hub.Areas.Api.Controllers
         [ActionName("Index")]
         public ActionResult IndexDelete(string id)
         {
-            _agentStore.UnregisterAgent(id);
+            _agentManager.UnregisterAgent(id);
             return new HttpStatusCodeResult((int)HttpStatusCode.OK);
         }
 
