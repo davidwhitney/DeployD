@@ -8,6 +8,7 @@
 {
 }
 <link href="/Content/themes/base/jquery-ui.css" rel="stylesheet"/>
+<link href="/Content/views/home.css" rel="stylesheet"/>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.0/jquery.min.js"></script>
 <script src="/scripts/jquery-ui.min.js"></script>
   <script src="http://ajax.cdnjs.com/ajax/libs/json2/20110223/json2.js"></script>
@@ -27,23 +28,25 @@
 </script>
 
 <script type="text/template" id="agent-row-template">
-	<li id="<%=hostname%>">
+	<li class="agent" id="<%=hostname%>">
     <input type="checkbox" id="select-<%=hostname%>" data-value="<%=hostname%>" name="select-agent"  />
-        <label for="select-<%=hostname%>">
+        <label for="select-<%=hostname%>" class="agent-hostname">
             <%=hostname%>
             <%if (!contacted) {%> (!) <%}%>
-        </label> (<%=environment%>) <a class="manage-agent" data-id="<%=hostname%>" href="javascript:void(0);">manage</a> <a class="unregister-agent" href="javascript:void(0);">unregister</a>
-        <%if (packages&&packages.length==0) {%>
-            No packages
-        <%} else {%>
-            <ul>
-            <%_.each(packages, function(package) {%>
-                <%=_.template(_packageTemplate, package)%>
+        </label> (<%=environment%>) <a class="manage-agent" data-id="<%=hostname%>" href="javascript:void(0);">manage</a> <a class="unregister-agent" href="javascript:void(0);"><img src="/content/images/delete.png" alt="unregister agent" title="unregister agent" /></a>
+        <%if (packages&&packages.length>0) {
+            var distinctVersions=[];
+            var installedVersions = new jsinq.Enumerable(packages)
+                                                .where(function(p) { return p.installed; })
+                                                .groupBy(function(p) { return p.installedVersion; })
+                                                .select(function(g) { return { version: g.key, count: g.count()}; });
+            installedVersions.each(function(version, index) {%>
+                <%=version.version%> (<%=version.count%>)
             <%});%>
-            </ul>
         <%}%>
+        
         <%if (currentTasks&&currentTasks.length != 0) {%>
-            <ul>
+            <ul class="tasks">
                 <%_.each(currentTasks, function(task) {%>
                     <%=_.template(_taskTemplate, task)%>
                 <%});%>
@@ -53,19 +56,19 @@
 </script>
 
 <script type="text/template" id="task-template">
-    <li><%=PackageId%> <%=Version%>: <%=Status%>, <%=LastMessage%></li>
+    <li class="task"><span class="package-id"><%=packageId%></span> <span class="package-version"><%=version%></span>: <span class="task-status"><%=status%></span>, <span class="task-message"><%=lastMessage%></span></li>
 </script>
 
 <script type="text/template" id="package-template">
-    <li><%=packageId%><%if (installed) {%>(<%=installedVersion%>)<%} else {%>Not installed<%}%>
+    <li class="package"><%=packageId%><%if (installed) {%>(<%=installedVersion%>)<%} else {%>Not installed<%}%>
     <%if (currentTask!= null) {%>-> <%=currentTask.version%>: <%=currentTask.status%>, <%=currentTask.lastMessage%><%}%>
     </li>
 </script>
 
 <script type="text/template" id="manage-agent-template">
-    <div class="dialog">
+    <div class="dialog" id="manage-agent">
     <h2><%=hostname%></h2>
-    <ul>
+    <ul class="manage-agent">
         <form id="apply-versions-form" method="POST" action="/api/agent/<%=hostname%>/applyVersions">
     <%_.each(packages, function(package) {%>
         <li><%=package.packageId%><%if (package.installed) {%>(<%=package.installedVersion%>)<%} else {%>Not installed<%}%>
@@ -73,11 +76,11 @@
                 <%_.each(package.availableVersions, function(version) {%>
                     <option value="<%=version%>"><%=version%></option>
                 <%});%>
-            </select>
-        <%if (package.currentTask!= null) {%>-> <%=package.currentTask.version%>: <%=package.currentTask.status%>, <%=package.currentTask.lastMessage%><%}%>
+            </select> <button class="update-agent" data-packageid="<%=package.packageId%>">Update</button>
+        <div class="manage-agent-current-task"><%if (package.currentTask!= null) {%>-> <%=package.currentTask.version%>: <%=package.currentTask.status%>, <%=package.currentTask.lastMessage%><%}%></div>
         </li>
     <%});%>
-        <input type="submit" value="Apply Versions to <%=hostname%>" />
+        <input type="submit" value="Update All on <%=hostname%>" />
     </form>
     </ul>
     </div>

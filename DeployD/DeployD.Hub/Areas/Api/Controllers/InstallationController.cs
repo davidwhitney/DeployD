@@ -10,11 +10,11 @@ namespace DeployD.Hub.Areas.Api.Controllers
 {
     public class InstallationController : Controller
     {
-        private readonly IApiHttpChannel _apiHttpChannel;
+        private readonly IAgentRemoteService _agentRemoteService;
 
-        public InstallationController(IApiHttpChannel apiHttpChannel)
+        public InstallationController(IAgentRemoteService agentRemoteService)
         {
-            _apiHttpChannel = apiHttpChannel;
+            _agentRemoteService = agentRemoteService;
         }
 
         //
@@ -22,6 +22,10 @@ namespace DeployD.Hub.Areas.Api.Controllers
 
         public ActionResult Start(StartInstallationRequest request)
         {
+            foreach(string agentHostname in request.Agents)
+            {
+                _agentRemoteService.StartUpdate(agentHostname, request.PackageId, request.Version);
+            }
             return new HttpStatusCodeResult((int) HttpStatusCode.Accepted);
         }
 

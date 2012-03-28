@@ -36,6 +36,7 @@ namespace Deployd.Agent.Conventions
             Bind<InstallationTaskQueue>().ToSelf().InSingletonScope();
 
             Bind<IDeploymentHook>().To<PowershellDeploymentHook>();
+            Bind<IDeploymentHook>().To<WaitHook>();
             Bind<IDeploymentHook>().To<ServiceDeploymentHook>();
             Bind<IDeploymentHook>().To<MsDeployDeploymentHook>();
             Bind<IDeploymentHook>().To<ConfigTransformationDeploymentHook>(); // we want the config transform to run AfterDeploy() before the AppOffline hook does

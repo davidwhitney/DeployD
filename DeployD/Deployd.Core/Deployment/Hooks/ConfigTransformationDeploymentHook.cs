@@ -16,19 +16,6 @@ namespace Deployd.Core.Deployment.Hooks
         public override bool HookValidForPackage(DeploymentContext context)
         {
             return true;
-            //return context.Package.Tags.ToLower().Split(' ', ',', ';').Contains("service");
-
-            string searchString = string.Empty;
-            //  find base config files
-            if (context.Package.Tags.ToLower().Split(' ',',',';').Contains("website"))
-            {
-                searchString = "web.config";
-            } else
-            {
-                searchString = context.Package.Title + ".exe.config";
-            }
-
-            return context.Package.GetFiles().Any(f => Path.GetFileName(f.Path).Equals(searchString, StringComparison.CurrentCultureIgnoreCase));
         }
 
         private void RecursivelyFindFileByName(DirectoryInfo folder, string fileName, ref List<FileInfo> matches )
@@ -78,7 +65,7 @@ namespace Deployd.Core.Deployment.Hooks
                         baseConfigurationPath,
                         transformFilePath,
                         outputPath);
-                    RunProcess(Path.Combine(Environment.CurrentDirectory, @"tools\TransformVsConfiguration.exe"), transformArgs);
+                    RunProcess(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"tools\TransformVsConfiguration.exe"), transformArgs);
                 } 
                 else
                 {

@@ -57,9 +57,9 @@ namespace DeployD.Hub.App_Start
             kernel.Bind<IRepresentationBuilder>().To<XmlRepresentationBuilder>();
             kernel.Bind<IRepresentationBuilder>().To<JsonRepresentationBuilder>();
             kernel.Bind<IAgentRepository>().To<RavenDbAgentRepository>().InSingletonScope();
-            kernel.Bind<IAgentManager>().To<AgentManager>();
+            kernel.Bind<IAgentManager>().To<AgentManager>().InSingletonScope();
             kernel.Bind<IPackageStore>().To<LocalPackageStore>().InSingletonScope();
-            kernel.Bind<IAgentRemoteService>().To<AgentRemoteService>();
+            kernel.Bind<IAgentRemoteService>().To<AgentRemoteService>().InSingletonScope();
             kernel.Bind<ILog>().ToMethod(context => LogManager.GetLogger(context.Request.Target.Name));
 
             kernel.Bind<IDocumentStore>()

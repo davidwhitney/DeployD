@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using System.IO.Abstractions;
+using Deployd.Core.AgentConfiguration;
 using log4net;
 
 namespace Deployd.Core
@@ -8,7 +9,6 @@ namespace Deployd.Core
     public static class FileSystemExtensions
     {
         private static readonly ILog Logger = LogManager.GetLogger("IFileSystemExtensions");
-        private static string _baseFolder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData), "DeployD.Agent");
 
         public static void EnsureDirectoryExists(this IFileSystem fs, string dir)
         {
@@ -24,7 +24,7 @@ namespace Deployd.Core
             const string virtualToken = "~\\";
             return !absolutePath.Contains(virtualToken)
                        ? absolutePath
-                       : absolutePath.Replace(virtualToken, _baseFolder + "\\");
+                       : absolutePath.Replace(virtualToken, AgentSettings.AgentProgramDataPath + "\\");
         }
 
         public static string MapVirtualPath(this string virtualPath)
@@ -32,7 +32,7 @@ namespace Deployd.Core
             const string virtualToken = "~\\";
             return !virtualPath.Contains(virtualToken)
                        ? virtualPath
-                       : virtualPath.Replace(virtualToken, _baseFolder + "\\");
+                       : virtualPath.Replace(virtualToken, AgentSettings.AgentProgramDataPath + "\\");
         }
     }
 }

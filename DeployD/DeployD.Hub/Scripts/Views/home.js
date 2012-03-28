@@ -4,8 +4,10 @@ var _taskTemplate;
 var _packageTemplate;
 var _manageAgentDialogTemplate;
 var _updateAgentsTemplate;
-var _updateInterval = 10000;
-var listView=null;
+var _updateInterval = 6 * 1000;
+var listView = null;
+var _apiBaseUrl = '/api';
+var _manageAgentDialogOpen = false;
 
 (function ($) {
     var PackageModel = Backbone.Model.extend({
@@ -27,19 +29,19 @@ var listView=null;
             contacted: false,
             selected: false
         },
-        urlRoot: 'api/agent'
+        urlRoot: _apiBaseUrl + '/agent'
     });
 
     var Version = Backbone.Model.extend();
 
     var AgentList = Backbone.Collection.extend({
         model: Agent,
-        url: 'api/agent'
+        url: _apiBaseUrl + '/agent'
     });
 
     var VersionList = Backbone.Collection.extend({
-       model: Version,
-       url: 'api/versionlist'
+        model: Version,
+        url: _apiBaseUrl + '/versionlist'
     });
 
     /* VIEWS */
@@ -52,7 +54,7 @@ var listView=null;
             'click a.manage-agent': 'manage'
         },
         initialize: function () {
-            _.bindAll(this, 'render','manage','unregister');
+            _.bindAll(this, 'render', 'manage', 'unregister');
 
             this.model.bind('change', this.update);
             this.model.bind('destroy', this.render);
@@ -77,7 +79,7 @@ var listView=null;
                 contacted: this.model.get('contacted')
             };
 
-            _(viewModel.packages).each(function(package) {
+            _(viewModel.packages).each(function (package) {
                 if (package.currentTask != null) {
                     console.log(package.packageId + ' current task is ' + package.currentTask);
                 }
@@ -87,9 +89,9 @@ var listView=null;
 
             this.$el = $(template);
             target.append(this.$el);
-            
+
             if (checked) {
-                $('input[type=checkbox]', this.$el).attr('checked','checked');
+                $('input[type=checkbox]', this.$el).attr('checked', 'checked');
             }
 
             return this;
@@ -97,94 +99,118 @@ var listView=null;
         unregister: function () {
             this.model.destroy();
         },
-        manage: function(event) {
+        manage: function (event) {
             var id = $(event.target).attr('data-id');
             manageAgentDialog.load(id);
         }
     });
 
     var ManageAgentDialogView = Backbone.View.extend({
-       tagName: 'div',
-       id: 'manage-agent-dialog',
-       events: {
-           'click a.close-dialog': 'closeDialog',
-           'submit form#apply-versions-form': 'startInstall'
-       },
-       initialize: function () {
-           _.bindAll(this, 'render');
-           this.model = new Agent();
-           this.$el.hide();
-           $('body').append(this.$el);
-       },
-       load: function (hostname) {
-           if (this.model) {
-               console.log('load ' + hostname);
-               this.model.id = hostname;
-               this.model.fetch({success: this.render});
-           }
-       },
-       render: function () {
-           console.log('render dialog');
+        tagName: 'div',
+        id: 'manage-agent-dialog',
+        events: {
+            'click a.close-dialog': 'closeDialog',
+            'submit form#apply-versions-form': 'startInstall',
+            'click button.update-agent': 'startInstallSpecificPackage'
+        },
+        initialize: function () {
+            _.bindAll(this, 'render');
+            this.model = new Agent();
+            this.$el.hide();
+            $('body').append(this.$el);
+        },
+        load: function (hostname) {
+            if (this.model) {
+                console.log('load ' + hostname);
+                this.model.id = hostname;
+                this.model.fetch({ success: this.render });
+            }
+        },
+        update: function() {
+            this.model.fetch({ success: this.render });
+            console.log('update dialog');
+        },
+        render: function () {
+            console.log('render dialog');
+            _manageAgentDialogOpen = true;
             var viewModel = {
                 hostname: this.model.get('id'),
                 packages: this.model.get('packages')
             };
             var dialogContent = _.template(_manageAgentDialogTemplate, viewModel);
-           this.$el.html(dialogContent);
-           this.$el.dialog({autoOpen: false,
-			height: 500,
-			width: 600,
-			modal: true});
-           this.$el.dialog("open");
-           this.delegateEvents();
+            this.$el.html(dialogContent);
+            this.$el.dialog({ autoOpen: false,
+                height: 500,
+                width: 600,
+                modal: true,
+                close: function () { _manageAgentDialogOpen = false;}
+            });
+            this.$el.dialog("open");
+            this.delegateEvents();
 
-       },
-       closeDialog: function () {
-           $("div.dialog").hide();
-       },
-       startInstall: function () {
-           var url = $('form', this.$el).attr('action');
-           var data = '';
-           var selectors = $('form select', this.$el);
-           $(selectors).each(function(index,element) {
-            if (data.length > 0) {
-                data += '&';
-            }
-               data += $(element).attr('name') + '=' + $(element).val();
-           });
-           $.post(url, data);
+        },
+        closeDialog: function () {
+            _manageAgentDialogOpen = false;
+            $("div.dialog").hide();
+        },
+        startInstall: function () {
+            var url = $('form', this.$el).attr('action');
+            var data = '';
+            var selectors = $('form select', this.$el);
+            $(selectors).each(function (index, element) {
+                if (data.length > 0) {
+                    data += '&';
+                }
+                data += $(element).attr('name') + '=' + $(element).val();
+            });
+            $.post(url, data);
 
-           return false;
-       }
+            return false;
+        },
+        startInstallSpecificPackage: function (event) {
+            var packageId = $(event.target).attr('data-packageid');
+            var selectedVersion = $('select[name="' + packageId + '"]', '#manage-agent').val();
+            console.log('Update ' + packageId + ' to version ' + selectedVersion);
+
+            var dataString = 'agents=' + this.model.get('id') + '&PackageId=' + packageId + '&Version=' + selectedVersion;
+
+            var url = _apiBaseUrl + '/installation/start';
+
+            $.post(url,
+                dataString,
+            function () { listView.updateAll(); });
+            
+            return false;
+        }
     });
 
     var UpdateToVersionView = Backbone.View.extend({
-       tagName: 'div',
-       id:'update-agents',
-       initialize: function () {
-           
-       },
-       render:function (container) {
-           var selector = $('select[name=allVersions]', this.$el);
-           var selectedValue='';
-           if (selector.length==0) {
-               selectedValue = selector.val();
-           }
-           var content = _.template(_updateAgentsTemplate, listView.versionCollection);
+        tagName: 'div',
+        id: 'update-agents',
+        initialize: function () {
+
+        },
+        render: function (container) {
+            var selector = $('select[name=allVersions]', this.$el);
+            var selectedValue = '';
+            if (selector.length == 0) {
+                selectedValue = selector.val();
+            }
+            var content = _.template(_updateAgentsTemplate, listView.versionCollection);
             selector.val(selectedValue);
             this.$el.html(content);
-           
-           if (container && container.html() == "") {
-               container.append(this.$el);
-           }
+
+            if (container && container.html() == "") {
+                container.append(this.$el);
+            }
 
             return this;
-       }
+        }
     });
 
     var ListView = Backbone.View.extend({
         tagName: 'div',
-        id:'agent-list',
+        id: 'agent-list',
         events: {
             'click button#add': 'addItem',
             'click button#updateSelected': 'updateSelected'
@@ -207,47 +233,47 @@ var listView=null;
             this.collection.bind('destroy', this.render);
             this.collection.fetch({ add: true, success: this.render });
 
-            this.collection.each(function(agent) {
-              self.agentViews.push(new AgentView({
-                model : agent,
-                tagName : 'li'
-              }));
+            this.collection.each(function (agent) {
+                self.agentViews.push(new AgentView({
+                    model: agent,
+                    tagName: 'li'
+                }));
             });
 
         },
-        add: function(agent) {
+        add: function (agent) {
             var that = this;
             var dv = new AgentView({
                 model: agent,
                 tagName: 'li'
             });
             this.agentViews.push(dv);
-            
+
             if (this._rendered) {
                 $(this.el).append(dv.render().el);
             }
         },
         remove: function (agent) {
-            var viewToRemove = _(this.agentViews).select(function(cv) { return cv.model === agent; })[0];
+            var viewToRemove = _(this.agentViews).select(function (cv) { return cv.model === agent; })[0];
             this.agentViews = _(this.agentViews).without(viewToRemove);
             if (this._rendered) $(viewToRemove.el).remove();
         },
         change: function (agent) {
             console.log('listView.change()');
-            var viewToUpdate = _(this.agentViews).select(function(cv) { return cv.model === agent; })[0];
+            var viewToUpdate = _(this.agentViews).select(function (cv) { return cv.model === agent; })[0];
             if (this._rendered) viewToUpdate.render();
         },
 
         render: function () {
             var self = this;
             this._rendered = true;
-            
+
             $(this.el).empty();
 
             $(this.el).append(_appTemplate);
-            
 
-            _(this.collection.models).each(function(agent) {
+
+            _(this.collection.models).each(function (agent) {
                 console.log('collection has agent ' + agent.id);
                 console.log('with packages:');
                 _(agent.get('packages')).each(function (package) {
@@ -258,10 +284,10 @@ var listView=null;
                 });
             });
 
-            _(this.agentViews).each(function(dv) {
+            _(this.agentViews).each(function (dv) {
                 console.log('agentview render()');
                 var agentId = dv.model.get("id");
-                var matchingAgents= self.collection.where({ id: agentId });
+                var matchingAgents = self.collection.where({ id: agentId });
                 if (matchingAgents.length == 1) {
                     dv.model = matchingAgents[0];
                 }
@@ -282,18 +308,18 @@ var listView=null;
             this.collection.add(item);
             this.render();
         },
-        
+
         updateSelected: function () {
             var version = $('select[name=allVersions]').val();
             var selectedAgents = $('input:checked[type=checkbox][name="select-agent"]');
             var hostnames = '';
-            _(selectedAgents).each(function(input) {
+            _(selectedAgents).each(function (input) {
                 hostnames += '&agentHostnames=' + $(input).attr('data-value');
             });
             $.post('/api/agent/updateall',
                 'version=' + version + hostnames,
             function () {
-                listView.collection.fetch({success:function (){ listView.render();}});
+                listView.collection.fetch({ success: function () { listView.render(); } });
             });
         },
 
@@ -313,14 +339,14 @@ var listView=null;
             }
         },
         updateVersionSelectionView: function () {
-            this.updateToVersionView.render($('div#version-select',this.$el));
+            this.updateToVersionView.render($('div#version-select', this.$el));
             console.log('draw version selection thing');
         },
         updateAll: function () {
 
-         this.collection.fetch({ success: listView.render });
+            this.collection.fetch({ success: listView.render });
             //this.versionCollection.clear();
-         this.versionCollection.fetch();
+            this.versionCollection.fetch();
 
         }
     });
@@ -329,15 +355,19 @@ var listView=null;
 
     var manageAgentDialog = new ManageAgentDialogView();
 
-    var updateLink = $('<a>update</a>').click(function() {
-        listView.updateAll();
+    /*var updateLink = $('<a>update</a>').click(function() {
+    listView.updateAll();
     });
-    $('body').append(updateLink);
+    $('body').append(updateLink);*/
 
-    setInterval(function () { 
-        listView.updateAll(); }, 
+    setInterval(function () {
+        listView.updateAll();
+        if (_manageAgentDialogOpen) {
+            manageAgentDialog.update();
+        }
+    },
         _updateInterval);
-    
+
 })(jQuery);
 
 $(document).ready(function () {
