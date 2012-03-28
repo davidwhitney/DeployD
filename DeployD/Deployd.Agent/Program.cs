@@ -43,7 +43,7 @@ namespace Deployd.Agent
                                                                     serviceInstaller.StartType =
                                                                         ServiceStartMode.Automatic;
                                                                     serviceProcessInstaller.Account =
-                                                                        ServiceAccount.LocalSystem;
+                                                                        ServiceAccount.User;
                                                                 },
                                         registerContainer: () => _containerWrapper,
                                         configureContext: x => { x.Log = s => Logger.Info(s); })
