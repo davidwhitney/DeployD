@@ -14,6 +14,7 @@ StarBastardMmo.Website/App_Data/_FileCache/*
 StarBastardMmo.Database/Raven.Server.log*
 StarBastardMmo.Database/Data/*
 
+DeployD/DeployD.Hub/App_Data/
 
 StarBastardMmo.Website/Bin/*
 /Appraise.Me.Logs

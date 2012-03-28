@@ -142,6 +142,7 @@
     <Compile Include="Areas\Api\Code\JsonRepresentationBuilder.cs" />
     <Compile Include="Areas\Api\Code\AgentManager.cs" />
     <Compile Include="Areas\Api\Code\LocalPackageStore.cs" />
+    <Compile Include="Areas\Api\Code\RavenDbAgentRepository.cs" />
     <Compile Include="Areas\Api\Code\XmlRepresentationBuilder.cs" />
     <Compile Include="Areas\Api\Controllers\AgentController.cs" />
     <Compile Include="Areas\Api\Controllers\InstallationController.cs" />

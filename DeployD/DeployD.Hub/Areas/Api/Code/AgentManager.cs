@@ -65,6 +65,11 @@ namespace DeployD.Hub.Areas.Api.Code
 
         public void RegisterAgentAndGetStatus(string hostname)
         {
+            if (_agentRepository.List().Any(a=>a.Hostname == hostname))
+            {
+                throw new InvalidOperationException("Agent already registered");
+            }
+
             AgentRecord agent = new AgentRecord() { Hostname = hostname };
             new TaskFactory().StartNew(() => UpdateAgentStatus(agent));
             _agentRepository.SaveOrUpdate(agent);

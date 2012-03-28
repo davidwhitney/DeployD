@@ -56,7 +56,7 @@ namespace DeployD.Hub.App_Start
             kernel.Bind<IApiHttpChannel>().To<ApiHttpChannel>();
             kernel.Bind<IRepresentationBuilder>().To<XmlRepresentationBuilder>();
             kernel.Bind<IRepresentationBuilder>().To<JsonRepresentationBuilder>();
-            kernel.Bind<IAgentRepository>().To<InMemoryAgentRepository>().InSingletonScope();
+            kernel.Bind<IAgentRepository>().To<RavenDbAgentRepository>().InSingletonScope();
             kernel.Bind<IAgentManager>().To<AgentManager>();
             kernel.Bind<IPackageStore>().To<LocalPackageStore>().InSingletonScope();
             kernel.Bind<IAgentRemoteService>().To<AgentRemoteService>();
