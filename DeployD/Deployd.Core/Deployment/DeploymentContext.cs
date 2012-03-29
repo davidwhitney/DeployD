@@ -24,19 +24,21 @@ namespace Deployd.Core.Deployment
             TargetInstallationFolder = targetInstallationFolder;
 
             log4net.Layout.PatternLayout layout = new log4net.Layout.PatternLayout();
-            layout.ConversionPattern = "%n%d{yyMMdd_hhmmss.fff};%-5level;%m";
+            layout.ConversionPattern = "%d{dd-MM-yyyy HH:mm:ss} [%thread] %-5level %logger - %message%newline";
             layout.Header = "Time;Level;Description;";
 
             string logFileName = string.Format("{0:dd-MM-yyyy-HH-mm-ss}.log", _contextCreateTime);
-            var deploymentFileAppender = new log4net.Appender.FileAppender();
-            deploymentFileAppender.File = Path.Combine(AgentSettings.AgentProgramDataPath, Path.Combine("installation_logs", Path.Combine(_package.Id, logFileName)));
-            deploymentFileAppender.AppendToFile = true;
-            deploymentFileAppender.ImmediateFlush = true;
-            deploymentFileAppender.Layout = layout;
-            deploymentFileAppender.Threshold = log4net.Core.Level.All;
-            deploymentFileAppender.LockingModel = new log4net.Appender.FileAppender.MinimalLock();
-            deploymentFileAppender.ActivateOptions();
-            _logAppender = deploymentFileAppender;
+            var plainTextAppender = new log4net.Appender.FileAppender();
+            plainTextAppender.Name = "InstallationAppender";
+            plainTextAppender.File = Path.Combine(AgentSettings.AgentProgramDataPath, Path.Combine("installation_logs", Path.Combine(_package.Id, logFileName)));
+            plainTextAppender.AppendToFile = true;
+            plainTextAppender.ImmediateFlush = true;
+            plainTextAppender.Layout = layout;
+            plainTextAppender.Threshold = log4net.Core.Level.All;
+            plainTextAppender.LockingModel = new log4net.Appender.FileAppender.MinimalLock();
+            plainTextAppender.ActivateOptions();
+            _logAppender = plainTextAppender;
+
         }
 
         public string TargetInstallationFolder { get; set; }

@@ -146,6 +146,7 @@
     <Compile Include="WebUi\Models\PackageListViewModel.cs" />
     <Compile Include="WebUi\CustomFormatterExtensions.cs" />
     <Compile Include="WebUi\Modules\InstallationsModule.cs" />
+    <Compile Include="WebUi\Modules\LogModule.cs" />
     <Compile Include="WebUi\NancyModuleExtensions.cs" />
     <Compile Include="WebUi\Modules\PackagesModule.cs" />
     <Compile Include="WebUi\NancyConventionsBootstrapper.cs" />
@@ -174,6 +175,15 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <None Include="web.config" />
+    <None Include="WebUi\Views\logs\log-file.cshtml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="WebUi\Views\logs\package-logs.cshtml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="WebUi\Views\logs\packages.cshtml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="WebUi\Views\sitrep.cshtml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

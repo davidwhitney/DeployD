@@ -23,6 +23,7 @@ namespace Deployd.Agent.Services.Management
             HomeModule.Container = AppContext.Container;
             PackagesModule.Container = AppContext.Container;
             InstallationsModule.Container = AppContext.Container;
+            LogModule.Container = AppContext.Container;
 
             try
             {

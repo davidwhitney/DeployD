@@ -1,0 +1,17 @@
+﻿<!DOCTYPE html>
+<html>
+    <head>
+        <title>Deployd.Agent</title>
+    </head>
+    <body>
+        <h1>Deployd.Agent</h1>
+        
+        <h2>Installation Logs for @Model.PackageId</h2>
+        
+        @foreach(var log in Model.Logs)
+        {
+            <p><a href="/log/@log.PackageId/@log.LogFileName">@log.LogFileName</a></p>
+        }
+
+    </body>
+</html>
