@@ -16,12 +16,19 @@ namespace Deployd.Core.Deployment.Hooks
     public class TryThis : ITryThisNow, ISayTimes
     {
         private readonly Action _action;
-        private readonly ILog _logger = LogManager.GetLogger("TryThis");
+        private readonly ILog _logger = null;
         private int _times = 1;
 
         public TryThis(Action action)
         {
             _action = action;
+            _logger = LogManager.GetLogger("TryThis");
+        }
+
+        public TryThis(Action action, ILog logger)
+        {
+            _action = action;
+            _logger = logger;
         }
 
         public void Go()

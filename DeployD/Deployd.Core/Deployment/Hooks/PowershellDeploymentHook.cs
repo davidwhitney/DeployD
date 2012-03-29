@@ -5,6 +5,7 @@ using System.Linq;
 using System.Management.Automation.Runspaces;
 using System.Text;
 using Deployd.Core.AgentConfiguration;
+using log4net;
 
 namespace Deployd.Core.Deployment.Hooks
 {
@@ -24,20 +25,20 @@ namespace Deployd.Core.Deployment.Hooks
 
         public override void BeforeDeploy(DeploymentContext context)
         {
-            ExecuteScriptIfFoundInPackage(context, "beforedeploy.ps1");
+            ExecuteScriptIfFoundInPackage(context, "beforedeploy.ps1", context.GetLoggerFor(this));
         }
 
         public override void Deploy(DeploymentContext context)
         {
-            ExecuteScriptIfFoundInPackage(context, "deploy.ps1");
+            ExecuteScriptIfFoundInPackage(context, "deploy.ps1", context.GetLoggerFor(this));
         }
 
         public override void AfterDeploy(DeploymentContext context)
         {
-            ExecuteScriptIfFoundInPackage(context, "afterdeploy.ps1");
+            ExecuteScriptIfFoundInPackage(context, "afterdeploy.ps1", context.GetLoggerFor(this));
         }
 
-        private void ExecuteScriptIfFoundInPackage(DeploymentContext context, string scriptPath)
+        private void ExecuteScriptIfFoundInPackage(DeploymentContext context, string scriptPath, ILog logger)
         {
             var file = context.Package.GetFiles().SingleOrDefault(f => f.Path.Equals(scriptPath, StringComparison.InvariantCultureIgnoreCase));
             
@@ -46,19 +47,19 @@ namespace Deployd.Core.Deployment.Hooks
                 return;
             }
 
-            Logger.DebugFormat("Found script {0}, executing...", scriptPath);
+            logger.DebugFormat("Found script {0}, executing...", scriptPath);
 
             try
             {
-                LoadAndExecuteScript(Path.Combine(context.WorkingFolder, file.Path));
+                LoadAndExecuteScript(Path.Combine(context.WorkingFolder, file.Path), logger);
             } 
             catch (Exception ex)
             {
-                Logger.Fatal("Failed executing powershell script " + file.Path, ex);
+                logger.Fatal("Failed executing powershell script " + file.Path, ex);
             }
         }
 
-        private void LoadAndExecuteScript(string pathToScript)
+        private void LoadAndExecuteScript(string pathToScript, ILog logger)
         {
             var serviceManagementScript = File.ReadAllText("Scripts/PS/Services.ps1");
             var scriptText = _fileSystem.File.ReadAllText(pathToScript);
@@ -84,7 +85,7 @@ namespace Deployd.Core.Deployment.Hooks
                 stringBuilder.AppendLine(obj.ToString());
             }
 
-            Logger.Info(stringBuilder.ToString());
+            logger.Info(stringBuilder.ToString());
         }
     }
 }

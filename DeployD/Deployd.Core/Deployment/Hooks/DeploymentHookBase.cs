@@ -15,7 +15,6 @@ namespace Deployd.Core.Deployment.Hooks
     {
         protected readonly IAgentSettings AgentSettings;
         private readonly IFileSystem _fileSystem;
-        protected ILog Logger = LogManager.GetLogger("DefaultDeploymentHook");
 
         protected DeploymentHookBase(IAgentSettings agentSettings, IFileSystem fileSystem)
         {
@@ -30,6 +29,7 @@ namespace Deployd.Core.Deployment.Hooks
 
         protected void CopyAllFilesToDestination(DeploymentContext context)
         {
+            var installationLogger = context.GetLoggerFor(this);
             // this is where file copy will occur
             var sourceFolder = new DirectoryInfo(Path.Combine(context.WorkingFolder, "content"));
 
@@ -37,30 +37,30 @@ namespace Deployd.Core.Deployment.Hooks
 			{
 				Directory.CreateDirectory(context.TargetInstallationFolder);
 			}
-			
-            CleanDestinationFolder(context);
+
+            CleanDestinationFolder(context, installationLogger);
 
             try
             {
-                RecursiveCopy(sourceFolder, context.TargetInstallationFolder);
+                RecursiveCopy(sourceFolder, context.TargetInstallationFolder, installationLogger);
             }
             catch (Exception exception)
             {
-                Logger.Fatal("Copy failed", exception);
+                installationLogger.Fatal("Copy failed", exception);
             }
         }
 
-        private void CleanDestinationFolder(DeploymentContext context)
+        private void CleanDestinationFolder(DeploymentContext context, ILog logger)
         {
             // wait 1 second for processes to release locks on destination files
             System.Threading.Thread.Sleep(1000);
 
-            new TryThis(() => _fileSystem.Directory.Delete(context.TargetInstallationFolder, true))
+            new TryThis(() => _fileSystem.Directory.Delete(context.TargetInstallationFolder, true), logger)
                 .UpTo(10).Times
                 .Go();
         }
 
-        private void RecursiveCopy(DirectoryInfo from, string to)
+        private void RecursiveCopy(DirectoryInfo from, string to, ILog logger)
         {
             if (!Directory.Exists(to))
             {
@@ -71,17 +71,17 @@ namespace Deployd.Core.Deployment.Hooks
             foreach(var subfolder in subfolders)
             {
                 var destinationFolder = Path.Combine(to, subfolder.Name);
-                RecursiveCopy(subfolder, destinationFolder);
+                RecursiveCopy(subfolder, destinationFolder, logger);
             }
 
             var files = from.GetFiles().ToArray();
             for (var fileIndex = 0; fileIndex < files.Count(); fileIndex++)
             {
                 var destinationFile = Path.Combine(to, files[fileIndex].Name);
-                Logger.InfoFormat("Copying {0}", destinationFile);
+                logger.InfoFormat("Copying {0}", destinationFile);
 
                 var index = fileIndex;
-                new TryThis(() => files[index].CopyTo(destinationFile, true))
+                new TryThis(() => files[index].CopyTo(destinationFile, true), logger)
                     .UpTo(10).Times
                     .Go();
             }
@@ -93,9 +93,9 @@ namespace Deployd.Core.Deployment.Hooks
             return tags.Intersect(AgentSettings.Tags).Any();
         }
 
-        protected void RunProcess(string executablePath, string executableArgs)
+        protected void RunProcess(string executablePath, string executableArgs, ILog logger)
         {
-            Logger.InfoFormat("{0} {1}", executablePath, executableArgs);
+            logger.InfoFormat("{0} {1}", executablePath, executableArgs);
             var msDeploy = new Process
                                {
                                    StartInfo =
@@ -114,10 +114,10 @@ namespace Deployd.Core.Deployment.Hooks
                 var output = msDeploy.StandardOutput.ReadToEnd();
                 var error = msDeploy.StandardError.ReadToEnd();
 
-                Logger.Info(output);
+                logger.Info(output);
                 if (error.Length > 0)
                 {
-                    Logger.Error(error);
+                    logger.Error(error);
                 }
 
                 msDeploy.WaitForExit(2000);

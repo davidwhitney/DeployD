@@ -48,33 +48,35 @@ namespace Deployd.Core.Deployment
 
         public void Deploy(string taskId, IPackage package, CancellationTokenSource cancellationToken, Action<ProgressReport> reportProgress)
         {
+            var unpackFolder = Path.Combine(AgentSettings.AgentProgramDataPath, _agentSettings.UnpackingLocation);
+            var workingFolder = Path.Combine(unpackFolder, package.GetFullName());
+            var targetInstallationFolder = Path.Combine(@"d:\wwwcom", package.Id);
+            var deploymentContext = new DeploymentContext(package, workingFolder, targetInstallationFolder, taskId);
+
+            var logger = deploymentContext.GetLoggerFor(this);
             var frameworks = package.GetSupportedFrameworks();
             foreach(var framework in frameworks)
             {
-                Logger.DebugFormat("package supports {0}", framework.FullName);
+                logger.DebugFormat("package supports {0}", framework.FullName);
             }
 
-            var unpackFolder = Path.Combine(AgentSettings.AgentProgramDataPath, _agentSettings.UnpackingLocation);
-            var workingFolder = Path.Combine(unpackFolder, package.GetFullName());
             
             try
             {
-                reportProgress(ProgressReport.Info(package.Id, package.Version.Version.ToString(), taskId, "Extracting package to temp folder..."));
+                reportProgress(ProgressReport.Info(deploymentContext, package.Id, package.Version.Version.ToString(), taskId, "Extracting package to temp folder..."));
                 new PackageExtractor().Extract(package, workingFolder);
             } 
             catch (Exception ex)
             {
-                Logger.Fatal("Could not extract package", ex);
+                logger.Fatal("Could not extract package", ex);
             }
 
-            var targetInstallationFolder = Path.Combine(@"d:\wwwcom", package.Id);
-            var deploymentContext = new DeploymentContext(package, workingFolder, targetInstallationFolder, taskId);
             
             BeforeDeploy(deploymentContext, reportProgress);
             PerformDeploy(deploymentContext, reportProgress);
             AfterDeploy(deploymentContext, reportProgress);
 
-            reportProgress(ProgressReport.Info(package.Id, package.Version.Version.ToString(), taskId,
+            reportProgress(ProgressReport.Info(deploymentContext, package.Id, package.Version.Version.ToString(), taskId,
                                                "Deployment complete"));
         }
 
@@ -114,16 +116,17 @@ namespace Deployd.Core.Deployment
         
         private void ForEachHook(DeploymentContext context, string comment, Action<IDeploymentHook> action, Action<ProgressReport> reportProgress)
         {
+            var installationLogger = context.GetLoggerFor(this);
             foreach (var hook in _hooks)
             {
                 if (hook.HookValidForPackage(context))
                 {
-                    reportProgress(ProgressReport.InfoFormat(context.Package.Id, context.Package.Version.Version.ToString(), context.InstallationTaskId, "Running {0} hook {1}...", comment, hook.GetType().Name));
+                    reportProgress(ProgressReport.InfoFormat(context, context.Package.Id, context.Package.Version.Version.ToString(), context.InstallationTaskId, "Running {0} hook {1}...", comment, hook.GetType().Name));
                     action(hook);
                 }
                 else
                 {
-                    Logger.DebugFormat("Skipping {0} for {1}", comment, hook.GetType());
+                    installationLogger.DebugFormat("Skipping {0} for {1}", comment, hook.GetType());
                 }
             }
         }

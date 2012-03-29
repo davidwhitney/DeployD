@@ -3,6 +3,8 @@ using System.IO;
 using System.IO.Abstractions;
 using System.Linq;
 using Deployd.Core.AgentConfiguration;
+using log4net;
+using log4net.Repository.Hierarchy;
 
 namespace Deployd.Core.Deployment.Hooks
 {
@@ -22,16 +24,21 @@ namespace Deployd.Core.Deployment.Hooks
         public MsDeployDeploymentHook(IAgentSettings agentSettings, IFileSystem fileSystem) : base(agentSettings, fileSystem)
         {
             _fileSystem = fileSystem;
+        }
+
+        private void LocateMsDeploy(ILog logger)
+        {
             if (_knownMsWebDeployPaths.Any(_fileSystem.File.Exists))
             {
                 MsWebDeployPath = _knownMsWebDeployPaths.Last(_fileSystem.File.Exists);
-            } 
+            }
             else
             {
                 if (string.IsNullOrEmpty(MsWebDeployPath))
                 {
-                    Logger.Fatal("Web Deploy could not be located. Ensure that Microsoft Web Deploy has been installed. Locations searched: " +
-                    string.Join("\r\n", _knownMsWebDeployPaths));
+                    logger.Fatal(
+                        "Web Deploy could not be located. Ensure that Microsoft Web Deploy has been installed. Locations searched: " +
+                        string.Join("\r\n", _knownMsWebDeployPaths));
                 }
             }
         }
@@ -44,14 +51,17 @@ namespace Deployd.Core.Deployment.Hooks
 
         public override void Deploy(DeploymentContext context)
         {
+            var installationLogger = context.GetLoggerFor(this);
+            LocateMsDeploy(installationLogger);
             DeployWebsite(
                 "localhost",
                 Path.Combine(context.WorkingFolder, "Content\\" + context.Package.Id + ".zip"),
                 context.Package.Title,
+                installationLogger,
                 Ignore.AppOffline().And().LogFiles().And().MaintenanceFile());
         }
 
-        protected void DeployWebsite(string targetMachineName, string sourcePackagePath, string iisApplicationName, params string[] ignoreRegexPaths)
+        protected void DeployWebsite(string targetMachineName, string sourcePackagePath, string iisApplicationName, ILog logger, params string[] ignoreRegexPaths)
         {
             var ignore = string.Join(" -skip:objectName=filePath,absolutePath=", ignoreRegexPaths);
             
@@ -64,7 +74,7 @@ namespace Deployd.Core.Deployment.Hooks
             var executableArgs = string.Format(msDeployArgsFormat, sourcePackagePath, targetMachineName,
                                                iisApplicationName, ignore);
 
-            RunProcess(MsWebDeployPath, executableArgs);
+            RunProcess(MsWebDeployPath, executableArgs, logger);
            
         }
     }
