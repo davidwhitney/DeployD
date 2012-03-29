@@ -92,7 +92,6 @@
     <Compile Include="Deployment\Hooks\PowershellDeploymentHook.cs" />
     <Compile Include="Deployment\Hooks\ServiceDeploymentHook.cs" />
     <Compile Include="Deployment\Hooks\TryThis.cs" />
-    <Compile Include="Deployment\Hooks\WaitHook.cs" />
     <Compile Include="Deployment\IDeploymentService.cs" />
     <Compile Include="Deployment\PackageExtractor.cs" />
     <Compile Include="FileSystemExtensions.cs" />
