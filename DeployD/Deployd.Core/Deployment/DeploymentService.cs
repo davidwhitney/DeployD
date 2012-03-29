@@ -9,6 +9,7 @@ using Deployd.Core.Hosting;
 using Deployd.Core.Installation;
 using NuGet;
 using log4net;
+using log4net.Repository;
 
 namespace Deployd.Core.Deployment
 {
@@ -78,6 +79,8 @@ namespace Deployd.Core.Deployment
 
             reportProgress(ProgressReport.Info(deploymentContext, package.Id, package.Version.Version.ToString(), taskId,
                                                "Deployment complete"));
+
+            deploymentContext.RemoveAppender();
         }
 
         public void InstallPackage(string packageId, Func<IPackage> selectionCriteria, CancellationTokenSource cancellationToken, Action<ProgressReport> reportProgress, string taskId)

@@ -13,8 +13,9 @@ namespace Deployd.Core.Deployment
         private readonly IPackage _package;
         private readonly string _workingFolder;
         private readonly string _installationTaskId;
-        private readonly log4net.Appender.IAppender _logAppender=null;
         private DateTime _contextCreateTime = DateTime.Now;
+        private log4net.Appender.IAppender _appender;
+        private readonly string _logAppenderName;
 
         public DeploymentContext(IPackage package, string workingFolder, string targetInstallationFolder, string installationTaskId)
         {
@@ -23,13 +24,15 @@ namespace Deployd.Core.Deployment
             _installationTaskId = installationTaskId;
             TargetInstallationFolder = targetInstallationFolder;
 
+            string logFileName = string.Format("{0:dd-MM-yyyy-HH-mm-ss}.log", _contextCreateTime);
+            _logAppenderName = string.Format("Install.{0}.{1:dd.MM.yyyy.HH.mm.ss}", _package.Id, _contextCreateTime);
+
             log4net.Layout.PatternLayout layout = new log4net.Layout.PatternLayout();
             layout.ConversionPattern = "%d{dd-MM-yyyy HH:mm:ss} [%thread] %-5level %logger - %message%newline";
             layout.Header = "Time;Level;Description;";
 
-            string logFileName = string.Format("{0:dd-MM-yyyy-HH-mm-ss}.log", _contextCreateTime);
             var plainTextAppender = new log4net.Appender.FileAppender();
-            plainTextAppender.Name = "InstallationAppender";
+            plainTextAppender.Name = _logAppenderName;
             plainTextAppender.File = Path.Combine(AgentSettings.AgentProgramDataPath, Path.Combine("installation_logs", Path.Combine(_package.Id, logFileName)));
             plainTextAppender.AppendToFile = true;
             plainTextAppender.ImmediateFlush = true;
@@ -37,8 +40,8 @@ namespace Deployd.Core.Deployment
             plainTextAppender.Threshold = log4net.Core.Level.All;
             plainTextAppender.LockingModel = new log4net.Appender.FileAppender.MinimalLock();
             plainTextAppender.ActivateOptions();
-            _logAppender = plainTextAppender;
 
+            _appender = plainTextAppender;
         }
 
         public string TargetInstallationFolder { get; set; }
@@ -48,11 +51,19 @@ namespace Deployd.Core.Deployment
 
         public ILog GetLoggerFor<T>(T process)
         {
-            var baseLogger = LogManager.GetLogger(typeof (T));
+            var baseLogger = LogManager.GetLogger(_logAppenderName);
 
-            ((Logger)baseLogger.Logger).AddAppender(_logAppender);
+            ((Logger)baseLogger.Logger).AddAppender(_appender);
     
             return baseLogger;
+        }
+
+        public void RemoveAppender()
+        {
+            _appender.Close();
+            IAppenderAttachable connectionAppender = (IAppenderAttachable) GetLoggerFor(this).Logger;
+            connectionAppender.RemoveAppender(_appender);
+            _appender = null;
         }
     }
 }
