@@ -6,6 +6,13 @@
       <Packages>
         <string>justgiving-sdk</string>
 		<string>GG.Search.Indexing.Service</string>
+          <string>GG.GlobalGiving.FeedConsumer.Service</string>
+          <string>GG.PaymentProcessing.Agent</string>
+          <string>GG.GlobalGiving.FeedConsumer.Service</string>
+          <string>GG.Integration.EmailVision.MsmqService</string>
+          <string>GG.Integration.EmailVision.NmpClient</string>
+          <string>GG.Service.MsmqListenerService</string>
+          <string>GG.Web.Website.Charity.ReportingServices</string>
 		<string>GG.Web.Website</string>
 		<string>GG.Api.Services</string>
 		<string>GG.Olr2</string>
