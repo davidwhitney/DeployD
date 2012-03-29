@@ -20,6 +20,11 @@ namespace DeployD.Hub.Areas.Api
                              new {controller = "Agent", action = "List"},
                              new {httpMethod = new HttpMethodConstraint("GET")});
 
+            context.MapRoute("UpdateAgents",
+                             "api/agent/updateAll",
+                             new {controller = "Agent", action = "UpdateAll"},
+                             new {httpMethod = new HttpMethodConstraint("POST")});
+
             context.MapRoute("AgentMethod",
                 "Api/agent/{id}/{action}",
                 new { controller = "Agent", action = "Index" },

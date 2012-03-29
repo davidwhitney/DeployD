@@ -4,7 +4,8 @@ var _taskTemplate;
 var _packageTemplate;
 var _manageAgentDialogTemplate;
 var _updateAgentsTemplate;
-var _updateInterval = 120 * 1000;
+var _agentPackageLogFolderTemplate, _logFileListTemplate, _logFileTemplate;
+var _updateInterval = 6 * 1000;
 var agentsManagement = null;
 var _apiBaseUrl = '/api';
 var _manageAgentDialogOpen = false;
@@ -80,10 +81,8 @@ var _manageAgentDialogOpen = false;
         render : function () {
             var that = this;
             console.log('render log file');
-            this.$el.html('');
-            this.$el.append('<a href="/#/logs/' + this.model.hostname + '/' + this.model.packageId + '">&lt; up to logs for ' + this.model.packageId + '</a>');
-            this.$el.append('<h2>' + this.model.fileName+'</h2>');
-            this.$el.append(this.model.get('LogContents'));
+            var content = _.template(_logFileTemplate, this.model);
+            this.$el.html(content);
             this.$el.detach();
             $(this.container).append(this.$el);
         },
@@ -107,14 +106,9 @@ var _manageAgentDialogOpen = false;
            this.collection.fetch({ success: this.render });
        },
        render: function () {
-           var that = this;
            console.log('render logs for ' + this.collection.packageId + ' on agent ' + this.collection.hostname);
-           this.$el.html('');
-           this.$el.append('<a href="/#/logs/'+this.collection.hostname+'">&lt; up to '+this.collection.hostname+'</a>');
-           this.$el.append('<p>Log files for ' + this.collection.packageId + ' on agent ' + this.collection.hostname);
-           _(this.collection.models).each(function(logFile) {
-               that.$el.append('<p><a href="#/logs/'+ that.collection.hostname + '/' + that.collection.packageId + '/' + logFile.get('LogFileName') + '">'+logFile.get('LogFileName')+'</a></p>');
-           });
+           var content = _.template(_logFileListTemplate, this.collection);
+           this.$el.html(content);
            this.$el.detach();
            $(this.container).append(this.$el);
        },
@@ -143,12 +137,8 @@ var _manageAgentDialogOpen = false;
        render: function () {
            var that = this;
            console.log('render log folders for ' + this.collection.hostname);
-           this.$el.html('');
-           this.$el.append('<a href="/">&lt; up to agent list</a>');
-           this.$el.append('<p>log folders</p>');
-           _(this.collection.models).each(function(logFileFolder) {
-               that.$el.append('<p><a href="#/logs/'+that.collection.hostname+'/'+logFileFolder.get('PackageId')+'">' + logFileFolder.get('PackageId') + '</a></p>');
-           });
+           var content = _.template(_agentPackageLogFolderTemplate, this.collection);
+           this.$el.html(content);
            this.$el.detach();
            $(this.container).append(this.$el);
        },
@@ -562,6 +552,9 @@ $(document).ready(function () {
     _packageTemplate = $('#package-template').html();
     _manageAgentDialogTemplate = $('#manage-agent-template').html();
     _updateAgentsTemplate = $('#update-agents-template').html();
+    _logFileListTemplate = $('#log-file-list-template').html();
+    _logFileTemplate = $('#log-file-template').html();
+    _agentPackageLogFolderTemplate = $('#agent-log-packages-list-template').html();
     
     $('div#app').append(agentsManagement.el);
 });

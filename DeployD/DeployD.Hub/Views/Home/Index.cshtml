@@ -92,3 +92,34 @@
 <script type="text/template" id="update-agents-template">
     Update selected agents to version <select name="allVersions"><option value="latest">latest</option><%_.each(models, function(version){%><option value="<%=version.get("version")%>"><%=version.get("version")%></option><%});%></select><button id="updateSelected">Update Selected</button>
 </script>
+
+<script type="text/template" id="agent-log-packages-list-template">
+    <p><a href="/#">&lt; up to agent list</a></p>
+    <h2>Package logs for <%=hostname%></h2>
+    <ul>
+        <% _(models).each(function(logFileFolder) {%>
+            <li><a href="#/logs/<%=hostname%>/<%=logFileFolder.get('PackageId')%>"><%=logFileFolder.get('PackageId')%></a></li>
+        <%});%>
+    </ul>
+</script>
+
+<script type="text/template" id="log-file-list-template">
+    <p><a href="/#/logs/<%=hostname%>">&lt; up to <%=hostname%></a></p>
+
+    <p>Log files for <%=packageId%></p>
+    
+    <ul>
+    <%_(models).each(function(logFile) {%>
+        <li><a href="/#/logs/<%=hostname%>/<%=packageId%>/<%=logFile.get('LogFileName')%>"><%=logFile.get('DateCreatedString')%></a></li>
+    <%});%>
+    </ul>
+
+</script>
+
+<script type="text/template" id="log-file-template">
+    <p><a href="/#/logs/<%=hostname%>/<%=packageId%>">&lt; up to logs for <%=packageId%></a></p>
+    
+    <h2><%=fileName%></h2>
+    
+    <div><%=get('LogContents')%></div>
+</script>

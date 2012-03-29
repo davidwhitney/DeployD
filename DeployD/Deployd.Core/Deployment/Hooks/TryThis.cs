@@ -47,11 +47,11 @@ namespace Deployd.Core.Deployment.Hooks
                 {
                     if (retryCount == 0)
                     {
-                        _logger.Fatal("Failed to clean destination");
+                        _logger.Fatal("Failed to execute a task", ex);
                         throw;
                     }
                     
-                    _logger.Warn("Could not clean destination", ex);
+                    _logger.Warn("Could not execute a task", ex);
                     _logger.WarnFormat("Will retry {0} more times", retryCount);
                     
                     System.Threading.Thread.Sleep(1000);

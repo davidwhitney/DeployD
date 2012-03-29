@@ -122,7 +122,15 @@ namespace Deployd.Core.Deployment
                 if (hook.HookValidForPackage(context))
                 {
                     reportProgress(ProgressReport.InfoFormat(context, context.Package.Id, context.Package.Version.Version.ToString(), context.InstallationTaskId, "Running {0} hook {1}...", comment, hook.GetType().Name));
-                    action(hook);
+
+                    try
+                    {
+                        action(hook);
+                    } catch (Exception ex)
+                    {
+                        installationLogger.Fatal("Errors encountered, will not continue deploying", ex);
+                        break;
+                    }
                 }
                 else
                 {

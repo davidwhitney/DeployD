@@ -112,6 +112,8 @@ namespace DeployD.Hub.Areas.Api.Code
         public DateTime DateModified { get; set; }
         public string PackageId { get; set; }
         public string LogContents { get; set; }
+        public string DateCreatedString { get { return DateCreated.ToString("dd-MM-yyyy HH:mm:ss"); } }
+        public string DateModifiedString { get { return DateModified.ToString("dd-MM-yyyy HH:mm:ss"); } }
     }
 
     public class LogListDto
@@ -125,6 +127,8 @@ namespace DeployD.Hub.Areas.Api.Code
         public string LogFileName { get; set; }
         public DateTime DateCreated { get; set; }
         public DateTime DateModified { get; set; }
+        public string DateCreatedString { get { return DateCreated.ToString("dd-MM-yyyy HH:mm:ss"); } }
+        public string DateModifiedString { get { return DateModified.ToString("dd-MM-yyyy HH:mm:ss"); } }
     }
 
     public class PackageListDto
