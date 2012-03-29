@@ -1,5 +1,7 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Text;
 using DeployD.Hub.Areas.Api.Models;
@@ -13,7 +15,7 @@ namespace DeployD.Hub.Areas.Api.Code
         {
             string url = string.Format("http://{0}:9999/packages", hostname);
 
-            var packages = Get<PackageListViewModel>(url);
+            var packages = Get<PackageListDto>(url);
             return packages.Packages;
         }
 
@@ -75,9 +77,57 @@ namespace DeployD.Hub.Areas.Api.Code
             {
             }
         }
+
+        public List<LogListDto> ListPackagesWithLogs(string hostname)
+        {
+            string url = string.Format("http://{0}:9999/log", hostname);
+            var packages = Get<string[]>(url);
+            List<LogListDto> dto = packages.Select(p => new LogListDto() {PackageId = p}).ToList();
+            return dto;
+        }
+
+        public List<LogDto> ListLogsForPackage(string hostname, string packageId)
+        {
+            string url = string.Format("http://{0}:9999/log/{1}", hostname, packageId);
+            var logList = Get<LogListDto>(url);
+            return logList.Logs;
+        }
+
+        public LogFileDto GetLogFile(string hostname, string packageId, string filename)
+        {
+            string url = string.Format("http://{0}:9999/log/{1}/{2}", hostname, packageId, filename);
+            return Get<LogFileDto>(url);
+        }
     }
 
-    public class PackageListViewModel
+    public class PackageLogFolderListDto
+    {
+        public List<LogListDto> PackageLogFolders { get; set; }
+    }
+
+    public class LogFileDto
+    {
+        public string LogFileName { get; set; }
+        public DateTime DateCreated { get; set; }
+        public DateTime DateModified { get; set; }
+        public string PackageId { get; set; }
+        public string LogContents { get; set; }
+    }
+
+    public class LogListDto
+    {
+        public List<LogDto> Logs { get; set; }
+        public string PackageId { get; set; }
+    }
+
+    public class LogDto
+    {
+        public string LogFileName { get; set; }
+        public DateTime DateCreated { get; set; }
+        public DateTime DateModified { get; set; }
+    }
+
+    public class PackageListDto
     {
         public List<PackageViewModel> Packages { get; set; } 
     }

@@ -4,8 +4,8 @@ var _taskTemplate;
 var _packageTemplate;
 var _manageAgentDialogTemplate;
 var _updateAgentsTemplate;
-var _updateInterval = 6 * 1000;
-var listView = null;
+var _updateInterval = 120 * 1000;
+var agentsManagement = null;
 var _apiBaseUrl = '/api';
 var _manageAgentDialogOpen = false;
 
@@ -44,14 +44,126 @@ var _manageAgentDialogOpen = false;
         url: _apiBaseUrl + '/versionlist'
     });
 
+    var AgentLogFile = Backbone.Model.extend({
+        url: function () { return _apiBaseUrl + '/log/' + this.hostname + '/'+this.packageId + '/' + this.fileName; }
+    });
+
+    var AgentLogCollection = Backbone.Collection.extend({
+       model: AgentLogFile,
+       url: function () { return _apiBaseUrl + '/log/' + this.hostname+ '/' + this.packageId; }
+    });
+
+    var AgentLogFolder = Backbone.Model.extend({
+        model: AgentLogFile,
+        url: _apiBaseUrl + '/log/:hostname/:packageId'
+    });
+
+    var AgentLogFolderCollection = Backbone.Collection.extend({
+        model: AgentLogFolder,
+        url: function () { return _apiBaseUrl + '/log/' + this.hostname;}
+    });
+
     /* VIEWS */
+    var AgentLogFileView = Backbone.View.extend({
+        tagName: 'div',
+        container: 'div#app',
+        initialize: function () {
+            _.bindAll(this, 'render');
+            this.model = new AgentLogFile();
+        },
+        load: function (hostname, packageId, fileName) {
+            this.model.hostname = hostname;
+            this.model.packageId = packageId;
+            this.model.fileName = fileName;
+            this.model.fetch({ success: this.render });
+        },
+        render : function () {
+            var that = this;
+            console.log('render log file');
+            this.$el.html('');
+            this.$el.append('<a href="/#/logs/' + this.model.hostname + '/' + this.model.packageId + '">&lt; up to logs for ' + this.model.packageId + '</a>');
+            this.$el.append('<h2>' + this.model.fileName+'</h2>');
+            this.$el.append(this.model.get('LogContents'));
+            this.$el.detach();
+            $(this.container).append(this.$el);
+        },
+       show: function (){ this.$el.show();},
+       hide: function (){ this.$el.hide();}
+    });
+
+
+    var AgentLogFolderView = Backbone.View.extend({
+       tagName:'div',
+       container: 'div#app',
+       initialize: function () {
+           _.bindAll(this, 'render');
+           console.log('initialise agent log folder view');
+           this.collection = new AgentLogCollection();
+       },
+       load: function (hostname, packageId) {
+           console.log('load log files for package ' + packageId + ' on agent ' + hostname);
+           this.collection.hostname = hostname;
+           this.collection.packageId = packageId;
+           this.collection.fetch({ success: this.render });
+       },
+       render: function () {
+           var that = this;
+           console.log('render logs for ' + this.collection.packageId + ' on agent ' + this.collection.hostname);
+           this.$el.html('');
+           this.$el.append('<a href="/#/logs/'+this.collection.hostname+'">&lt; up to '+this.collection.hostname+'</a>');
+           this.$el.append('<p>Log files for ' + this.collection.packageId + ' on agent ' + this.collection.hostname);
+           _(this.collection.models).each(function(logFile) {
+               that.$el.append('<p><a href="#/logs/'+ that.collection.hostname + '/' + that.collection.packageId + '/' + logFile.get('LogFileName') + '">'+logFile.get('LogFileName')+'</a></p>');
+           });
+           this.$el.detach();
+           $(this.container).append(this.$el);
+       },
+       show: function (){ this.$el.show();},
+       hide: function (){ this.$el.hide();}
+    });
+
+
+    var AgentLogFolderCollectionView = Backbone.View.extend({
+       tagName: 'div',
+       container: 'div#app',
+       initialize: function () {
+           _.bindAll(this, 'render');
+           console.log('initialise agent log folder collection view');
+           this.collection = new AgentLogFolderCollection();
+            this.collection.bind('change', this.update);
+            this.collection.bind('destroy', this.render);
+            this.collection.bind('add', this.render);
+           
+       },
+       load: function (hostname) {
+           console.log('load log folders for ' + hostname);
+           this.collection.hostname = hostname;
+           this.collection.fetch({ success:this.render });
+       },
+       render: function () {
+           var that = this;
+           console.log('render log folders for ' + this.collection.hostname);
+           this.$el.html('');
+           this.$el.append('<a href="/">&lt; up to agent list</a>');
+           this.$el.append('<p>log folders</p>');
+           _(this.collection.models).each(function(logFileFolder) {
+               that.$el.append('<p><a href="#/logs/'+that.collection.hostname+'/'+logFileFolder.get('PackageId')+'">' + logFileFolder.get('PackageId') + '</a></p>');
+           });
+           this.$el.detach();
+           $(this.container).append(this.$el);
+       },
+       show: function () { this.$el.show();},
+       hide: function () { this.$el.hide();}
+    });
+
     var AgentView = Backbone.View.extend({
         tagName: 'li',
         container: 'ul#agents',
         selected: false,
         events: {
             'click a.unregister-agent': 'unregister',
-            'click a.manage-agent': 'manage'
+            'click a.manage-agent': 'manage'/*,
+            'click a.agent-logs': 'viewLogs'*/
         },
         initialize: function () {
             _.bindAll(this, 'render', 'manage', 'unregister');
@@ -102,6 +214,11 @@ var _manageAgentDialogOpen = false;
         manage: function (event) {
             var id = $(event.target).attr('data-id');
             manageAgentDialog.load(id);
+        },
+        viewLogs: function () {
+            console.log("navigate to agent logs");
+            app_router.navigate('logs/' + this.model.get('id'), {trigger: true});
+            return true;
         }
     });
 
@@ -151,7 +268,7 @@ var _manageAgentDialogOpen = false;
         },
         closeDialog: function () {
             _manageAgentDialogOpen = false;
-            $("div.dialog").hide();
+            this.$el.dialog("close");
         },
         startInstall: function () {
             var url = $('form', this.$el).attr('action');
@@ -178,7 +295,7 @@ var _manageAgentDialogOpen = false;
 
             $.post(url,
                 dataString,
-            function () { listView.updateAll(); });
+            function () { agentsManagement.updateAll(); });
             
             return false;
         }
@@ -196,7 +313,7 @@ var _manageAgentDialogOpen = false;
             if (selector.length == 0) {
                 selectedValue = selector.val();
             }
-            var content = _.template(_updateAgentsTemplate, listView.versionCollection);
+            var content = _.template(_updateAgentsTemplate, agentsManagement.versionCollection);
             selector.val(selectedValue);
             this.$el.html(content);
 
@@ -208,7 +325,7 @@ var _manageAgentDialogOpen = false;
         }
     });
 
-    var ListView = Backbone.View.extend({
+    var AgentsManagementView = Backbone.View.extend({
         tagName: 'div',
         id: 'agent-list',
         events: {
@@ -219,6 +336,8 @@ var _manageAgentDialogOpen = false;
         initialize: function () {
             _.bindAll(this, 'render', 'add', 'remove');
             var self = this;
+
+            this.hide();
 
             this.agentViews = [];
 
@@ -319,7 +438,7 @@ var _manageAgentDialogOpen = false;
             $.post('/api/agent/updateall',
                 'version=' + version + hostnames,
             function () {
-                listView.collection.fetch({ success: function () { listView.render(); } });
+                agentsManagement.collection.fetch({ success: function () { agentsManagement.render(); } });
             });
         },
 
@@ -344,24 +463,90 @@ var _manageAgentDialogOpen = false;
         },
         updateAll: function () {
 
-            this.collection.fetch({ success: listView.render });
+            this.collection.fetch({ success: agentsManagement.render });
             //this.versionCollection.clear();
             this.versionCollection.fetch();
 
+        },
+        show: function () {
+            this.$el.show();
+        },
+        hide: function() {
+            this.$el.hide();
         }
     });
-
-    listView = new ListView();
-
+    
+    
+    agentsManagement = new AgentsManagementView();
+    
     var manageAgentDialog = new ManageAgentDialogView();
+
+    var logFoldersView = new AgentLogFolderCollectionView();
+    var logFolderView = new AgentLogFolderView();
+    var logFileView = new AgentLogFileView();
+
+    var AppRouter = Backbone.Router.extend({
+        routes: {
+            "logs/:hostname/:packageId/:logFileName": "logFile",
+            "logs/:hostname/:packageId": "logsForPackage",
+            "logs/:hostname": "logsForAgent",
+            "*actions": "defaultRoute" // matches http://example.com/#anything-here
+        },
+        defaultRoute: function( actions ){
+            // The variable passed in matches the variable in the route definition "actions"
+            console.log("default route");
+            logFoldersView.hide();
+            logFolderView.hide();
+            logFileView.hide();
+            
+            agentsManagement.show();
+        },
+        logsForPackage: function (hostname, packageId) {
+            console.log("show logs for " + packageId + " on agent " + hostname);
+            manageAgentDialog.closeDialog();
+            agentsManagement.hide();
+            logFoldersView.hide();
+            logFileView.hide();
+
+            logFolderView.load(hostname, packageId);
+            logFolderView.show();
+        },
+        logFile: function (hostname, packageId, logFileName) {
+            console.log("show log " + packageId + "/" + logFileName + " on agent " + hostname);
+            manageAgentDialog.closeDialog();
+            agentsManagement.hide();
+            logFoldersView.hide();
+            logFolderView.hide();
+
+            logFileView.load(hostname, packageId, logFileName);
+            logFileView.show();
+        },
+        logsForAgent: function (hostname) {
+            console.log("show logs for agent " + hostname);
+            manageAgentDialog.closeDialog();
+            agentsManagement.hide();
+            logFolderView.hide();
+            logFileView.hide();
+            
+            logFoldersView.load(hostname);
+            logFoldersView.show();
+            
+        }
+    });
+    // Initiate the router
+    var app_router = new AppRouter;
+    // Start Backbone history a neccesary step for bookmarkable URL's
+    Backbone.history.start();
+
 
     /*var updateLink = $('<a>update</a>').click(function() {
     listView.updateAll();
     });
     $('body').append(updateLink);*/
+    
 
     setInterval(function () {
-        listView.updateAll();
+        agentsManagement.updateAll();
         if (_manageAgentDialogOpen) {
             manageAgentDialog.update();
         }
@@ -378,5 +563,5 @@ $(document).ready(function () {
     _manageAgentDialogTemplate = $('#manage-agent-template').html();
     _updateAgentsTemplate = $('#update-agents-template').html();
     
-    $('div#app').append(listView.el);
+    $('div#app').append(agentsManagement.el);
 });

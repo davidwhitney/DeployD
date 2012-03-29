@@ -33,7 +33,9 @@
         <label for="select-<%=hostname%>" class="agent-hostname">
             <%=hostname%>
             <%if (!contacted) {%> (!) <%}%>
-        </label> (<%=environment%>) <a class="manage-agent" data-id="<%=hostname%>" href="javascript:void(0);">manage</a> <a class="unregister-agent" href="javascript:void(0);"><img src="/content/images/delete.png" alt="unregister agent" title="unregister agent" /></a>
+        </label> (<%=environment%>) <a class="manage-agent" data-id="<%=hostname%>" href="javascript:void(0);">manage</a>&nbsp;
+        <a class="agent-logs" href="#/logs/<%=hostname%>">Logs</a>&nbsp;
+        <a class="unregister-agent" href="javascript:void(0);"><img src="/content/images/delete.png" alt="unregister agent" title="unregister agent" /></a>
         <%if (packages&&packages.length>0) {
             var distinctVersions=[];
             var installedVersions = new jsinq.Enumerable(packages)
@@ -77,6 +79,7 @@
                     <option value="<%=version%>"><%=version%></option>
                 <%});%>
             </select> <button class="update-agent" data-packageid="<%=package.packageId%>">Update</button>
+            &nbsp; <a href="/#/logs/<%=hostname%>/<%=package.packageId%>">Logs</a>
         <div class="manage-agent-current-task"><%if (package.currentTask!= null) {%>-> <%=package.currentTask.version%>: <%=package.currentTask.status%>, <%=package.currentTask.lastMessage%><%}%></div>
         </li>
     <%});%>

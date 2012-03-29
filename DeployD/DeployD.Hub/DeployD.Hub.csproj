@@ -146,6 +146,7 @@
     <Compile Include="Areas\Api\Code\XmlRepresentationBuilder.cs" />
     <Compile Include="Areas\Api\Controllers\AgentController.cs" />
     <Compile Include="Areas\Api\Controllers\InstallationController.cs" />
+    <Compile Include="Areas\Api\Controllers\LogController.cs" />
     <Compile Include="Areas\Api\Controllers\PackageController.cs" />
     <Compile Include="Areas\Api\Models\AgentRecord.cs" />
     <Compile Include="Areas\Api\Models\AgentViewModel.cs" />

@@ -29,6 +29,17 @@ namespace DeployD.Hub.Areas.Api
                              "api/versionlist",
                              new {controller = "Package", action = "VersionList"});
 
+            // logs
+            context.MapRoute("AgentLogFolders",
+                             "api/log/{hostname}",
+                             new {controller = "Log", action = "PackagesWithLogs"});
+            context.MapRoute("AgentLogsForPackage",
+                             "api/log/{hostname}/{packageId}",
+                             new { controller = "Log", action = "ListForPackage" });
+            context.MapRoute("AgentLog",
+                             "api/log/{hostname}/{packageId}/{filename}",
+                             new {controller = "Log", action = "LogFile"});
+
             context.MapRoute(
                 "Api_default",
                 "Api/{controller}/{action}/{id}",
