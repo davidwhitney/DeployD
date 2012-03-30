@@ -118,6 +118,8 @@ namespace Deployd.Core.Deployment.Hooks
                 if (error.Length > 0)
                 {
                     logger.Error(error);
+                    throw new ApplicationException("An error occurred running process '"+Path.GetFileName(executablePath)+"'",
+                        new Exception(error));
                 }
 
                 msDeploy.WaitForExit(2000);

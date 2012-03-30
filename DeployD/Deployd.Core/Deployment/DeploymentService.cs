@@ -64,7 +64,7 @@ namespace Deployd.Core.Deployment
             
             try
             {
-                reportProgress(ProgressReport.Info(deploymentContext, package.Id, package.Version.Version.ToString(), taskId, "Extracting package to temp folder..."));
+                reportProgress(ProgressReport.Info(deploymentContext, this, package.Id, package.Version.Version.ToString(), taskId, "Extracting package to temp folder..."));
                 new PackageExtractor().Extract(package, workingFolder);
             } 
             catch (Exception ex)
@@ -72,15 +72,25 @@ namespace Deployd.Core.Deployment
                 logger.Fatal("Could not extract package", ex);
             }
 
-            
-            BeforeDeploy(deploymentContext, reportProgress);
-            PerformDeploy(deploymentContext, reportProgress);
-            AfterDeploy(deploymentContext, reportProgress);
+            try
+            {
+                BeforeDeploy(deploymentContext, reportProgress);
+                PerformDeploy(deploymentContext, reportProgress);
+                AfterDeploy(deploymentContext, reportProgress);
 
-            reportProgress(ProgressReport.Info(deploymentContext, package.Id, package.Version.Version.ToString(), taskId,
-                                               "Deployment complete"));
-
-            deploymentContext.RemoveAppender();
+                reportProgress(ProgressReport.Info(deploymentContext, this, package.Id, package.Version.Version.ToString(), taskId,
+                                       "Deployment complete"));
+            }
+            catch (Exception ex)
+            {
+                logger.Error("An error occurred", ex);
+                reportProgress(ProgressReport.Error(deploymentContext, this, package.Id, package.Version.Version.ToString(), taskId,
+                                       "Deployment failed", ex));
+            }
+            finally
+            {
+                deploymentContext.RemoveAppender();
+            }
         }
 
         public void InstallPackage(string packageId, Func<IPackage> selectionCriteria, CancellationTokenSource cancellationToken, Action<ProgressReport> reportProgress, string taskId)
@@ -120,20 +130,14 @@ namespace Deployd.Core.Deployment
         private void ForEachHook(DeploymentContext context, string comment, Action<IDeploymentHook> action, Action<ProgressReport> reportProgress)
         {
             var installationLogger = context.GetLoggerFor(this);
+            Exception exception = null;
             foreach (var hook in _hooks)
             {
                 if (hook.HookValidForPackage(context))
                 {
-                    reportProgress(ProgressReport.InfoFormat(context, context.Package.Id, context.Package.Version.Version.ToString(), context.InstallationTaskId, "Running {0} hook {1}...", comment, hook.GetType().Name));
+                    reportProgress(ProgressReport.InfoFormat(context, this, context.Package.Id, context.Package.Version.Version.ToString(), context.InstallationTaskId, "Running {0} hook {1}...", comment, hook.GetType().Name));
 
-                    try
-                    {
-                        action(hook);
-                    } catch (Exception ex)
-                    {
-                        installationLogger.Fatal("Errors encountered, will not continue deploying", ex);
-                        break;
-                    }
+                    action(hook);
                 }
                 else
                 {
