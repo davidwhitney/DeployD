@@ -41,7 +41,7 @@ namespace Deployd.Agent
                                                                 {
                                                                     serviceInstaller.ServiceName = NAME;
                                                                     serviceInstaller.StartType =
-                                                                        ServiceStartMode.Automatic;
+                                                                        ServiceStartMode.Manual;
                                                                     serviceProcessInstaller.Account =
                                                                         ServiceAccount.User;
                                                                 },
