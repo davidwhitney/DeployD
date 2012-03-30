@@ -992,7 +992,7 @@
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:Deployd.Agent"
         "ProductCode" = "8:{422B9682-42D4-408E-A2D2-407BA44BA571}"
-        "PackageCode" = "8:{5D083FD3-CA63-4984-8689-48EB6E6246D6}"
+        "PackageCode" = "8:{CA87C465-FEA0-4765-A126-69956520B089}"
         "UpgradeCode" = "8:{E96E570D-04DC-4B49-8658-012D68E38FEC}"
         "AspNetVersion" = "8:4.0.30319.0"
         "RestartWWWService" = "11:FALSE"
@@ -1403,7 +1403,7 @@
                             "ContextData" = "8:"
                             "Attributes" = "3:0"
                             "Setting" = "3:2"
-                            "Value" = "8:Nuget feed url (e.g: http://build.justgiving.com:81/nuget):"
+                            "Value" = "8:Nuget feed url (e.g: http://just-ln1-tcs01:81/nuget):"
                             "DefaultValue" = "8:#1246"
                             "UsePlugInResources" = "11:TRUE"
                             }
@@ -1429,7 +1429,7 @@
                             "ContextData" = "8:"
                             "Attributes" = "3:0"
                             "Setting" = "3:2"
-                            "Value" = "8:http://build.justgiving.com:81/nuget"
+                            "Value" = "8:http://just-ln1-tcs01:81/nuget"
                             "DefaultValue" = "8:"
                             "UsePlugInResources" = "11:TRUE"
                             }

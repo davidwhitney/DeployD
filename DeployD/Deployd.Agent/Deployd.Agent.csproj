@@ -175,33 +175,33 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <None Include="web.config" />
-    <None Include="WebUi\Views\logs\log-file.cshtml">
+    <Content Include="WebUi\Views\logs\log-file.cshtml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="WebUi\Views\logs\package-logs.cshtml">
+    </Content>
+    <Content Include="WebUi\Views\logs\package-logs.cshtml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="WebUi\Views\logs\packages.cshtml">
+    </Content>
+    <Content Include="WebUi\Views\logs\packages.cshtml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="WebUi\Views\sitrep.cshtml">
+    </Content>
+    <Content Include="WebUi\Views\sitrep.cshtml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="WebUi\Views\layout.cshtml">
+    </Content>
+    <Content Include="WebUi\Views\layout.cshtml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="WebUi\Views\installations.cshtml">
+    </Content>
+    <Content Include="WebUi\Views\installations.cshtml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="WebUi\Views\package-details.cshtml">
+    </Content>
+    <Content Include="WebUi\Views\package-details.cshtml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="WebUi\Views\packages.cshtml">
+    </Content>
+    <Content Include="WebUi\Views\packages.cshtml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="WebUi\Views\index.cshtml">
+    </Content>
+    <Content Include="WebUi\Views\index.cshtml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
+    </Content>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Deployd.Core\Deployd.Core.csproj">
