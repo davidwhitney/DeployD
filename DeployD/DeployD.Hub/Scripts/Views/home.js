@@ -4,9 +4,10 @@ var _taskTemplate;
 var _packageTemplate;
 var _manageAgentDialogTemplate;
 var _updateAgentsTemplate;
+var _addAgentFormTemplate;
 var _agentPackageLogFolderTemplate, _logFileListTemplate, _logFileTemplate;
 var _updateInterval = 6 * 1000;
-var agentsManagement = null;
+var agentsListView = null, addAgentFormView=null, updateAgentsToVersionView=null;
 var _apiBaseUrl = '/api';
 var _manageAgentDialogOpen = false;
 
@@ -190,7 +191,7 @@ var _manageAgentDialogOpen = false;
             var template = _.template(_agentTemplate, viewModel);
 
             this.$el = $(template);
-            target.append(this.$el);
+            $(target).append(this.$el);
 
             if (checked) {
                 $('input[type=checkbox]', this.$el).attr('checked', 'checked');
@@ -285,7 +286,7 @@ var _manageAgentDialogOpen = false;
 
             $.post(url,
                 dataString,
-            function () { agentsManagement.updateAll(); });
+            function () { agentsListView.updateAll(); });
             
             return false;
         }
@@ -294,32 +295,82 @@ var _manageAgentDialogOpen = false;
     var UpdateToVersionView = Backbone.View.extend({
         tagName: 'div',
         id: 'update-agents',
-        initialize: function () {
-
+        events: {
+            'click button': 'updateAgents'
         },
-        render: function (container) {
+        initialize: function () {
+            _.bindAll(this, 'render');
+            this.versionCollection = new VersionList();
+            this.versionCollection.fetch({add:true, success:this.render});
+        },
+        render: function () {
+            var that = this;
             var selector = $('select[name=allVersions]', this.$el);
+            var currentOptions = $('option', selector);
+
+            var same = $(currentOptions).length == this.versionCollection.models.length;
+            if (same) {
+                $(currentOptions).each(function(option, index) {
+                    same = option.val() == that.versionCollection.models[index].get('version');
+                });
+            }
+            if (same) {
+                return this;
+            }
+
             var selectedValue = '';
             if (selector.length == 0) {
                 selectedValue = selector.val();
             }
-            var content = _.template(_updateAgentsTemplate, agentsManagement.versionCollection);
+            var content = _.template(_updateAgentsTemplate, that.versionCollection);
             selector.val(selectedValue);
             this.$el.html(content);
 
-            if (container && container.html() == "") {
-                container.append(this.$el);
-            }
-
             return this;
+        },
+        updateAgents: function () {
+            var version = $('select[name=allVersions]').val();
+            var selectedAgents = $('input:checked[type=checkbox][name="select-agent"]', agentsListView.$el);
+            var hostnames = '';
+            _(selectedAgents).each(function (input) {
+                hostnames += '&agentHostnames=' + $(input).attr('data-value');
+            });
+            $.post('/api/agent/updateall',
+                'version=' + version + hostnames,
+            function () {
+                agentsListView.collection.fetch({ success: function () { agentsListView.render(); } });
+            });
         }
     });
 
-    var AgentsManagementView = Backbone.View.extend({
+    var AddAgentFormView = Backbone.View.extend({
+        tagName: 'div',
+        id: 'add-agent-form',
+        events: {
+            'click button#add': 'addAgent'
+        },
+        initialize: function () {
+            _addAgentFormTemplate = "<input name='hostname' id='new-agent-hostname' type='textbox' /> <button id='add'>Add Agent</button>";
+            this.render();
+        },
+        render: function () {
+            
+            var content = _.template(_addAgentFormTemplate);
+            this.$el.html(content);
+            return this;
+        },
+        addAgent: function () {
+            var hostname = $('input[name=hostname]', this.$el).val();
+            console.log('add agent ' + hostname);
+            agentsListView.addAgent(hostname);
+            $('input[name=hostname]', this.$el).val('');
+        }
+    });
+
+    var AgentsListView = Backbone.View.extend({
         tagName: 'div',
         id: 'agent-list',
         events: {
-            'click button#add': 'addItem',
             'click button#updateSelected': 'updateSelected'
         },
 
@@ -330,11 +381,7 @@ var _manageAgentDialogOpen = false;
             this.hide();
 
             this.agentViews = [];
-
-            this.updateToVersionView = new UpdateToVersionView();
-            this.versionCollection = new VersionList();
-            this.versionCollection.fetch({ add: true });
-
+            
             this.collection = new AgentList();
             this.collection.bind('change', this.change);
             this.collection.bind('add', this.add);
@@ -365,21 +412,26 @@ var _manageAgentDialogOpen = false;
         remove: function (agent) {
             var viewToRemove = _(this.agentViews).select(function (cv) { return cv.model === agent; })[0];
             this.agentViews = _(this.agentViews).without(viewToRemove);
-            if (this._rendered) $(viewToRemove.el).remove();
+            if (this._rendered) {
+                $(viewToRemove.el).remove();
+            }
         },
         change: function (agent) {
             console.log('listView.change()');
             var viewToUpdate = _(this.agentViews).select(function (cv) { return cv.model === agent; })[0];
-            if (this._rendered) viewToUpdate.render();
+            if (this._rendered) {
+                viewToUpdate.render();
+            }
         },
 
         render: function () {
             var self = this;
             this._rendered = true;
 
-            $(this.el).empty();
-
-            $(this.el).append(_appTemplate);
+            var addHostnameValue = $('input[name=hostname]', this.$el).val();
+            
+            $(this.el).html(_appTemplate);
+            $('input[name=hostname]', this.$el).val(addHostnameValue);
 
 
             _(this.collection.models).each(function (agent) {
@@ -403,15 +455,13 @@ var _manageAgentDialogOpen = false;
                 dv.render($('ul', self.el));
                 dv.delegateEvents();
             });
-
-            this.updateVersionSelectionView();
         },
 
-        addItem: function () {
+        addAgent: function (hostname) {
 
             var item = new Agent();
             item.set({
-                id: $('#new-agent-hostname').val()
+                id: hostname
             });
             item.save();
             this.collection.add(item);
@@ -428,7 +478,7 @@ var _manageAgentDialogOpen = false;
             $.post('/api/agent/updateall',
                 'version=' + version + hostnames,
             function () {
-                agentsManagement.collection.fetch({ success: function () { agentsManagement.render(); } });
+                agentsListView.collection.fetch({ success: function () { agentsListView.render(); } });
             });
         },
 
@@ -447,16 +497,8 @@ var _manageAgentDialogOpen = false;
                 this.agentViews.push(agentView);
             }
         },
-        updateVersionSelectionView: function () {
-            this.updateToVersionView.render($('div#version-select', this.$el));
-            console.log('draw version selection thing');
-        },
         updateAll: function () {
-
-            this.collection.fetch({ success: agentsManagement.render });
-            //this.versionCollection.clear();
-            this.versionCollection.fetch();
-
+            this.collection.fetch({ success: agentsListView.render });
         },
         show: function () {
             this.$el.show();
@@ -466,15 +508,16 @@ var _manageAgentDialogOpen = false;
         }
     });
     
-    
-    agentsManagement = new AgentsManagementView();
-    
-    var manageAgentDialog = new ManageAgentDialogView();
+    agentsListView = new AgentsListView();
+    addAgentFormView = new AddAgentFormView();
+    updateAgentsToVersionView = new UpdateToVersionView();
 
+    var manageAgentDialog = new ManageAgentDialogView();
     var logFoldersView = new AgentLogFolderCollectionView();
     var logFolderView = new AgentLogFolderView();
     var logFileView = new AgentLogFileView();
 
+    
     var AppRouter = Backbone.Router.extend({
         routes: {
             "logs/:hostname/:packageId/:logFileName": "logFile",
@@ -489,12 +532,12 @@ var _manageAgentDialogOpen = false;
             logFolderView.hide();
             logFileView.hide();
             
-            agentsManagement.show();
+            agentsListView.show();
         },
         logsForPackage: function (hostname, packageId) {
             console.log("show logs for " + packageId + " on agent " + hostname);
             manageAgentDialog.closeDialog();
-            agentsManagement.hide();
+            agentsListView.hide();
             logFoldersView.hide();
             logFileView.hide();
 
@@ -504,7 +547,7 @@ var _manageAgentDialogOpen = false;
         logFile: function (hostname, packageId, logFileName) {
             console.log("show log " + packageId + "/" + logFileName + " on agent " + hostname);
             manageAgentDialog.closeDialog();
-            agentsManagement.hide();
+            agentsListView.hide();
             logFoldersView.hide();
             logFolderView.hide();
 
@@ -514,7 +557,7 @@ var _manageAgentDialogOpen = false;
         logsForAgent: function (hostname) {
             console.log("show logs for agent " + hostname);
             manageAgentDialog.closeDialog();
-            agentsManagement.hide();
+            agentsListView.hide();
             logFolderView.hide();
             logFileView.hide();
             
@@ -536,7 +579,7 @@ var _manageAgentDialogOpen = false;
     
 
     setInterval(function () {
-        agentsManagement.updateAll();
+        agentsListView.updateAll();
         if (_manageAgentDialogOpen) {
             manageAgentDialog.update();
         }
@@ -555,6 +598,10 @@ $(document).ready(function () {
     _logFileListTemplate = $('#log-file-list-template').html();
     _logFileTemplate = $('#log-file-template').html();
     _agentPackageLogFolderTemplate = $('#agent-log-packages-list-template').html();
+    _addAgentFormTemplate = $('#add-agent-form-template').html();
+
+    $('div#app').append(addAgentFormView.$el);
+    $('div#app').append(updateAgentsToVersionView.$el);
+    $('div#app').append(agentsListView.$el);
     
-    $('div#app').append(agentsManagement.el);
 });
