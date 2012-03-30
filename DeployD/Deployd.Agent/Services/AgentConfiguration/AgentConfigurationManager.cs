@@ -11,7 +11,6 @@ namespace Deployd.Agent.Services.AgentConfiguration
 {
     public class AgentConfigurationManager : IAgentConfigurationManager
     {
-        private static string _baseUrl = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData), "DeployD.Agent");
         private readonly object _fileLock;
         private ILog _logger = LogManager.GetLogger(typeof (AgentConfigurationManager));
 
@@ -25,6 +24,12 @@ namespace Deployd.Agent.Services.AgentConfiguration
             get { return ReadFromDisk(); }
         }
 
+        private string ApplicationFilePath(string fileName)
+        {
+            return Path.Combine(ConfigurationFiles.AGENT_CONFIGURATION_FILE_LOCATION.MapVirtualPath(), fileName);
+            
+        }
+
         public IList<string> GetWatchedPackages(string environmentName)
         {
             var firstOrDefault = GlobalAgentConfiguration.Environments.FirstOrDefault(x => x.Name == environmentName);
@@ -33,9 +38,10 @@ namespace Deployd.Agent.Services.AgentConfiguration
 
         public GlobalAgentConfiguration ReadFromDisk(string fileName = ConfigurationFiles.AGENT_CONFIGURATION_FILE)
         {
+            string configurationPath = ApplicationFilePath(fileName);
             lock (_fileLock)
             {
-                using (var fs = new FileStream(fileName, FileMode.Open))
+                using (var fs = new FileStream(configurationPath, FileMode.Open))
                 {
                     return (GlobalAgentConfiguration) new XmlSerializer(typeof (GlobalAgentConfiguration)).Deserialize(fs);
                 }
@@ -44,21 +50,23 @@ namespace Deployd.Agent.Services.AgentConfiguration
 
         public void SaveToDisk(GlobalAgentConfiguration configuration, string fileName = ConfigurationFiles.AGENT_CONFIGURATION_FILE)
         {
+            string configurationPath = ApplicationFilePath(fileName);
+            _logger.DebugFormat("saving configuration file to {0}", configurationPath);
             lock (_fileLock)
             {
                 using (var memoryStream = new MemoryStream())
                 using (var writer = new StreamWriter(memoryStream))
                 {
                     new XmlSerializer(typeof (GlobalAgentConfiguration)).Serialize(writer, configuration);
-                    SaveToDisk(memoryStream.ToArray(), fileName);
+                    SaveToDisk(memoryStream.ToArray(), configurationPath);
                 }
             }
         }
 
         public void SaveToDisk(byte[] configuration, string fileName = ConfigurationFiles.AGENT_CONFIGURATION_FILE)
         {
-            _logger.DebugFormat("saving configuration file to {0}", fileName.MapVirtualPath());
-            string configurationPath = Path.Combine(ConfigurationFiles.AGENT_CONFIGURATION_FILE_LOCATION.MapVirtualPath(), fileName);
+            string configurationPath = ApplicationFilePath(fileName);
+            _logger.DebugFormat("saving configuration file to {0}", configurationPath);
             try
             {
                 lock (_fileLock)
