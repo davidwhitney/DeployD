@@ -299,7 +299,7 @@ var _manageAgentDialogOpen = false;
             'click button': 'updateAgents'
         },
         initialize: function () {
-            _.bindAll(this, 'render');
+            _.bindAll(this, 'render', 'show', 'hide');
             this.versionCollection = new VersionList();
             this.versionCollection.fetch({add:true, success:this.render});
         },
@@ -340,6 +340,12 @@ var _manageAgentDialogOpen = false;
             function () {
                 agentsListView.collection.fetch({ success: function () { agentsListView.render(); } });
             });
+        },
+        show: function () {
+            this.$el.show();
+        },
+        hide: function() {
+            this.$el.hide();
         }
     });
 
@@ -350,6 +356,7 @@ var _manageAgentDialogOpen = false;
             'click button#add': 'addAgent'
         },
         initialize: function () {
+            _.bindAll(this, 'render', 'show', 'hide');
             _addAgentFormTemplate = "<input name='hostname' id='new-agent-hostname' type='textbox' /> <button id='add'>Add Agent</button>";
             this.render();
         },
@@ -364,6 +371,12 @@ var _manageAgentDialogOpen = false;
             console.log('add agent ' + hostname);
             agentsListView.addAgent(hostname);
             $('input[name=hostname]', this.$el).val('');
+        },
+        show: function () {
+            this.$el.show();
+        },
+        hide: function() {
+            this.$el.hide();
         }
     });
 
@@ -533,11 +546,15 @@ var _manageAgentDialogOpen = false;
             logFileView.hide();
             
             agentsListView.show();
+            addAgentFormView.show();
+            updateAgentsToVersionView.show();
         },
         logsForPackage: function (hostname, packageId) {
             console.log("show logs for " + packageId + " on agent " + hostname);
             manageAgentDialog.closeDialog();
             agentsListView.hide();
+            addAgentFormView.hide();
+            updateAgentsToVersionView.hide();
             logFoldersView.hide();
             logFileView.hide();
 
@@ -548,6 +565,8 @@ var _manageAgentDialogOpen = false;
             console.log("show log " + packageId + "/" + logFileName + " on agent " + hostname);
             manageAgentDialog.closeDialog();
             agentsListView.hide();
+            addAgentFormView.hide();
+            updateAgentsToVersionView.hide();
             logFoldersView.hide();
             logFolderView.hide();
 
@@ -558,6 +577,8 @@ var _manageAgentDialogOpen = false;
             console.log("show logs for agent " + hostname);
             manageAgentDialog.closeDialog();
             agentsListView.hide();
+            addAgentFormView.hide();
+            updateAgentsToVersionView.hide();
             logFolderView.hide();
             logFileView.hide();
             
