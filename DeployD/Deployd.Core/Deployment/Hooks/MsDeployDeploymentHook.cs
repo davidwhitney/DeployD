@@ -72,7 +72,13 @@ namespace Deployd.Core.Deployment.Hooks
 
         private void RestartApplication(DeploymentContext context, ILog logger)
         {
-            using (var website = FindVirtualDirectory("localhost", context.Package.Id))
+            string virtualDirectoryPath = null;
+            string[] websitePath = context.Package.Title.Split(new[] {'/'}, StringSplitOptions.RemoveEmptyEntries);
+            if (websitePath.Length > 1)
+            {
+                virtualDirectoryPath = string.Join("/", websitePath.Skip(1).ToArray());
+            }
+            using (var website = FindVirtualDirectory("localhost", websitePath[0], virtualDirectoryPath))
             {
                 if (website == null)
                 {
