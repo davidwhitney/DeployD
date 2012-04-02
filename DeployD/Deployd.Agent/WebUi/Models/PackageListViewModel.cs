@@ -14,6 +14,6 @@ namespace Deployd.Agent.WebUi.Models
             CurrentTasks = new List<InstallTaskViewModel>();
             AvailableVersions = new List<string>();
         }
-        public InstallTaskViewModel CurrentTask { get; set; }
+
     }
 }
