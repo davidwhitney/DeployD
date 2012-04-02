@@ -8,6 +8,7 @@ using Deployd.Core.Installation;
 using Deployd.Core.Queries;
 using Ninject.Modules;
 using NuGet;
+using log4net;
 
 namespace Deployd.Agent.Conventions
 {
@@ -16,8 +17,8 @@ namespace Deployd.Agent.Conventions
         public override void Load()
         {
             Bind<IAgentConfigurationManager>().ToMethod(context => new AgentConfigurationManager() );
-            Bind<IAgentSettingsManager>().To<AgentSettingsManager>();
-            Bind<IAgentSettings>().ToMethod(context => GetService<IAgentSettingsManager>().LoadSettings());
+            Bind<IAgentSettingsManager>().To<AgentSettingsManager>().InSingletonScope();
+            Bind<IAgentSettings>().ToMethod(context => GetService<IAgentSettingsManager>().Settings);
             Bind<FeedLocation>().ToMethod(context => new FeedLocation { Source = GetService<IAgentSettings>().NuGetRepository });
 
             Bind<IRetrievePackageQuery>().To<RetrievePackageQuery>();
@@ -40,6 +41,8 @@ namespace Deployd.Agent.Conventions
             Bind<IDeploymentHook>().To<ConfigTransformationDeploymentHook>(); // we want the config transform to run AfterDeploy() before the AppOffline hook does
             Bind<IDeploymentHook>().To<AppOfflineDeploymentHook>();
             Bind<System.IO.Abstractions.IFileSystem>().To<System.IO.Abstractions.FileSystem>();
+
+            Bind<ILog>().ToMethod(context => LogManager.GetLogger(context.Request.Target.Name));
         }
 
         public T GetService<T>()

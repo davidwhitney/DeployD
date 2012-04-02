@@ -1,5 +1,6 @@
 using System;
 using System.ComponentModel;
+using System.Configuration;
 using System.Configuration.Install;
 using System.Linq;
 using System.Reflection;
@@ -100,6 +101,20 @@ namespace Deployd.Core.Hosting
             context.ConfigureInstall(_serviceInstaller, _serviceProcessInstaller);
 
             Installers.AddRange(new Installer[] { _serviceProcessInstaller, _serviceInstaller });
+        }
+
+        public override void Install(System.Collections.IDictionary stateSaver)
+        {
+            base.Install(stateSaver);
+
+            string nugetRepositoryUrl = Context.Parameters["NugetRepository"];
+            string environment = Context.Parameters["Environment"];
+
+            string exePath = string.Format("{0}Deployd.Agent.exe", Context.Parameters["targetdir"]);
+            var config = ConfigurationManager.OpenExeConfiguration(exePath);
+            config.AppSettings.Settings["NuGetRepository"].Value = nugetRepositoryUrl;
+            config.AppSettings.Settings["DeploymentEnvironment"].Value = environment;
+            config.Save();
         }
 
         public static bool IsServiceInstalled(string serviceName)

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using NuGet;
 using log4net;
@@ -20,8 +21,16 @@ namespace Deployd.Core.Queries
 
         public IPackage GetLatestPackage(string packageId)
         {
-            var all = _packageRepository.GetPackages().Where(x => x.Id == packageId && x.IsLatestVersion).ToList();
-            all.Reverse();
+            List<IPackage> all = null;
+            try
+            {
+                all = _packageRepository.GetPackages().Where(x => x.Id == packageId && x.IsLatestVersion).ToList();
+                all.Reverse();
+            } catch (Exception ex)
+            {
+                Logger.Error("Could not get packages", ex);
+                throw;
+            }
             return all.FirstOrDefault();
         }
     }

@@ -23,6 +23,7 @@ namespace Deployd.Core.Deployment.Hooks
 
         public override void BeforeDeploy(DeploymentContext context)
         {
+            var logger = context.GetLoggerFor(this);
             // find an app_online.htm file in the package
             var appOnline = context.Package.GetFiles().SingleOrDefault(f => f.Path.EndsWith(APP_ONLINE_FILE));
 
@@ -39,7 +40,7 @@ namespace Deployd.Core.Deployment.Hooks
                 return;
             }
 
-            Logger.Info("Copying app_offline.htm to destination");
+            logger.Info("Copying app_offline.htm to destination");
             
             if (!_fileSystem.Directory.Exists(Path.GetDirectoryName(destinationFilePath)))
             {
@@ -61,7 +62,8 @@ namespace Deployd.Core.Deployment.Hooks
 
         public override void AfterDeploy(DeploymentContext context)
         {
-            Logger.Info("Removing app_offline.htm to destination");
+            var logger = context.GetLoggerFor(this);
+            logger.Info("Removing app_offline.htm to destination");
 
             var appOfflineFilePath = Path.Combine(context.TargetInstallationFolder, APP_OFFLINE_FILE);
             

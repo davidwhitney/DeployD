@@ -1,4 +1,5 @@
-﻿using System.ComponentModel;
+﻿using System;
+using System.ComponentModel;
 using System.ServiceProcess;
 using Deployd.Agent.Conventions;
 using Deployd.Agent.Services.AgentConfiguration;
@@ -29,22 +30,26 @@ namespace Deployd.Agent
             _containerWrapper = new ContainerWrapper(_kernel);
 
             new WindowsServiceRunner(args,
-                ()=> new IWindowsService []
-                         {
-                             _kernel.Get<AgentConfigurationService>(), 
-                             _kernel.Get<PackageDownloadingService>(), 
-                             _kernel.Get<ManagementInterfaceHost>(),
-                             _kernel.Get<PackageInstallationService>() 
-                         },
-                installationSettings: (serviceInstaller, serviceProcessInstaller) =>
-                {
-                    serviceInstaller.ServiceName = NAME;
-                    serviceInstaller.StartType = ServiceStartMode.Automatic;
-                    serviceProcessInstaller.Account = ServiceAccount.LocalSystem;
-                },
-                registerContainer: () => _containerWrapper,
-                configureContext: x => { x.Log = s => Logger.Info(s); })
+                                        () => new IWindowsService[]
+                                                {
+                                                    _kernel.Get<AgentConfigurationService>(),
+                                                    _kernel.Get<PackageDownloadingService>(),
+                                                    _kernel.Get<ManagementInterfaceHost>(),
+                                                    _kernel.Get<PackageInstallationService>()
+                                                },
+                                        installationSettings: (serviceInstaller, serviceProcessInstaller) =>
+                                                                {
+                                                                    serviceInstaller.ServiceName = NAME;
+                                                                    serviceInstaller.StartType =
+                                                                        ServiceStartMode.Manual;
+                                                                    serviceProcessInstaller.Account =
+                                                                        ServiceAccount.User;
+                                                                },
+                                        registerContainer: () => _containerWrapper,
+                                        configureContext: x => { x.Log = s => Logger.Info(s); })
                 .Host();
+
+            
         }
     }
 

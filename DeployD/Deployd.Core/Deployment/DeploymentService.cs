@@ -2,12 +2,14 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading;
+using Deployd.Core.AgentConfiguration;
 using Deployd.Core.Caching;
 using Deployd.Core.Deployment.Hooks;
 using Deployd.Core.Hosting;
 using Deployd.Core.Installation;
 using NuGet;
 using log4net;
+using log4net.Repository;
 
 namespace Deployd.Core.Deployment
 {
@@ -16,41 +18,20 @@ namespace Deployd.Core.Deployment
         private readonly IEnumerable<IDeploymentHook> _hooks;
         private readonly INuGetPackageCache _packageCache;
         private readonly ICurrentInstalledCache _currentInstalledCache;
+        private readonly IAgentSettings _agentSettings;
         protected static readonly ILog Logger = LogManager.GetLogger("DeploymentService"); 
         public ApplicationContext AppContext { get; set; }
 
         public DeploymentService(IEnumerable<IDeploymentHook> hooks, 
                                  INuGetPackageCache packageCache,
-                                 ICurrentInstalledCache currentInstalledCache)
+                                 ICurrentInstalledCache currentInstalledCache,
+            IAgentSettings agentSettings)
         {
             _hooks = hooks;
             _packageCache = packageCache;
             _currentInstalledCache = currentInstalledCache;
+            _agentSettings = agentSettings;
         }
-
-        /*
-         * TODO: move this to the cache service
-        public IList<LocalPackageInformation> AvailablePackages()
-        {
-            var packageDetails = new List<LocalPackageInformation>();
-            foreach (var packageId in _packageCache.AvailablePackages)
-            {
-                var packageViewModel = new LocalPackageInformation { PackageId = packageId };
-                var installed = _currentInstalledCache.GetCurrentInstalledVersion(packageId);
-                if (installed != null)
-                {
-                    packageViewModel.InstalledVersion = installed.Version.Version.ToString();
-                }
-                var latestAvailable = _packageCache.GetLatestVersion(packageId);
-                if (latestAvailable != null)
-                {
-                    packageViewModel.LatestAvailableVersion = latestAvailable.Version.Version.ToString();
-                }
-                packageDetails.Add(packageViewModel);
-            }
-
-            return packageDetails;
-        }*/
 
         public void InstallPackage(string packageId, string taskId, CancellationTokenSource cancellationToken, Action<ProgressReport> reportProgress)
         {
@@ -59,7 +40,7 @@ namespace Deployd.Core.Deployment
 
         public void InstallPackage(string packageId, string specificVersion, string taskId, CancellationTokenSource cancellationToken, Action<ProgressReport> reportProgress)
         {
-            var packageSelector = specificVersion == null
+            var packageSelector = specificVersion == null || specificVersion == "latest"
                                        ? (Func<IPackage>) (() => _packageCache.GetLatestVersion(packageId))
                                        : (() => _packageCache.GetSpecificVersion(packageId, specificVersion));
 
@@ -68,33 +49,48 @@ namespace Deployd.Core.Deployment
 
         public void Deploy(string taskId, IPackage package, CancellationTokenSource cancellationToken, Action<ProgressReport> reportProgress)
         {
+            var unpackFolder = Path.Combine(AgentSettings.AgentProgramDataPath, _agentSettings.UnpackingLocation);
+            var workingFolder = Path.Combine(unpackFolder, package.GetFullName());
+            var targetInstallationFolder = Path.Combine(@"d:\wwwcom", package.Id);
+            var deploymentContext = new DeploymentContext(package, workingFolder, targetInstallationFolder, taskId);
+
+            var logger = deploymentContext.GetLoggerFor(this);
             var frameworks = package.GetSupportedFrameworks();
             foreach(var framework in frameworks)
             {
-                Logger.DebugFormat("package supports {0}", framework.FullName);
+                logger.DebugFormat("package supports {0}", framework.FullName);
             }
 
-            var outputPath = @"d:\temp\" + package.GetFullName();
             
             try
             {
-                reportProgress(ProgressReport.Info(package.Id, package.Version.Version.ToString(), taskId, "Extracting package to temp folder..."));
-                new PackageExtractor().Extract(package, outputPath);
+                reportProgress(ProgressReport.Info(deploymentContext, this, package.Id, package.Version.Version.ToString(), taskId, "Extracting package to temp folder..."));
+                new PackageExtractor().Extract(package, workingFolder);
             } 
             catch (Exception ex)
             {
-                Logger.Fatal("Could not extract package", ex);
+                logger.Fatal("Could not extract package", ex);
             }
 
-            var targetInstallationFolder = Path.Combine(@"d:\wwwcom", package.Id);
-            var deploymentContext = new DeploymentContext(package, outputPath, targetInstallationFolder, taskId);
-            
-            BeforeDeploy(deploymentContext, reportProgress);
-            PerformDeploy(deploymentContext, reportProgress);
-            AfterDeploy(deploymentContext, reportProgress);
+            try
+            {
+                BeforeDeploy(deploymentContext, reportProgress);
+                PerformDeploy(deploymentContext, reportProgress);
+                AfterDeploy(deploymentContext, reportProgress);
 
-            reportProgress(ProgressReport.Info(package.Id, package.Version.Version.ToString(), taskId,
-                                               "Deployment complete"));
+                reportProgress(ProgressReport.Info(deploymentContext, this, package.Id, package.Version.Version.ToString(), taskId,
+                                       "Deployment complete"));
+            }
+            catch (Exception ex)
+            {
+                logger.Error("An error occurred", ex);
+                reportProgress(ProgressReport.Error(deploymentContext, this, package.Id, package.Version.Version.ToString(), taskId,
+                                       "Deployment failed", ex));
+            }
+            finally
+            {
+                deploymentContext.RemoveAppender();
+            }
         }
 
         public void InstallPackage(string packageId, Func<IPackage> selectionCriteria, CancellationTokenSource cancellationToken, Action<ProgressReport> reportProgress, string taskId)
@@ -133,16 +129,19 @@ namespace Deployd.Core.Deployment
         
         private void ForEachHook(DeploymentContext context, string comment, Action<IDeploymentHook> action, Action<ProgressReport> reportProgress)
         {
+            var installationLogger = context.GetLoggerFor(this);
+            Exception exception = null;
             foreach (var hook in _hooks)
             {
                 if (hook.HookValidForPackage(context))
                 {
-                    reportProgress(ProgressReport.InfoFormat(context.Package.Id, context.Package.Version.Version.ToString(), context.InstallationTaskId, "Running {0} hook {1}...", comment, hook.GetType().Name));
+                    reportProgress(ProgressReport.InfoFormat(context, this, context.Package.Id, context.Package.Version.Version.ToString(), context.InstallationTaskId, "Running {0} hook {1}...", comment, hook.GetType().Name));
+
                     action(hook);
                 }
                 else
                 {
-                    Logger.DebugFormat("Skipping {0} for {1}", comment, hook.GetType());
+                    installationLogger.DebugFormat("Skipping {0} for {1}", comment, hook.GetType());
                 }
             }
         }

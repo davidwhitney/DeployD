@@ -39,7 +39,8 @@ namespace Deployd.Agent.WebUi.Converters
                                                                                } : null;
                                        }).FirstOrDefault()
                            : null;
-                
+
+                package.AvailableVersions = cache.AvailablePackageVersions(packageId).ToList();
                 model.Packages.Add(package);
             }
 

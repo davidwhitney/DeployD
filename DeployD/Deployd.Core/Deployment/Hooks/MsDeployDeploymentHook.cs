@@ -1,8 +1,11 @@
 using System;
+using System.DirectoryServices;
 using System.IO;
 using System.IO.Abstractions;
 using System.Linq;
 using Deployd.Core.AgentConfiguration;
+using log4net;
+using log4net.Repository.Hierarchy;
 
 namespace Deployd.Core.Deployment.Hooks
 {
@@ -22,36 +25,78 @@ namespace Deployd.Core.Deployment.Hooks
         public MsDeployDeploymentHook(IAgentSettings agentSettings, IFileSystem fileSystem) : base(agentSettings, fileSystem)
         {
             _fileSystem = fileSystem;
+        }
+
+        private void LocateMsDeploy(ILog logger)
+        {
             if (_knownMsWebDeployPaths.Any(_fileSystem.File.Exists))
             {
                 MsWebDeployPath = _knownMsWebDeployPaths.Last(_fileSystem.File.Exists);
-            } 
+            }
             else
             {
                 if (string.IsNullOrEmpty(MsWebDeployPath))
                 {
-                    Logger.Fatal("Web Deploy could not be located. Ensure that Microsoft Web Deploy has been installed. Locations searched: " +
-                    string.Join("\r\n", _knownMsWebDeployPaths));
+                    logger.Fatal(
+                        "Web Deploy could not be located. Ensure that Microsoft Web Deploy has been installed. Locations searched: " +
+                        string.Join("\r\n", _knownMsWebDeployPaths));
                 }
             }
         }
 
         public override bool HookValidForPackage(DeploymentContext context)
         {
+            LocateMsDeploy(context.GetLoggerFor(this));
             return context.Package.Tags.ToLower().Split(' ', ',', ';').Contains("website")
                 && !string.IsNullOrEmpty(MsWebDeployPath);
         }
 
         public override void Deploy(DeploymentContext context)
         {
+            var installationLogger = context.GetLoggerFor(this);
+            LocateMsDeploy(installationLogger);
             DeployWebsite(
                 "localhost",
                 Path.Combine(context.WorkingFolder, "Content\\" + context.Package.Id + ".zip"),
                 context.Package.Title,
+                installationLogger,
                 Ignore.AppOffline().And().LogFiles().And().MaintenanceFile());
         }
 
-        protected void DeployWebsite(string targetMachineName, string sourcePackagePath, string iisApplicationName, params string[] ignoreRegexPaths)
+        public override void AfterDeploy(DeploymentContext context)
+        {
+            var installationLogger = context.GetLoggerFor(this);
+            RestartApplication(context, installationLogger);
+
+        }
+
+        private void RestartApplication(DeploymentContext context, ILog logger)
+        {
+            string virtualDirectoryPath = null;
+            string[] websitePath = context.Package.Title.Split(new[] {'/'}, StringSplitOptions.RemoveEmptyEntries);
+            if (websitePath.Length > 1)
+            {
+                virtualDirectoryPath = string.Join("/", websitePath.Skip(1).ToArray());
+            }
+            using (var website = FindVirtualDirectory("localhost", websitePath[0], virtualDirectoryPath))
+            {
+                if (website == null)
+                {
+                    logger.WarnFormat("No such IIS website found: '{0}'", context.Package.Id);
+                }
+                var appPoolId = website.Properties["AppPoolId"].Value;
+
+                using (var applicationPool = new DirectoryEntry("IIS://localhost/W3SVC/AppPools/" + appPoolId))
+                {
+                    logger.InfoFormat("Stopping AppPool {0}...", appPoolId);
+                    applicationPool.Invoke("Stop");
+                    logger.InfoFormat("Starting AppPool {0}...", appPoolId);
+                    applicationPool.Invoke("Start");
+                }
+            }
+        }
+
+        protected void DeployWebsite(string targetMachineName, string sourcePackagePath, string iisApplicationName, ILog logger, params string[] ignoreRegexPaths)
         {
             var ignore = string.Join(" -skip:objectName=filePath,absolutePath=", ignoreRegexPaths);
             
@@ -64,8 +109,61 @@ namespace Deployd.Core.Deployment.Hooks
             var executableArgs = string.Format(msDeployArgsFormat, sourcePackagePath, targetMachineName,
                                                iisApplicationName, ignore);
 
-            RunProcess(MsWebDeployPath, executableArgs);
+            RunProcess(MsWebDeployPath, executableArgs, logger);
            
+        }
+
+        static DirectoryEntry FindVirtualDirectory(string server, string website, string virtualdir=null)
+        {
+            DirectoryEntry siteEntry = null;
+            DirectoryEntry rootEntry = null;
+            try
+            {
+                siteEntry = FindWebSite(server, website);
+                if (siteEntry == null)
+                {
+                    return null;
+                }
+
+                rootEntry = siteEntry.Children.Find("ROOT", "IIsWebVirtualDir");
+                if (rootEntry == null)
+                {
+                    return null;
+
+                }
+
+                if (string.IsNullOrWhiteSpace(virtualdir))
+                {
+                    return rootEntry;
+                }
+
+                return rootEntry.Children.Find(virtualdir, "IIsWebVirtualDir");
+            }
+            catch (DirectoryNotFoundException ex)
+            {
+                if (rootEntry != null) rootEntry.Dispose();
+                if (siteEntry != null) siteEntry.Dispose();
+
+                throw;
+            }
+        }
+
+        static DirectoryEntry FindWebSite(string server, string friendlyName)
+        {
+            string path = String.Format("IIS://{0}/W3SVC", server);
+
+            using (DirectoryEntry w3svc = new DirectoryEntry(path))
+            {
+                foreach (DirectoryEntry entry in w3svc.Children)
+                {
+                    if (entry.SchemaClassName == "IIsWebServer" &&
+                        entry.Properties["ServerComment"].Value.Equals(friendlyName))
+                    {
+                        return entry;
+                    }
+                }
+            }
+            return null;
         }
     }
 

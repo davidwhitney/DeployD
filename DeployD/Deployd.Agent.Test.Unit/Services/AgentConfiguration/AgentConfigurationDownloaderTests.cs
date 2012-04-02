@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using Deployd.Agent.Services.AgentConfiguration;
+using Deployd.Core.AgentConfiguration;
 using Deployd.Core.Queries;
 using Moq;
 using NUnit.Framework;
@@ -16,15 +17,17 @@ namespace Deployd.Agent.Test.Unit.Services.AgentConfiguration
         private Mock<IRetrievePackageQuery> _retrieveQueryMock;
         private Mock<IPackage> _nugetPackageMock;
         private PackageFileStub _nugetPackageFile;
+        private Mock<IAgentSettingsManager> _agentSettingsManagerMock;
 
         [SetUp]
         public void SetUp()
         {
+            _agentSettingsManagerMock = new Mock<IAgentSettingsManager>();
             _nugetPackageMock = new Mock<IPackage>();
             _nugetPackageFile = new PackageFileStub { Path = ConfigurationFiles.AGENT_CONFIGURATION_FILE };
             _agentConfigManagerMock = new Mock<IAgentConfigurationManager>();
             _retrieveQueryMock = new Mock<IRetrievePackageQuery>();
-            _downloader = new AgentConfigurationDownloader(_agentConfigManagerMock.Object, _retrieveQueryMock.Object);
+            _downloader = new AgentConfigurationDownloader(_agentConfigManagerMock.Object, _retrieveQueryMock.Object, _agentSettingsManagerMock.Object);
         }
 
         [Test]

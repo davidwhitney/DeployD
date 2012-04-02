@@ -4,6 +4,7 @@ using System.IO.Abstractions;
 using System.Linq;
 using System.ServiceProcess;
 using Deployd.Core.AgentConfiguration;
+using log4net;
 
 namespace Deployd.Core.Deployment.Hooks
 {
@@ -21,15 +22,16 @@ namespace Deployd.Core.Deployment.Hooks
 
         public override void BeforeDeploy(DeploymentContext context)
         {
+            var logger = context.GetLoggerFor(this);
             if (!EnvironmentIsValidForPackage(context))
             {
                 return;
             }
 
-            ShutdownRequiredServices(context);
+            ShutdownRequiredServices(context, logger);
         }
 
-        private void ShutdownRequiredServices(DeploymentContext context)
+        private void ShutdownRequiredServices(DeploymentContext context, ILog logger)
         {
             using (var service = ServiceController.GetServices().SingleOrDefault(s => s.ServiceName == context.Package.Title))
             {
@@ -45,7 +47,7 @@ namespace Deployd.Core.Deployment.Hooks
                     return;
                 }
 
-                ChangeServiceStateTo(service, ServiceControllerStatus.Stopped, service.Stop);
+                ChangeServiceStateTo(service, ServiceControllerStatus.Stopped, service.Stop, logger);
             }
         }
 
@@ -64,6 +66,7 @@ namespace Deployd.Core.Deployment.Hooks
 
         public override void AfterDeploy(DeploymentContext context)
         {
+            var logger = context.GetLoggerFor(this);
             if (!EnvironmentIsValidForPackage(context))
             {
                 return;
@@ -75,7 +78,7 @@ namespace Deployd.Core.Deployment.Hooks
                 if (service == null)
                 {
                     var pathToExecutable = Path.Combine(context.TargetInstallationFolder, context.Package.Id + ".exe");
-                    Logger.InfoFormat("Installing service {0} from {1}", context.Package.Title, pathToExecutable);
+                    logger.InfoFormat("Installing service {0} from {1}", context.Package.Title, pathToExecutable);
 
                     System.Configuration.Install.ManagedInstallerClass.InstallHelper(new[] {pathToExecutable});
                 }
@@ -87,13 +90,13 @@ namespace Deployd.Core.Deployment.Hooks
                     return;
                 }
                 
-                ChangeServiceStateTo(service, ServiceControllerStatus.Running, service.Start);
+                ChangeServiceStateTo(service, ServiceControllerStatus.Running, service.Start, logger);
             }
         }
 
-        private void ChangeServiceStateTo(ServiceController service, ServiceControllerStatus verifyMeetsThisStatus, Action switchAction)
+        private void ChangeServiceStateTo(ServiceController service, ServiceControllerStatus verifyMeetsThisStatus, Action switchAction, ILog logger)
         {
-            Logger.InfoFormat("Stopping service {0}", service.ServiceName);
+            logger.InfoFormat("Stopping service {0}", service.ServiceName);
             switchAction();
 
             var retryCount = 10; // wait 10 retries
@@ -103,7 +106,7 @@ namespace Deployd.Core.Deployment.Hooks
                 service.Refresh();
             }
 
-            Logger.InfoFormat("service is now {0}", service.Status);            
+            logger.InfoFormat("service is now {0}", service.Status);            
         }
     }
 }
