@@ -79,7 +79,37 @@ namespace Deployd.Agent.Services.InstallationService
             nextPendingInstall.Task = new Task<InstallationResult>(() =>
             {
                 _deploymentService.InstallPackage(nextPendingInstall.PackageId, nextPendingInstall.Version, Guid.NewGuid().ToString(), new CancellationTokenSource(),
-                                                    progressReport =>nextPendingInstall.ProgressReports.Add(progressReport));
+                                                    progressReport =>
+                                                        {
+                                                            log4net.Core.Level level = log4net.Core.Level.Info;
+                                                            switch(progressReport.Level)
+                                                            {
+                                                                case "Debug":
+                                                                    level = log4net.Core.Level.Debug;
+                                                                    break;
+                                                                case "Warn":
+                                                                    level = log4net.Core.Level.Warn;
+                                                                    break;
+                                                                case "Error":
+                                                                    level = log4net.Core.Level.Error;
+                                                                    break;
+                                                                case "Fatal":
+                                                                    level = log4net.Core.Level.Fatal;
+                                                                    break;
+                                                                case "Info":
+                                                                default:
+                                                                    level = log4net.Core.Level.Info;
+                                                                    break;
+                                                            }
+
+                                                            progressReport.Context.GetLoggerFor(this).Logger.Log(
+                                                                progressReport.ReportingType,
+                                                                level,
+                                                                progressReport.Message,
+                                                                progressReport.Exception);
+
+                                                            nextPendingInstall.ProgressReports.Add(progressReport);
+                                                        });
                 return new InstallationResult();
             });
 

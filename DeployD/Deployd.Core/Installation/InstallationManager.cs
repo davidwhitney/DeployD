@@ -10,7 +10,7 @@ namespace Deployd.Core.Installation
 {
     public class InstallationManager : IInstallationManager
     {
-        private ILog logger = LogManager.GetLogger("InstallationManager");
+        private readonly ILog _logger = LogManager.GetLogger("InstallationManager");
         private readonly IDeploymentService _deploymentService;
         public static readonly List<InstallationTask> InstallationTasks = new List<InstallationTask>();
 
@@ -18,7 +18,8 @@ namespace Deployd.Core.Installation
 
         private void ReportProgress(ProgressReport report)
         {
-            logger.Info(report.Message);
+            var installationLogger = report.Context.GetLoggerFor(this);
+            installationLogger.Info(report.Message);
             
             var task = GetTaskById(report.InstallationTaskId);
             if (task != null)

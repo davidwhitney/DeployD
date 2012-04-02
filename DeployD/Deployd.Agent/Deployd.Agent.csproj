@@ -28,7 +28,7 @@
     <InstallUrl>http://build.justgiving.com:83/</InstallUrl>
     <CreateWebPageOnPublish>true</CreateWebPageOnPublish>
     <WebPage>publish.htm</WebPage>
-    <ApplicationRevision>2</ApplicationRevision>
+    <ApplicationRevision>3</ApplicationRevision>
     <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <PublishWizardCompleted>true</PublishWizardCompleted>
@@ -140,11 +140,14 @@
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="WebUi\Converters\RunningTasksToPackageListViewModelConverter.cs" />
+    <Compile Include="WebUi\Models\AgentStatusViewModel.cs" />
     <Compile Include="WebUi\Models\InstallationsViewModel.cs" />
     <Compile Include="WebUi\Models\InstallTaskViewModel.cs" />
+    <Compile Include="WebUi\Models\LocalPackageInformation.cs" />
     <Compile Include="WebUi\Models\PackageListViewModel.cs" />
     <Compile Include="WebUi\CustomFormatterExtensions.cs" />
     <Compile Include="WebUi\Modules\InstallationsModule.cs" />
+    <Compile Include="WebUi\Modules\LogModule.cs" />
     <Compile Include="WebUi\NancyModuleExtensions.cs" />
     <Compile Include="WebUi\Modules\PackagesModule.cs" />
     <Compile Include="WebUi\NancyConventionsBootstrapper.cs" />
@@ -173,21 +176,33 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <None Include="web.config" />
-    <None Include="WebUi\Views\layout.cshtml">
+    <Content Include="WebUi\Views\logs\log-file.cshtml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="WebUi\Views\installations.cshtml">
+    </Content>
+    <Content Include="WebUi\Views\logs\package-logs.cshtml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="WebUi\Views\package-details.cshtml">
+    </Content>
+    <Content Include="WebUi\Views\logs\packages.cshtml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="WebUi\Views\packages.cshtml">
+    </Content>
+    <Content Include="WebUi\Views\sitrep.cshtml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="WebUi\Views\index.cshtml">
+    </Content>
+    <Content Include="WebUi\Views\layout.cshtml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
+    </Content>
+    <Content Include="WebUi\Views\installations.cshtml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="WebUi\Views\package-details.cshtml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="WebUi\Views\packages.cshtml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="WebUi\Views\index.cshtml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Deployd.Core\Deployd.Core.csproj">

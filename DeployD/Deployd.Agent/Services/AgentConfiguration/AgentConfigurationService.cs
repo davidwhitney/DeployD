@@ -8,7 +8,7 @@ namespace Deployd.Agent.Services.AgentConfiguration
 {
     public class AgentConfigurationService : IWindowsService
     {
-        protected static readonly ILog Logger = LogManager.GetLogger("AgentConfigurationService");
+        protected static readonly ILog Logger = LogManager.GetLogger(typeof(AgentConfigurationService));
         
         public ApplicationContext AppContext { get; set; }
         public TimedSingleExecutionTask TimedTask { get; private set; }
@@ -19,7 +19,6 @@ namespace Deployd.Agent.Services.AgentConfiguration
         {
             if (agentSettings == null) throw new ArgumentNullException("agentSettings");
             if (configurationDownloader == null) throw new ArgumentNullException("configurationDownloader");
-
             _configurationDownloader = configurationDownloader;
             TimedTask = new TimedSingleExecutionTask(agentSettings.ConfigurationSyncIntervalMs, DownloadConfiguration, true);
         }
@@ -36,7 +35,7 @@ namespace Deployd.Agent.Services.AgentConfiguration
 
         public void DownloadConfiguration()
         {
-            Logger.DebugFormat("Downloading " + ConfigurationFiles.AGENT_CONFIGURATION_FILE);
+            Logger.DebugFormat("Downloading configuration");
             _configurationDownloader.DownloadAgentConfiguration();
         }
     }

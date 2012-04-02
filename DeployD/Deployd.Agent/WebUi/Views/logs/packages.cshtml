@@ -1,0 +1,16 @@
+﻿<!DOCTYPE html>
+<html>
+    <head>
+        <title>Deployd.Agent</title>
+    </head>
+    <body>
+        <h1>Deployd.Agent</h1>
+        <h2>Logs</h2>
+        
+        @foreach(var package in Model)
+        {
+            <p><a href="/log/@package">@package</a></p>
+        }
+
+    </body>
+</html>

@@ -16,12 +16,19 @@ namespace Deployd.Core.Deployment.Hooks
     public class TryThis : ITryThisNow, ISayTimes
     {
         private readonly Action _action;
-        private readonly ILog _logger = LogManager.GetLogger("TryThis");
+        private readonly ILog _logger = null;
         private int _times = 1;
 
         public TryThis(Action action)
         {
             _action = action;
+            _logger = LogManager.GetLogger("TryThis");
+        }
+
+        public TryThis(Action action, ILog logger)
+        {
+            _action = action;
+            _logger = logger;
         }
 
         public void Go()
@@ -40,11 +47,11 @@ namespace Deployd.Core.Deployment.Hooks
                 {
                     if (retryCount == 0)
                     {
-                        _logger.Fatal("Failed to clean destination");
+                        _logger.Fatal("Failed to execute a task", ex);
                         throw;
                     }
                     
-                    _logger.Warn("Could not clean destination", ex);
+                    _logger.Warn("Could not execute a task", ex);
                     _logger.WarnFormat("Will retry {0} more times", retryCount);
                     
                     System.Threading.Thread.Sleep(1000);

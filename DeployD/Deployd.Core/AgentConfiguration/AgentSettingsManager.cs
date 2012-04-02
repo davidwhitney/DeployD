@@ -2,17 +2,36 @@
 using System.Collections.Specialized;
 using System.Configuration;
 using System.IO.Abstractions;
+using log4net;
 
 namespace Deployd.Core.AgentConfiguration
 {
     public class AgentSettingsManager : IAgentSettingsManager
     {
         private readonly IFileSystem _fileSystem;
+        private readonly ILog _log;
         public static Dictionary<string, string> ConfigurationDefaults { get; private set; }
+        private IAgentSettings _settings = null;
+        public IAgentSettings Settings
+        {
+            get
+            {
+                if (_settings == null)
+                    _settings = LoadSettings();
 
-        public AgentSettingsManager(IFileSystem fileSystem)
+                return _settings;
+            }
+        }
+
+        public void UnloadSettings()
+        {
+            _settings = null;
+        }
+
+        public AgentSettingsManager(IFileSystem fileSystem, ILog log)
         {
             _fileSystem = fileSystem;
+            _log = log;
         }
 
         static AgentSettingsManager()
@@ -33,6 +52,8 @@ namespace Deployd.Core.AgentConfiguration
 
         public IAgentSettings LoadSettings()
         {
+            _log.Debug("Loading settings from app settings");
+
             return LoadSettings(ConfigurationManager.AppSettings);
         }
 
@@ -41,6 +62,11 @@ namespace Deployd.Core.AgentConfiguration
             var agentSettings = new AppSettings();
             ConfigureDefaults(settings, agentSettings);
             EnsurePathsExist(agentSettings);
+
+            foreach(var setting in agentSettings)
+            {
+                _log.DebugFormat("{0} = {1}", setting.Key, setting.Value);
+            }
 
             return agentSettings;
         }

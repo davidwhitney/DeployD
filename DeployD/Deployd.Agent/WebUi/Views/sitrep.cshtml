@@ -1,0 +1,61 @@
+﻿@using Deployd.Agent.WebUi.Models
+@{
+
+
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Deployd.Agent</title>
+    </head>
+    <body>
+        <h1>Deployd.Agent - @Environment.MachineName</h1>
+        
+        <ul>
+            <li><a href="/packages">Packages</a></li>
+            <li><a href="/installations">Installations</a></li>
+        </ul>
+
+        <h2>Available Packages</h2>
+        
+        <form method="post" action="/packages/UpdateAllTo">
+            <input type="submit" value="Update all to:"/> <select name="specificVersion">
+                               @foreach(string version in Model.AvailableVersions)
+                               {
+                                   <option>@version</option>
+                               }
+                           </select>
+        </form>
+
+        @foreach(LocalPackageInformation package in Model.Packages)
+        {
+            <div style="clear:both">
+                <a href="/packages/@package.PackageId">@package.PackageId</a><div style="float:right;margin-right:80px"><form style="display:inline" action="/packages/@package.PackageId/install" method="POST"><input type="submit" value="Install Latest"></input></form></div><br/>
+                @if (package.CurrentTask != null)
+                {
+                    <text>@package.CurrentTask.Status: @package.CurrentTask.LastMessage<br/></text>
+                }
+
+                @if(!string.IsNullOrWhiteSpace(package.LatestAvailableVersion))
+                {
+                    <text>Latest: @package.LatestAvailableVersion<br/></text>
+                }
+                @if (!string.IsNullOrWhiteSpace(package.InstalledVersion))
+                {
+                    <text>Installed: @package.InstalledVersion</text>
+                }
+                else
+                {
+                    <text>Not installed</text>
+                }
+                <br/>
+            </div>
+            
+        }
+        
+        <h2>Tasks</h2>
+        @foreach (InstallTaskViewModel task in Model.CurrentTasks)
+        {
+            <p>@task.PackageId @task.Version @task.Status @task.LastMessage</p>
+        }
+    </body>
+</html>

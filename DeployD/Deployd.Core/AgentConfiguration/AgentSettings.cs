@@ -1,7 +1,13 @@
-﻿namespace Deployd.Core.AgentConfiguration
+﻿using System;
+using System.IO;
+
+namespace Deployd.Core.AgentConfiguration
 {
     public class AgentSettings : IAgentSettings
     {
+        public static readonly string AgentProgramDataPath =
+            Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData), "DeployD.Agent");
+
         public int PackageSyncIntervalMs { get; set; }
         public int ConfigurationSyncIntervalMs { get; set; }
         public string DeploymentEnvironment { get; set; }
