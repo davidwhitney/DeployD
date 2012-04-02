@@ -65,17 +65,12 @@ namespace Deployd.Core.Deployment.Hooks
 
             string scriptText = File.ReadAllText(pathToScript);
 
-
             // create Powershell runspace
             Runspace runspace = RunspaceFactory.CreateRunspace();
 
             // open it
-            var runspace = RunspaceFactory.CreateRunspace();
             var command = new Command(pathToScript);
             command.Parameters.Add("agentEnvironment", AgentSettings.DeploymentEnvironment);
-
-            // create Powershell runspace
-            Runspace runspace = RunspaceFactory.CreateRunspace();
 
             // open it
             runspace.Open();
