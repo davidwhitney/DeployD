@@ -51,7 +51,7 @@ namespace Deployd.Core.Deployment.Hooks
 
             try
             {
-                LoadAndExecuteScript(Path.Combine(context.WorkingFolder, file.Path), logger);
+                LoadAndExecuteScript(context, Path.Combine(context.WorkingFolder, file.Path), logger);
             } 
             catch (Exception ex)
             {
@@ -59,16 +59,31 @@ namespace Deployd.Core.Deployment.Hooks
             }
         }
 
-        private void LoadAndExecuteScript(string pathToScript, ILog logger)
+        private void LoadAndExecuteScript(DeploymentContext context, string pathToScript, ILog logger)
         {
-            var serviceManagementScript = File.ReadAllText("Scripts/PS/Services.ps1");
-            var scriptText = _fileSystem.File.ReadAllText(pathToScript);
+            var serviceCommands = new Command("Scripts/PS/Services.ps1");
 
+            string scriptText = File.ReadAllText(pathToScript);
+
+
+            // create Powershell runspace
+            Runspace runspace = RunspaceFactory.CreateRunspace();
+
+            // open it
             var runspace = RunspaceFactory.CreateRunspace();
+            var command = new Command(pathToScript);
+            command.Parameters.Add("agentEnvironment", AgentSettings.DeploymentEnvironment);
+
+            // create Powershell runspace
+            Runspace runspace = RunspaceFactory.CreateRunspace();
+
+            // open it
             runspace.Open();
             var pipeline = runspace.CreatePipeline();
-            pipeline.Commands.AddScript(serviceManagementScript);
-            pipeline.Commands.AddScript(scriptText);
+            pipeline.Commands.Add(serviceCommands);
+            
+            // add the custom script
+            pipeline.Commands.Add(command);
 
             // add an extra command to transform the script output objects into nicely formatted strings 
             // remove this line to get the actual objects that the script returns. For example, the script 
