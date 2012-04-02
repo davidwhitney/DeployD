@@ -226,6 +226,12 @@ var _manageAgentDialogOpen = false;
             this.model = new Agent();
             this.$el.hide();
             $('body').append(this.$el);
+            this.$el.dialog({ autoOpen: false,
+                height: 500,
+                width: 600,
+                modal: true,
+                close: function () { _manageAgentDialogOpen = false;}
+            });
         },
         load: function (hostname) {
             if (this.model) {
@@ -247,12 +253,6 @@ var _manageAgentDialogOpen = false;
             };
             var dialogContent = _.template(_manageAgentDialogTemplate, viewModel);
             this.$el.html(dialogContent);
-            this.$el.dialog({ autoOpen: false,
-                height: 500,
-                width: 600,
-                modal: true,
-                close: function () { _manageAgentDialogOpen = false;}
-            });
             this.$el.dialog("open");
             this.delegateEvents();
 

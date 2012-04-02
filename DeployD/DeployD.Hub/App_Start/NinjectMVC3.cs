@@ -67,10 +67,8 @@ namespace DeployD.Hub.App_Start
                               {
                                   var documentStore = new EmbeddableDocumentStore()
                                 {
-                                    DataDirectory =System.Web.Hosting.HostingEnvironment.MapPath("~/App_Data/Database"),
-                                    UseEmbeddedHttpServer = true
+                                    DataDirectory =System.Web.Hosting.HostingEnvironment.MapPath("~/App_Data/Database")
                                 };
-                                  Raven.Database.Server.NonAdminHttp.EnsureCanListenToWhenInNonAdminContext(8080);
                                   documentStore.Initialize();
 
                                   return documentStore;
