@@ -6,7 +6,7 @@ using System.ServiceProcess;
 using Deployd.Core.AgentConfiguration;
 using log4net;
 
-namespace Deployd.Core.Deployment.Hooks
+namespace Deployd.Core.Installation.Hooks
 {
     public class ServiceDeploymentHook : DeploymentHookBase
     {

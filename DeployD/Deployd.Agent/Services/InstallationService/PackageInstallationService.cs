@@ -4,7 +4,6 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Deployd.Core;
-using Deployd.Core.Deployment;
 using Deployd.Core.Hosting;
 using Deployd.Core.Installation;
 using log4net;

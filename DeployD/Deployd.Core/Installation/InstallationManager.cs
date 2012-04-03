@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Deployd.Core.Deployment;
 using log4net;
 
 namespace Deployd.Core.Installation

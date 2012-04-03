@@ -4,7 +4,7 @@ using Deployd.Core.AgentConfiguration;
 using NuGet;
 using IFileSystem = System.IO.Abstractions.IFileSystem;
 
-namespace Deployd.Core.Caching
+namespace Deployd.Core.PackageCaching
 {
     public class InstalledPackageArchive : IInstalledPackageArchive
     {

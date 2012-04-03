@@ -1,11 +1,10 @@
 using System;
 using Deployd.Core.AgentConfiguration;
-using Deployd.Core.Caching;
 using Deployd.Agent.Services.AgentConfiguration;
-using Deployd.Core.Deployment;
-using Deployd.Core.Deployment.Hooks;
 using Deployd.Core.Installation;
-using Deployd.Core.Queries;
+using Deployd.Core.Installation.Hooks;
+using Deployd.Core.PackageCaching;
+using Deployd.Core.PackageTransport;
 using Ninject.Modules;
 using NuGet;
 using log4net;

@@ -2,9 +2,9 @@
 using Deployd.Agent.Services.AgentConfiguration;
 using Deployd.Core;
 using Deployd.Core.AgentConfiguration;
-using Deployd.Core.Caching;
 using Deployd.Core.Hosting;
-using Deployd.Core.Queries;
+using Deployd.Core.PackageCaching;
+using Deployd.Core.PackageTransport;
 using log4net;
 
 namespace Deployd.Agent.Services.PackageDownloading

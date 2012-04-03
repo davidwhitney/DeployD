@@ -2,7 +2,7 @@
 using System.IO;
 using Deployd.Agent.Services.AgentConfiguration;
 using Deployd.Core.AgentConfiguration;
-using Deployd.Core.Queries;
+using Deployd.Core.PackageTransport;
 using Moq;
 using NUnit.Framework;
 using NuGet;

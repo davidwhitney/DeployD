@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Deployd.Core.AgentConfiguration;
-using Deployd.Core.Queries;
+using Deployd.Core.PackageTransport;
 using NuGet;
 using log4net;
 

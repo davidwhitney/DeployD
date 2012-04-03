@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using Deployd.Agent.WebUi.Converters;
 using Deployd.Agent.WebUi.Models;
-using Deployd.Core.Caching;
 using Deployd.Core.Hosting;
 using Deployd.Core.Installation;
+using Deployd.Core.PackageCaching;
 using Nancy;
 using NuGet;
 

@@ -3,7 +3,7 @@ using System.Linq;
 using NuGet;
 using log4net;
 
-namespace Deployd.Core.Queries
+namespace Deployd.Core.PackageTransport
 {
     public class RetrieveNuGetPackageQuery : IRetrievePackageQuery
     {

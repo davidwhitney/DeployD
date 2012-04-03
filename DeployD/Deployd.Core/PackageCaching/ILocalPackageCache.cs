@@ -1,8 +1,7 @@
-using System.Collections;
 using System.Collections.Generic;
 using NuGet;
 
-namespace Deployd.Core.Caching
+namespace Deployd.Core.PackageCaching
 {
     public interface ILocalPackageCache
     {

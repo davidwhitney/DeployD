@@ -2,8 +2,8 @@
 using System.Linq;
 using System.Threading.Tasks;
 using Deployd.Agent.WebUi.Models;
-using Deployd.Core.Caching;
 using Deployd.Core.Installation;
+using Deployd.Core.PackageCaching;
 
 namespace Deployd.Agent.WebUi.Converters
 {

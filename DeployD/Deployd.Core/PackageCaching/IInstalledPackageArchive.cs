@@ -1,8 +1,7 @@
 ﻿using System.Collections.Generic;
-using System.Text;
 using NuGet;
 
-namespace Deployd.Core.Caching
+namespace Deployd.Core.PackageCaching
 {
     public interface IInstalledPackageArchive
     {

@@ -2,11 +2,11 @@ using System.IO;
 using NuGet;
 using log4net;
 
-namespace Deployd.Core.Deployment
+namespace Deployd.Core.PackageFormats.NuGet
 {
-    public class PackageExtractor
+    public class NuGetPackageExtractor
     {
-        private readonly ILog _logger = LogManager.GetLogger("PackageExtractor");
+        private readonly ILog _logger = LogManager.GetLogger("NuGetPackageExtractor");
 
         public void Extract(string packagePath, string destinationPath)
         {

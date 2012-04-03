@@ -3,15 +3,14 @@ using System.Collections.Generic;
 using System.IO;
 using System.Threading;
 using Deployd.Core.AgentConfiguration;
-using Deployd.Core.Caching;
-using Deployd.Core.Deployment.Hooks;
 using Deployd.Core.Hosting;
-using Deployd.Core.Installation;
+using Deployd.Core.Installation.Hooks;
+using Deployd.Core.PackageCaching;
+using Deployd.Core.PackageFormats.NuGet;
 using NuGet;
 using log4net;
-using log4net.Repository;
 
-namespace Deployd.Core.Deployment
+namespace Deployd.Core.Installation
 {
     public class DeploymentService : IDeploymentService
     {
@@ -65,7 +64,7 @@ namespace Deployd.Core.Deployment
             try
             {
                 reportProgress(ProgressReport.Info(deploymentContext, this, package.Id, package.Version.Version.ToString(), taskId, "Extracting package to temp folder..."));
-                new PackageExtractor().Extract(package, workingFolder);
+                new NuGetPackageExtractor().Extract(package, workingFolder);
             } 
             catch (Exception ex)
             {
@@ -130,7 +129,6 @@ namespace Deployd.Core.Deployment
         private void ForEachHook(DeploymentContext context, string comment, Action<IDeploymentHook> action, Action<ProgressReport> reportProgress)
         {
             var installationLogger = context.GetLoggerFor(this);
-            Exception exception = null;
             foreach (var hook in _hooks)
             {
                 if (hook.HookValidForPackage(context))

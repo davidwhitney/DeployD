@@ -1,5 +1,5 @@
 ﻿using System.Linq;
-using Deployd.Core.Queries;
+using Deployd.Core.PackageTransport;
 using Moq;
 using NUnit.Framework;
 using NuGet;
