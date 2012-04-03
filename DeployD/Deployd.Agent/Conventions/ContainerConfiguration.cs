@@ -21,7 +21,7 @@ namespace Deployd.Agent.Conventions
             Bind<IAgentSettings>().ToMethod(context => GetService<IAgentSettingsManager>().Settings);
             Bind<FeedLocation>().ToMethod(context => new FeedLocation { Source = GetService<IAgentSettings>().NuGetRepository });
 
-            Bind<IRetrievePackageQuery>().To<RetrievePackageQuery>();
+            Bind<IRetrievePackageQuery>().To<RetrieveNuGetPackageQuery>();
             Bind<IPackageRepositoryFactory>().To<PackageRepositoryFactory>();
             Bind<ILocalPackageCache>().To<NuGetPackageCache>();
             

@@ -119,7 +119,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Queries\IRetrievePackageQuery.cs" />
     <Compile Include="Queries\FeedLocation.cs" />
-    <Compile Include="Queries\RetrievePackageQuery.cs" />
+    <Compile Include="Queries\RetrieveNuGetPackageQuery.cs" />
     <Compile Include="TimedSingleExecutionTask.cs" />
   </ItemGroup>
   <ItemGroup>
