@@ -4,7 +4,7 @@ using NuGet;
 
 namespace Deployd.Core.Caching
 {
-    public interface ICurrentInstalledCache
+    public interface IInstalledPackageArchive
     {
         IEnumerable<IPackage> GetCurrentInstalledPackages();
         IPackage GetCurrentInstalledVersion(string packageId);

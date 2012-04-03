@@ -81,8 +81,8 @@
     <Compile Include="AgentConfiguration\AgentSettings.cs" />
     <Compile Include="AgentConfiguration\IAgentSettings.cs" />
     <Compile Include="AgentConfiguration\IAgentSettingsManager.cs" />
-    <Compile Include="Caching\CurrentInstalledCache.cs" />
-    <Compile Include="Caching\ICurrentInstalledCache.cs" />
+    <Compile Include="Caching\InstalledPackageArchive.cs" />
+    <Compile Include="Caching\IInstalledPackageArchive.cs" />
     <Compile Include="Deployment\DeploymentContext.cs" />
     <Compile Include="Deployment\DeploymentService.cs" />
     <Compile Include="Deployment\Hooks\AppOfflineDeploymentHook.cs" />

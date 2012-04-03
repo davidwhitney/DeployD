@@ -17,19 +17,19 @@ namespace Deployd.Core.Deployment
     {
         private readonly IEnumerable<IDeploymentHook> _hooks;
         private readonly ILocalPackageCache _packageCache;
-        private readonly ICurrentInstalledCache _currentInstalledCache;
+        private readonly IInstalledPackageArchive _installedPackageArchive;
         private readonly IAgentSettings _agentSettings;
         protected static readonly ILog Logger = LogManager.GetLogger("DeploymentService"); 
         public ApplicationContext AppContext { get; set; }
 
         public DeploymentService(IEnumerable<IDeploymentHook> hooks, 
                                  ILocalPackageCache packageCache,
-                                 ICurrentInstalledCache currentInstalledCache,
+                                 IInstalledPackageArchive installedPackageArchive,
             IAgentSettings agentSettings)
         {
             _hooks = hooks;
             _packageCache = packageCache;
-            _currentInstalledCache = currentInstalledCache;
+            _installedPackageArchive = installedPackageArchive;
             _agentSettings = agentSettings;
         }
 
@@ -104,7 +104,7 @@ namespace Deployd.Core.Deployment
         {
             try
             {
-                _currentInstalledCache.SetCurrentInstalledVersion(package);
+                _installedPackageArchive.SetCurrentInstalledVersion(package);
             }
             catch (Exception ex)
             {

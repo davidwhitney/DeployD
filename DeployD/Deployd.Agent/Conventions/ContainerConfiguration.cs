@@ -29,7 +29,7 @@ namespace Deployd.Agent.Conventions
 
             Bind<IDeploymentService>().To<DeploymentService>();
 
-            Bind<ICurrentInstalledCache>().To<CurrentInstalledCache>();
+            Bind<IInstalledPackageArchive>().To<InstalledPackageArchive>();
 
             Bind<IInstallationManager>().To<InstallationManager>().InSingletonScope();
             Bind<RunningInstallationTaskList>().ToSelf().InSingletonScope();

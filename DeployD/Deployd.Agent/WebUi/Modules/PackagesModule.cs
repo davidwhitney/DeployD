@@ -22,7 +22,7 @@ namespace Deployd.Agent.WebUi.Modules
             {
                 var cache = Container().GetType<ILocalPackageCache>();
                 var runningTasks = Container().GetType<RunningInstallationTaskList>();
-                var installCache = Container().GetType<ICurrentInstalledCache>();
+                var installCache = Container().GetType<IInstalledPackageArchive>();
                 var model = RunningTasksToPackageListViewModelConverter.Convert(cache, runningTasks, installCache);
                 return this.ViewOrJson("packages.cshtml", model);
             };
@@ -33,7 +33,7 @@ namespace Deployd.Agent.WebUi.Modules
                 var cache = Container().GetType<ILocalPackageCache>();
                 var packageVersions = cache.AvailablePackageVersions(x.packageId);
                 var runningTasks = Container().GetType<RunningInstallationTaskList>();
-                var installCache = Container().GetType<ICurrentInstalledCache>();
+                var installCache = Container().GetType<IInstalledPackageArchive>();
 
                 var currentInstallTask = runningTasks.SingleOrDefault(t => t.PackageId == x.packageId);
                 IPackage currentInstalledPackage = installCache.GetCurrentInstalledVersion(x.packageId);

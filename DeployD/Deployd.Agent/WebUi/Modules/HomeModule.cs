@@ -30,7 +30,7 @@ namespace Deployd.Agent.WebUi.Modules
                 _log.DebugFormat("{0} asked for status", Request.UserHostAddress);
                 var cache = Container().GetType<ILocalPackageCache>();
                 var runningTasks = Container().GetType<RunningInstallationTaskList>();
-                var installCache = Container().GetType<ICurrentInstalledCache>();
+                var installCache = Container().GetType<IInstalledPackageArchive>();
 
                 var model =
                 new AgentStatusViewModel

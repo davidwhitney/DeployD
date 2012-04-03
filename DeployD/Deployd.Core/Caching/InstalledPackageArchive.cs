@@ -6,13 +6,13 @@ using IFileSystem = System.IO.Abstractions.IFileSystem;
 
 namespace Deployd.Core.Caching
 {
-    public class CurrentInstalledCache : ICurrentInstalledCache
+    public class InstalledPackageArchive : IInstalledPackageArchive
     {
         private readonly IAgentSettings _agentSettings;
         private readonly IFileSystem _fileSystem;
         private readonly ILocalPackageCache _packageCache;
 
-        public CurrentInstalledCache(IAgentSettings agentSettings, IFileSystem fileSystem, ILocalPackageCache packageCache)
+        public InstalledPackageArchive(IAgentSettings agentSettings, IFileSystem fileSystem, ILocalPackageCache packageCache)
         {
             _agentSettings = agentSettings;
             _fileSystem = fileSystem;
