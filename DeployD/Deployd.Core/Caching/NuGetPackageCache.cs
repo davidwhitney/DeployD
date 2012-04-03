@@ -70,13 +70,13 @@ namespace Deployd.Core.Caching
         public IList<string> AvailablePackageVersions(string packageId)
         {
             var files = Directory.GetFiles(PackageCacheLocation(packageId)).ToList();
-            List<string> versions = new List<string>();
+            var versions = new List<string>();
             for (var index = 0; index < files.Count; index++)
             {
-                string filename = Path.GetFileNameWithoutExtension(files[index]);
+                var filename = Path.GetFileNameWithoutExtension(files[index]);
                 if (filename.Contains("-"))
                 {
-                    string version = filename.Split(new[]{'-'}, StringSplitOptions.RemoveEmptyEntries).Last();
+                    var version = filename.Split(new[]{'-'}, StringSplitOptions.RemoveEmptyEntries).Last();
                     versions.Add(version);
                 }
             }
@@ -144,8 +144,8 @@ namespace Deployd.Core.Caching
 
         public IPackage GetSpecificVersion(string packageId, string version)
         {
-            string filename = CachedPackageVersionFilename(packageId, version);
-            string packagePath = Path.Combine(PackageCacheLocation(packageId), filename);
+            var filename = CachedPackageVersionFilename(packageId, version);
+            var packagePath = Path.Combine(PackageCacheLocation(packageId), filename);
             if (!File.Exists(packagePath))
             {
                 throw new ArgumentOutOfRangeException("version");

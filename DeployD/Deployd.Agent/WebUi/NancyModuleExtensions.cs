@@ -1,7 +1,7 @@
 using System;
 using Nancy;
 
-namespace Deployd.Agent.WebUi.Modules
+namespace Deployd.Agent.WebUi
 {
     public static class NancyModuleExtensions
     {

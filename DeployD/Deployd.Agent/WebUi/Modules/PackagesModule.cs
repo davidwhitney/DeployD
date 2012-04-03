@@ -8,13 +8,11 @@ using Deployd.Core.Hosting;
 using Deployd.Core.Installation;
 using Nancy;
 using NuGet;
-using log4net;
 
 namespace Deployd.Agent.WebUi.Modules
 {
     public class PackagesModule : NancyModule
     {
-        private ILog _log = LogManager.GetLogger("PackagesModule");
         public static Func<IIocContainer> Container { get; set; }
         public static readonly List<InstallationTask> InstallationTasks = new List<InstallationTask>();
 
@@ -46,7 +44,7 @@ namespace Deployd.Agent.WebUi.Modules
             Post["/{packageId}/install", y => true] = x =>
             {
                 var installationManager = Container().GetType<InstallationTaskQueue>();
-                SemanticVersion version=null;
+                SemanticVersion version;
                 string versionString = null;
                 if (SemanticVersion.TryParse(Request.Form["specificVersion"], out version))
                 {
@@ -65,8 +63,8 @@ namespace Deployd.Agent.WebUi.Modules
             };
 
             Post["/UpdateAllTo", y => true] = x =>
-                                                  {
-                string specificVersion =Response.Context.Request.Form["specificVersion"];
+            {
+                string specificVersion = Response.Context.Request.Form["specificVersion"];
                 var cache = Container().GetType<INuGetPackageCache>();
                 var queue = Container().GetType<InstallationTaskQueue>();
                 var packagesByVersion = cache.AllCachedPackages().Where(p => p.Version.Equals(new SemanticVersion(specificVersion)));

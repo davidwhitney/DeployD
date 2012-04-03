@@ -11,7 +11,7 @@ namespace Deployd.Agent.Test.Unit.Services.AgentConfiguration
         {
             var ex = new AgentConfigurationPackageNotFoundException();
 
-            Assert.That(ex.Message, Is.EqualTo(AgentConfigurationPackageNotFoundException.ERROR_STUB));
+            Assert.That(ex.Message, Is.EqualTo(AgentConfigurationPackageNotFoundException.ErrorStub));
         }
 
         [Test]
@@ -20,7 +20,7 @@ namespace Deployd.Agent.Test.Unit.Services.AgentConfiguration
             var ex = new AgentConfigurationPackageNotFoundException("packageName");
 
             Assert.That(ex.Message, Is.StringContaining("packageName"));
-            Assert.That(ex.Message, Is.StringContaining(AgentConfigurationPackageNotFoundException.ERROR_STUB));
+            Assert.That(ex.Message, Is.StringContaining(AgentConfigurationPackageNotFoundException.ErrorStub));
         }
     }
 }

@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using Deployd.Core;
 using Deployd.Core.AgentConfiguration;
 using Deployd.Core.Queries;
 using NuGet;
@@ -12,7 +11,7 @@ namespace Deployd.Agent.Services.AgentConfiguration
 {
     public class AgentConfigurationDownloader : IAgentConfigurationDownloader
     {
-        public const string DEPLOYD_CONFIGURATION_PACKAGE_NAME = "Deployd.Configuration";
+        public const string DeploydConfigurationPackageName = "Deployd.Configuration";
         private static readonly ILog Logger = LogManager.GetLogger(typeof (AgentConfigurationDownloader));
         private readonly IAgentConfigurationManager _agentConfigurationManager;
         private readonly IRetrievePackageQuery _packageQuery;
@@ -20,7 +19,7 @@ namespace Deployd.Agent.Services.AgentConfiguration
 
         public AgentConfigurationDownloader(IAgentConfigurationManager agentConfigurationManager,
                                             IRetrievePackageQuery packageQuery,
-            IAgentSettingsManager agentSettingsManager)
+                                            IAgentSettingsManager agentSettingsManager)
         {
             _agentConfigurationManager = agentConfigurationManager;
             _packageQuery = packageQuery;
@@ -29,35 +28,42 @@ namespace Deployd.Agent.Services.AgentConfiguration
 
         public void DownloadAgentConfiguration()
         {
-            Logger.Debug("downloading " + DEPLOYD_CONFIGURATION_PACKAGE_NAME);
-            var configPackage = _packageQuery.GetLatestPackage(DEPLOYD_CONFIGURATION_PACKAGE_NAME);
+            Logger.Debug("downloading " + DeploydConfigurationPackageName);
+            var configPackage = _packageQuery.GetLatestPackage(DeploydConfigurationPackageName);
 
             if (configPackage == null)
             {
                 Logger.Error("configuration package is null");
-                throw new AgentConfigurationPackageNotFoundException(DEPLOYD_CONFIGURATION_PACKAGE_NAME);
+                throw new AgentConfigurationPackageNotFoundException(DeploydConfigurationPackageName);
             }
+            
             Logger.Debug("package downloaded");
+            
             try
             {
                 var files = configPackage.GetFiles();
-                var agentConfigurationFile = ExtractAgentConfigurationFile(ConfigurationFiles.AGENT_CONFIGURATION_FILE,
-                                                                           files);
+                var agentConfigurationFile = ExtractAgentConfigurationFile(ConfigurationFiles.AgentConfigurationFile, files);
                 Logger.Debug("extracted");
+               
                 var agentConfigurationFileStream = agentConfigurationFile.GetStream();
 
                 byte[] configBytes;
+                
                 using (var memoryStream = new MemoryStream())
                 {
                     agentConfigurationFileStream.CopyTo(memoryStream);
                     configBytes = memoryStream.ToArray();
                     memoryStream.Close();
                 }
+                
                 Logger.Debug("save");
+                
                 _agentConfigurationManager.SaveToDisk(configBytes);
                 _agentSettingsManager.UnloadSettings();
+                
                 Logger.Debug("saved configuration package");
-            } catch (Exception ex)
+            } 
+            catch (Exception ex)
             {
                 Logger.Error("failed", ex);
             }
@@ -70,7 +76,7 @@ namespace Deployd.Agent.Services.AgentConfiguration
 
             if (agentConfigFileList.Count == 0)
             {
-                throw new AgentConfigurationNotFoundException(DEPLOYD_CONFIGURATION_PACKAGE_NAME, targetFile);
+                throw new AgentConfigurationNotFoundException(DeploydConfigurationPackageName, targetFile);
             }
 
             return agentConfigFileList[0];
