@@ -32,7 +32,7 @@ namespace Deployd.Agent.Test.Unit.Conventions
         [TestCase(typeof(FeedLocation))]
         [TestCase(typeof(IRetrievePackageQuery))]
         [TestCase(typeof(IPackageRepositoryFactory))]
-        [TestCase(typeof(INuGetPackageCache))]
+        [TestCase(typeof(ILocalPackageCache))]
         [TestCase(typeof(IAgentConfigurationDownloader))]
         [TestCase(typeof(IDeploymentHook))]
         [TestCase(typeof(IDeploymentService))]

@@ -96,7 +96,7 @@
     <Compile Include="Deployment\IDeploymentService.cs" />
     <Compile Include="Deployment\PackageExtractor.cs" />
     <Compile Include="FileSystemExtensions.cs" />
-    <Compile Include="Caching\INuGetPackageCache.cs" />
+    <Compile Include="Caching\ILocalPackageCache.cs" />
     <Compile Include="Caching\NuGetPackageCache.cs" />
     <Compile Include="Hosting\ApplicationContext.cs" />
     <Compile Include="Hosting\IIocContainer.cs" />

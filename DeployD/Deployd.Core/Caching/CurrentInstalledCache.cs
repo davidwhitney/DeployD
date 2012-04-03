@@ -10,9 +10,9 @@ namespace Deployd.Core.Caching
     {
         private readonly IAgentSettings _agentSettings;
         private readonly IFileSystem _fileSystem;
-        private readonly INuGetPackageCache _packageCache;
+        private readonly ILocalPackageCache _packageCache;
 
-        public CurrentInstalledCache(IAgentSettings agentSettings, IFileSystem fileSystem, INuGetPackageCache packageCache)
+        public CurrentInstalledCache(IAgentSettings agentSettings, IFileSystem fileSystem, ILocalPackageCache packageCache)
         {
             _agentSettings = agentSettings;
             _fileSystem = fileSystem;

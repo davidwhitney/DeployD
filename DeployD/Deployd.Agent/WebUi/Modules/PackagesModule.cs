@@ -20,7 +20,7 @@ namespace Deployd.Agent.WebUi.Modules
         {
             Get["/"] = x =>
             {
-                var cache = Container().GetType<INuGetPackageCache>();
+                var cache = Container().GetType<ILocalPackageCache>();
                 var runningTasks = Container().GetType<RunningInstallationTaskList>();
                 var installCache = Container().GetType<ICurrentInstalledCache>();
                 var model = RunningTasksToPackageListViewModelConverter.Convert(cache, runningTasks, installCache);
@@ -30,7 +30,7 @@ namespace Deployd.Agent.WebUi.Modules
 
             Get["/{packageId}"] = x =>
             {
-                var cache = Container().GetType<INuGetPackageCache>();
+                var cache = Container().GetType<ILocalPackageCache>();
                 var packageVersions = cache.AvailablePackageVersions(x.packageId);
                 var runningTasks = Container().GetType<RunningInstallationTaskList>();
                 var installCache = Container().GetType<ICurrentInstalledCache>();
@@ -65,7 +65,7 @@ namespace Deployd.Agent.WebUi.Modules
             Post["/UpdateAllTo", y => true] = x =>
             {
                 string specificVersion = Response.Context.Request.Form["specificVersion"];
-                var cache = Container().GetType<INuGetPackageCache>();
+                var cache = Container().GetType<ILocalPackageCache>();
                 var queue = Container().GetType<InstallationTaskQueue>();
                 var packagesByVersion = cache.AllCachedPackages().Where(p => p.Version.Equals(new SemanticVersion(specificVersion)));
 
@@ -79,7 +79,7 @@ namespace Deployd.Agent.WebUi.Modules
 
             Post["/UpdateAllTo/{specificVersion}", y => true] = x =>
             {
-                var cache = Container().GetType<INuGetPackageCache>();
+                var cache = Container().GetType<ILocalPackageCache>();
                 var queue = Container().GetType<InstallationTaskQueue>();
                 var packagesByVersion = cache.AllCachedPackages().Where(p=>p.Version.Equals(new SemanticVersion(x.specificVersion)));
 

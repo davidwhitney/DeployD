@@ -12,7 +12,7 @@ namespace Deployd.Core.Caching
     /// <summary>
     /// Doesn't work with a debugger attached, framework bug fixed in 4.5
     /// </summary>
-    public class NuGetPackageCache : INuGetPackageCache
+    public class NuGetPackageCache : ILocalPackageCache
     {
         private readonly IFileSystem _fileSystem;
         protected static readonly ILog Logger = LogManager.GetLogger("NuGetPackageCache"); 

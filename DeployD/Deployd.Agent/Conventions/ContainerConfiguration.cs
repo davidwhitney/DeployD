@@ -23,7 +23,7 @@ namespace Deployd.Agent.Conventions
 
             Bind<IRetrievePackageQuery>().To<RetrievePackageQuery>();
             Bind<IPackageRepositoryFactory>().To<PackageRepositoryFactory>();
-            Bind<INuGetPackageCache>().To<NuGetPackageCache>();
+            Bind<ILocalPackageCache>().To<NuGetPackageCache>();
             
             Bind<IAgentConfigurationDownloader>().To<AgentConfigurationDownloader>();
 

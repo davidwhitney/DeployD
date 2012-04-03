@@ -18,11 +18,11 @@ namespace Deployd.Agent.Services.PackageDownloading
 
         private readonly IAgentSettings _settings;
         protected readonly IRetrievePackageQuery AllPackagesQuery;
-        protected readonly INuGetPackageCache AgentCache;
+        protected readonly ILocalPackageCache AgentCache;
 
         public TimedSingleExecutionTask TimedTask { get; private set; }
 
-        public PackageDownloadingService(IAgentSettings agentSettings, IRetrievePackageQuery allPackagesQuery, INuGetPackageCache agentCache, IAgentConfigurationManager agentConfigurationManager)
+        public PackageDownloadingService(IAgentSettings agentSettings, IRetrievePackageQuery allPackagesQuery, ILocalPackageCache agentCache, IAgentConfigurationManager agentConfigurationManager)
         {
             _settings = agentSettings;
             AllPackagesQuery = allPackagesQuery;

@@ -16,14 +16,14 @@ namespace Deployd.Core.Deployment
     public class DeploymentService : IDeploymentService
     {
         private readonly IEnumerable<IDeploymentHook> _hooks;
-        private readonly INuGetPackageCache _packageCache;
+        private readonly ILocalPackageCache _packageCache;
         private readonly ICurrentInstalledCache _currentInstalledCache;
         private readonly IAgentSettings _agentSettings;
         protected static readonly ILog Logger = LogManager.GetLogger("DeploymentService"); 
         public ApplicationContext AppContext { get; set; }
 
         public DeploymentService(IEnumerable<IDeploymentHook> hooks, 
-                                 INuGetPackageCache packageCache,
+                                 ILocalPackageCache packageCache,
                                  ICurrentInstalledCache currentInstalledCache,
             IAgentSettings agentSettings)
         {
