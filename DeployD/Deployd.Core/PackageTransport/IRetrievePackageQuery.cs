@@ -1,6 +1,6 @@
 using NuGet;
 
-namespace Deployd.Core.Queries
+namespace Deployd.Core.PackageTransport
 {
     public interface IRetrievePackageQuery
     {

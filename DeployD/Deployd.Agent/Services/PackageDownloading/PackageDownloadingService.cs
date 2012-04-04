@@ -2,9 +2,9 @@
 using Deployd.Agent.Services.AgentConfiguration;
 using Deployd.Core;
 using Deployd.Core.AgentConfiguration;
-using Deployd.Core.Caching;
 using Deployd.Core.Hosting;
-using Deployd.Core.Queries;
+using Deployd.Core.PackageCaching;
+using Deployd.Core.PackageTransport;
 using log4net;
 
 namespace Deployd.Agent.Services.PackageDownloading
@@ -18,11 +18,11 @@ namespace Deployd.Agent.Services.PackageDownloading
 
         private readonly IAgentSettings _settings;
         protected readonly IRetrievePackageQuery AllPackagesQuery;
-        protected readonly INuGetPackageCache AgentCache;
+        protected readonly ILocalPackageCache AgentCache;
 
         public TimedSingleExecutionTask TimedTask { get; private set; }
 
-        public PackageDownloadingService(IAgentSettings agentSettings, IRetrievePackageQuery allPackagesQuery, INuGetPackageCache agentCache, IAgentConfigurationManager agentConfigurationManager)
+        public PackageDownloadingService(IAgentSettings agentSettings, IRetrievePackageQuery allPackagesQuery, ILocalPackageCache agentCache, IAgentConfigurationManager agentConfigurationManager)
         {
             _settings = agentSettings;
             AllPackagesQuery = allPackagesQuery;
@@ -44,13 +44,9 @@ namespace Deployd.Agent.Services.PackageDownloading
         public void FetchPackages()
         {
             var packages = _agentConfigurationManager.GetWatchedPackages(_settings.DeploymentEnvironment);
-            foreach (var latestPackageOfType in packages.Select(packageId => AllPackagesQuery.GetLatestPackage(packageId)))
+            
+            foreach (var latestPackageOfType in packages.Select(packageId => AllPackagesQuery.GetLatestPackage(packageId)).Where(latestPackageOfType => latestPackageOfType != null))
             {
-                if (latestPackageOfType == null)
-                {
-                    continue;
-                }
-
                 AgentCache.Add(latestPackageOfType);
             }
         }

@@ -31,7 +31,8 @@ namespace Deployd.Agent.Services.Management
                 _host = new WebServiceHost(new NancyWcfGenericService(), WebUiAddress);
                 _host.AddServiceEndpoint(typeof (NancyWcfGenericService), new WebHttpBinding(), "");
                 _host.Open();
-            } catch (Exception ex)
+            } 
+            catch (Exception ex)
             {
                 Logger.Fatal("could not start listening", ex);
             }

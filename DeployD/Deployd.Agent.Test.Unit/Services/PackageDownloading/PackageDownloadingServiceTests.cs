@@ -3,8 +3,8 @@ using System.Threading;
 using Deployd.Agent.Services.AgentConfiguration;
 using Deployd.Agent.Services.PackageDownloading;
 using Deployd.Core.AgentConfiguration;
-using Deployd.Core.Caching;
-using Deployd.Core.Queries;
+using Deployd.Core.PackageCaching;
+using Deployd.Core.PackageTransport;
 using Moq;
 using NUnit.Framework;
 using NuGet;
@@ -15,7 +15,7 @@ namespace Deployd.Agent.Test.Unit.Services.PackageDownloading
     public class PackageDownloadingServiceTests 
     {
         private Mock<IRetrievePackageQuery> _packageRepoMock;
-        private Mock<INuGetPackageCache> _packageCacheMock;
+        private Mock<ILocalPackageCache> _packageCacheMock;
         private PackageDownloadingService _pds;
         private Mock<IAgentConfigurationManager> _agentConfigManagerMock;
         private AgentSettings _agentSettings;
@@ -28,7 +28,7 @@ namespace Deployd.Agent.Test.Unit.Services.PackageDownloading
             _agentConfigManagerMock = new Mock<IAgentConfigurationManager>();
             _agentConfigManagerMock.Setup(x => x.GetWatchedPackages(_agentSettings.DeploymentEnvironment)).Returns(new List<string> { PACKAGE_ID });
             _packageRepoMock = new Mock<IRetrievePackageQuery>();
-            _packageCacheMock = new Mock<INuGetPackageCache>();
+            _packageCacheMock = new Mock<ILocalPackageCache>();
             _pds = new PackageDownloadingService(_agentSettings, _packageRepoMock.Object, _packageCacheMock.Object, _agentConfigManagerMock.Object);
         }
 

@@ -6,7 +6,7 @@ using System.Linq;
 using Deployd.Core.AgentConfiguration;
 using log4net;
 
-namespace Deployd.Core.Deployment.Hooks
+namespace Deployd.Core.Installation.Hooks
 {
     /// <summary>
     /// Copies files from package to convention dictated destination folder

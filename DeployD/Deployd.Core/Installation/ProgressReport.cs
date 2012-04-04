@@ -1,5 +1,4 @@
 using System;
-using Deployd.Core.Deployment;
 
 namespace Deployd.Core.Installation
 {

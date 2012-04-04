@@ -1,5 +1,5 @@
 ﻿using System.Linq;
-using Deployd.Core.Queries;
+using Deployd.Core.PackageTransport;
 using Moq;
 using NUnit.Framework;
 using NuGet;
@@ -10,7 +10,7 @@ namespace Deployd.Core.Test.Unit.Queries
     public class RetrieveAllAvailablePackageManifestsQueryTests 
     {
         private Mock<IPackageRepository> _packageRepoMock;
-        private RetrievePackageQuery _query;
+        private RetrieveNuGetPackageQuery _query;
         private Mock<IPackageRepositoryFactory> _packageRepoFactoryMock;
 
         [SetUp]
@@ -19,7 +19,7 @@ namespace Deployd.Core.Test.Unit.Queries
             _packageRepoMock = new Mock<IPackageRepository>();
             _packageRepoFactoryMock = new Mock<IPackageRepositoryFactory>();
             _packageRepoFactoryMock.Setup(x => x.CreateRepository(It.IsAny<string>())).Returns(_packageRepoMock.Object);
-            _query = new RetrievePackageQuery(_packageRepoFactoryMock.Object, new FeedLocation{ Source = "source"});
+            _query = new RetrieveNuGetPackageQuery(_packageRepoFactoryMock.Object, new FeedLocation{ Source = "source"});
         }
 
         [Test]

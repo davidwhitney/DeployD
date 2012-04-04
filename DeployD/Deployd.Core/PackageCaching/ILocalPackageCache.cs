@@ -1,10 +1,9 @@
-using System.Collections;
 using System.Collections.Generic;
 using NuGet;
 
-namespace Deployd.Core.Caching
+namespace Deployd.Core.PackageCaching
 {
-    public interface INuGetPackageCache
+    public interface ILocalPackageCache
     {
         IEnumerable<IPackage> AllCachedPackages();
         IList<string> AvailablePackages { get; }

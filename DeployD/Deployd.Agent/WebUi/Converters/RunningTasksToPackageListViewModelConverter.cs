@@ -2,14 +2,14 @@
 using System.Linq;
 using System.Threading.Tasks;
 using Deployd.Agent.WebUi.Models;
-using Deployd.Core.Caching;
 using Deployd.Core.Installation;
+using Deployd.Core.PackageCaching;
 
 namespace Deployd.Agent.WebUi.Converters
 {
     public static class RunningTasksToPackageListViewModelConverter
     {
-        public static PackageListViewModel Convert(INuGetPackageCache cache, RunningInstallationTaskList runningTasks, ICurrentInstalledCache installCache, CompletedInstallationTaskList completedTasks)
+        public static PackageListViewModel Convert(ILocalPackageCache cache, RunningInstallationTaskList runningTasks, ICurrentInstalledCache installCache, CompletedInstallationTaskList completedTasks)
         {
             var model = new PackageListViewModel();
 
@@ -21,7 +21,7 @@ namespace Deployd.Agent.WebUi.Converters
                                       LatestAvailableVersion = cache.GetLatestVersion(packageId).Version.ToString()
                                   };
 
-                var installedPackage = installCache.GetCurrentInstalledVersion(packageId);
+                var installedPackage = installPackageArchive.GetCurrentInstalledVersion(packageId);
                 package.InstalledVersion = installedPackage == null ? "0.0.0.0" : installedPackage.Version.ToString();
 
                 package.LastInstallationTask =

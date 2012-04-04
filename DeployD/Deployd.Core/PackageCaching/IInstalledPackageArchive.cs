@@ -1,10 +1,9 @@
 ﻿using System.Collections.Generic;
-using System.Text;
 using NuGet;
 
-namespace Deployd.Core.Caching
+namespace Deployd.Core.PackageCaching
 {
-    public interface ICurrentInstalledCache
+    public interface IInstalledPackageArchive
     {
         IEnumerable<IPackage> GetCurrentInstalledPackages();
         IPackage GetCurrentInstalledVersion(string packageId);

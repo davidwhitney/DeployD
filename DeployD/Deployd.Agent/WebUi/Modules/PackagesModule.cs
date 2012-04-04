@@ -3,18 +3,16 @@ using System.Collections.Generic;
 using System.Linq;
 using Deployd.Agent.WebUi.Converters;
 using Deployd.Agent.WebUi.Models;
-using Deployd.Core.Caching;
 using Deployd.Core.Hosting;
 using Deployd.Core.Installation;
+using Deployd.Core.PackageCaching;
 using Nancy;
 using NuGet;
-using log4net;
 
 namespace Deployd.Agent.WebUi.Modules
 {
     public class PackagesModule : NancyModule
     {
-        private ILog _log = LogManager.GetLogger("PackagesModule");
         public static Func<IIocContainer> Container { get; set; }
         public static readonly List<InstallationTask> InstallationTasks = new List<InstallationTask>();
 
@@ -22,9 +20,9 @@ namespace Deployd.Agent.WebUi.Modules
         {
             Get["/"] = x =>
             {
-                var cache = Container().GetType<INuGetPackageCache>();
+                var cache = Container().GetType<ILocalPackageCache>();
                 var runningTasks = Container().GetType<RunningInstallationTaskList>();
-                var installCache = Container().GetType<ICurrentInstalledCache>();
+                var installCache = Container().GetType<IInstalledPackageArchive>();
                 var completedTasks = Container().GetType<CompletedInstallationTaskList>();
                 var model = RunningTasksToPackageListViewModelConverter.Convert(cache, runningTasks, installCache, completedTasks);
                 return this.ViewOrJson("packages.cshtml", model);
@@ -33,10 +31,10 @@ namespace Deployd.Agent.WebUi.Modules
 
             Get["/{packageId}"] = x =>
             {
-                var cache = Container().GetType<INuGetPackageCache>();
+                var cache = Container().GetType<ILocalPackageCache>();
                 var packageVersions = cache.AvailablePackageVersions(x.packageId);
                 var runningTasks = Container().GetType<RunningInstallationTaskList>();
-                var installCache = Container().GetType<ICurrentInstalledCache>();
+                var installCache = Container().GetType<IInstalledPackageArchive>();
 
                 var currentInstallTask = runningTasks.SingleOrDefault(t => t.PackageId == x.packageId);
                 IPackage currentInstalledPackage = installCache.GetCurrentInstalledVersion(x.packageId);
@@ -47,7 +45,7 @@ namespace Deployd.Agent.WebUi.Modules
             Post["/{packageId}/install", y => true] = x =>
             {
                 var installationManager = Container().GetType<InstallationTaskQueue>();
-                SemanticVersion version=null;
+                SemanticVersion version;
                 string versionString = null;
                 if (SemanticVersion.TryParse(Request.Form["specificVersion"], out version))
                 {
@@ -66,9 +64,9 @@ namespace Deployd.Agent.WebUi.Modules
             };
 
             Post["/UpdateAllTo", y => true] = x =>
-                                                  {
-                string specificVersion =Response.Context.Request.Form["specificVersion"];
-                var cache = Container().GetType<INuGetPackageCache>();
+            {
+                string specificVersion = Response.Context.Request.Form["specificVersion"];
+                var cache = Container().GetType<ILocalPackageCache>();
                 var queue = Container().GetType<InstallationTaskQueue>();
                 var packagesByVersion = cache.AllCachedPackages().Where(p => p.Version.Equals(new SemanticVersion(specificVersion)));
 
@@ -82,7 +80,7 @@ namespace Deployd.Agent.WebUi.Modules
 
             Post["/UpdateAllTo/{specificVersion}", y => true] = x =>
             {
-                var cache = Container().GetType<INuGetPackageCache>();
+                var cache = Container().GetType<ILocalPackageCache>();
                 var queue = Container().GetType<InstallationTaskQueue>();
                 var packagesByVersion = cache.AllCachedPackages().Where(p=>p.Version.Equals(new SemanticVersion(x.specificVersion)));
 
