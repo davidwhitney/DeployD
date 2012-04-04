@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Deployd.Agent.WebUi.Models;
 using Deployd.Core.Hosting;
 using Deployd.Core.Installation;
@@ -20,9 +21,17 @@ namespace Deployd.Agent.WebUi.Modules
             {
                 var taskQueue = Container().GetType<InstallationTaskQueue>();
                 var runningTasks = Container().GetType<RunningInstallationTaskList>();
-                var viewModel = new InstallationsViewModel {TaskQueue = taskQueue, RunningTasks = runningTasks};
+                var viewModel = new InstallationsViewModel {TaskQueue = taskQueue, Tasks = runningTasks.ToList()};
 
                 return this.ViewOrJson("installations.cshtml", viewModel);
+            };
+
+            Get["/completed"] = x =>
+            {
+                var taskList = Container().GetType<CompletedInstallationTaskList>();
+                var viewModel = new InstallationsViewModel() {Tasks = taskList.ToList()};
+                var response = this.ViewOrJson("installations/completed.cshtml", viewModel);
+                return response;
             };
         }
     }

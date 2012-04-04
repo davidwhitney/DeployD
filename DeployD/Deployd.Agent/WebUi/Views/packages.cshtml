@@ -1,4 +1,5 @@
 ﻿@using Deployd.Agent.WebUi.Models
+@using Deployd.Core.Installation
 @{
 	Layout  = "layout.cshtml";
 }
@@ -35,6 +36,10 @@
 		{
 			<text>Not installed</text>
 		}
+        @if (package.LastInstallationTask != null && package.LastInstallationTask.HasErrors)
+        {
+            <a href="/log/@package.PackageId/@package.LastInstallationTask.LogFileName">Errors</a>
+        }
 		<br/>
 	</div>
 	

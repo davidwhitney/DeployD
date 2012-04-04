@@ -25,7 +25,8 @@ namespace Deployd.Agent.WebUi.Modules
                 var cache = Container().GetType<INuGetPackageCache>();
                 var runningTasks = Container().GetType<RunningInstallationTaskList>();
                 var installCache = Container().GetType<ICurrentInstalledCache>();
-                var model = RunningTasksToPackageListViewModelConverter.Convert(cache, runningTasks, installCache);
+                var completedTasks = Container().GetType<CompletedInstallationTaskList>();
+                var model = RunningTasksToPackageListViewModelConverter.Convert(cache, runningTasks, installCache, completedTasks);
                 return this.ViewOrJson("packages.cshtml", model);
             };
 

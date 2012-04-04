@@ -9,7 +9,7 @@ namespace Deployd.Agent.WebUi.Converters
 {
     public static class RunningTasksToPackageListViewModelConverter
     {
-        public static PackageListViewModel Convert(INuGetPackageCache cache, RunningInstallationTaskList runningTasks, ICurrentInstalledCache installCache)
+        public static PackageListViewModel Convert(INuGetPackageCache cache, RunningInstallationTaskList runningTasks, ICurrentInstalledCache installCache, CompletedInstallationTaskList completedTasks)
         {
             var model = new PackageListViewModel();
 
@@ -23,6 +23,11 @@ namespace Deployd.Agent.WebUi.Converters
 
                 var installedPackage = installCache.GetCurrentInstalledVersion(packageId);
                 package.InstalledVersion = installedPackage == null ? "0.0.0.0" : installedPackage.Version.ToString();
+
+                package.LastInstallationTask =
+                    completedTasks
+                        .Where(t => t.PackageId == packageId).OrderByDescending(t => t.LogFileName).
+                        FirstOrDefault();
 
                 package.CurrentTask = runningTasks.Count > 0 ? runningTasks
                            .Where(t => t.PackageId == packageId)

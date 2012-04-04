@@ -16,6 +16,7 @@ namespace Deployd.Core.Deployment
         private DateTime _contextCreateTime = DateTime.Now;
         private log4net.Appender.IAppender _appender;
         private readonly string _logAppenderName;
+        private readonly string _logFileName;
 
         public DeploymentContext(IPackage package, string workingFolder, string targetInstallationFolder, string installationTaskId)
         {
@@ -24,7 +25,7 @@ namespace Deployd.Core.Deployment
             _installationTaskId = installationTaskId;
             TargetInstallationFolder = targetInstallationFolder;
 
-            string logFileName = string.Format("{0:dd-MM-yyyy-HH-mm-ss}.log", _contextCreateTime);
+            _logFileName = string.Format("{0:dd-MM-yyyy-HH-mm-ss}.log", _contextCreateTime);
             _logAppenderName = string.Format("Install.{0}.{1:dd.MM.yyyy.HH.mm.ss}", _package.Id, _contextCreateTime);
 
             log4net.Layout.PatternLayout layout = new log4net.Layout.PatternLayout();
@@ -33,7 +34,7 @@ namespace Deployd.Core.Deployment
 
             var plainTextAppender = new log4net.Appender.FileAppender();
             plainTextAppender.Name = _logAppenderName;
-            plainTextAppender.File = Path.Combine(AgentSettings.AgentProgramDataPath, Path.Combine("installation_logs", Path.Combine(_package.Id, logFileName)));
+            plainTextAppender.File = Path.Combine(AgentSettings.AgentProgramDataPath, Path.Combine("installation_logs", Path.Combine(_package.Id, _logFileName)));
             plainTextAppender.AppendToFile = true;
             plainTextAppender.ImmediateFlush = true;
             plainTextAppender.Layout = layout;
@@ -48,6 +49,7 @@ namespace Deployd.Core.Deployment
         public string WorkingFolder { get { return _workingFolder; } }
         public IPackage Package { get { return _package; } }
         public string InstallationTaskId { get { return _installationTaskId; } }
+        public string LogFileName { get { return _logFileName; } }
 
         public ILog GetLoggerFor<T>(T process)
         {

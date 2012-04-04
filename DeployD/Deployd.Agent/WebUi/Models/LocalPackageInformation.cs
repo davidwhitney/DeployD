@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Deployd.Core.Installation;
 
 namespace Deployd.Agent.WebUi.Models
 {
@@ -11,5 +12,7 @@ namespace Deployd.Agent.WebUi.Models
         public List<string> AvailableVersions { get; set; }
 
         public InstallTaskViewModel CurrentTask { get; set; }
+
+        public InstallationTask LastInstallationTask { get; set; }
     }
 }

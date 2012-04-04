@@ -109,6 +109,7 @@
     </Compile>
     <Compile Include="Hosting\WcfService.cs" />
     <Compile Include="Hosting\WindowsServiceRunner.cs" />
+    <Compile Include="Installation\CompletedInstallationTaskList.cs" />
     <Compile Include="Installation\IInstallationManager.cs" />
     <Compile Include="Installation\InstallationManager.cs" />
     <Compile Include="Installation\InstallationResult.cs" />

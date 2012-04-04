@@ -11,7 +11,7 @@
 
 <h2>Running Tasks</h2>
 
-@foreach (var task in Model.RunningTasks)
+@foreach (var task in Model.Tasks)
 {
 	<p>@task.PackageId @task.Version @task.LastMessage</p>
 }
