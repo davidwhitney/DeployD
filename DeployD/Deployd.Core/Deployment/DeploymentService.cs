@@ -47,7 +47,7 @@ namespace Deployd.Core.Deployment
             InstallPackage(packageId, packageSelector, cancellationToken, reportProgress, taskId);
         }
 
-        public void Deploy(string taskId, IPackage package, CancellationTokenSource cancellationToken, Action<ProgressReport> reportProgress)
+        public bool Deploy(string taskId, IPackage package, CancellationTokenSource cancellationToken, Action<ProgressReport> reportProgress)
         {
             var unpackFolder = Path.Combine(AgentSettings.AgentProgramDataPath, _agentSettings.UnpackingLocation);
             var workingFolder = Path.Combine(unpackFolder, package.GetFullName());
@@ -80,12 +80,14 @@ namespace Deployd.Core.Deployment
 
                 reportProgress(ProgressReport.Info(deploymentContext, this, package.Id, package.Version.Version.ToString(), taskId,
                                        "Deployment complete"));
+                return true;
             }
             catch (Exception ex)
             {
                 logger.Error("An error occurred", ex);
                 reportProgress(ProgressReport.Error(deploymentContext, this, package.Id, package.Version.Version.ToString(), taskId,
                                        "Deployment failed", ex));
+                return false;
             }
             finally
             {
@@ -96,8 +98,10 @@ namespace Deployd.Core.Deployment
         public void InstallPackage(string packageId, Func<IPackage> selectionCriteria, CancellationTokenSource cancellationToken, Action<ProgressReport> reportProgress, string taskId)
         {
             var package = selectionCriteria();
-            Deploy(taskId, package, cancellationToken, reportProgress);
-            WriteInstallMarker(package);
+            if (Deploy(taskId, package, cancellationToken, reportProgress))
+            {
+                WriteInstallMarker(package);
+            }
         }
 
         private void WriteInstallMarker(IPackage package)
