@@ -2,11 +2,10 @@
 using Deployd.Agent.Conventions;
 using Deployd.Agent.Services.AgentConfiguration;
 using Deployd.Core.AgentConfiguration;
-using Deployd.Core.Caching;
-using Deployd.Core.Deployment;
-using Deployd.Core.Deployment.Hooks;
 using Deployd.Core.Installation;
-using Deployd.Core.Queries;
+using Deployd.Core.Installation.Hooks;
+using Deployd.Core.PackageCaching;
+using Deployd.Core.PackageTransport;
 using NUnit.Framework;
 using Ninject;
 using Ninject.Modules;
@@ -32,7 +31,7 @@ namespace Deployd.Agent.Test.Unit.Conventions
         [TestCase(typeof(FeedLocation))]
         [TestCase(typeof(IRetrievePackageQuery))]
         [TestCase(typeof(IPackageRepositoryFactory))]
-        [TestCase(typeof(INuGetPackageCache))]
+        [TestCase(typeof(ILocalPackageCache))]
         [TestCase(typeof(IAgentConfigurationDownloader))]
         [TestCase(typeof(IDeploymentHook))]
         [TestCase(typeof(IDeploymentService))]

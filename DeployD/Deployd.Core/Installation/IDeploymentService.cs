@@ -1,10 +1,8 @@
 using System;
-using System.Collections.Generic;
 using System.Threading;
-using Deployd.Core.Installation;
 using NuGet;
 
-namespace Deployd.Core.Deployment
+namespace Deployd.Core.Installation
 {
     public interface IDeploymentService
     {

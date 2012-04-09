@@ -5,15 +5,15 @@ namespace Deployd.Agent.Services.AgentConfiguration
     [Serializable]
     public class AgentConfigurationPackageNotFoundException : Exception
     {
-        public const string ERROR_STUB = "Agent configuration package was not found in package repository";
+        public const string ErrorStub = "Agent configuration package was not found in package repository";
 
         public AgentConfigurationPackageNotFoundException()
-            : base(ERROR_STUB)
+            : base(ErrorStub)
         {
         }
 
         public AgentConfigurationPackageNotFoundException(string deploydConfigurationPackageName)
-            : base(ERROR_STUB + " '" + deploydConfigurationPackageName + "'")
+            : base(ErrorStub + " '" + deploydConfigurationPackageName + "'")
         {
         }
     }

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO.Abstractions;
 using System.Linq;
 using System.Text;
-using Deployd.Core.Caching;
+using Deployd.Core.PackageCaching;
 using Moq;
 using NUnit.Framework;
 

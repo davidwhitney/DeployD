@@ -3,7 +3,7 @@ using System.IO.Abstractions;
 using System.Linq;
 using Deployd.Core.AgentConfiguration;
 
-namespace Deployd.Core.Deployment.Hooks
+namespace Deployd.Core.Installation.Hooks
 {
     public class AppOfflineDeploymentHook : DeploymentHookBase
     {

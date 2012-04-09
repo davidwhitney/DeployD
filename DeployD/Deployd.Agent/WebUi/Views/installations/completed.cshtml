@@ -1,0 +1,14 @@
+﻿<!DOCTYPE html>
+<html>
+    <head>
+        <title>Deployd.Agent</title>
+    </head>
+    <body>
+<h2>Completed Installations</h2>
+
+@foreach (var task in Model.Tasks)
+{
+	<p>@task.PackageId @(task.Version ?? "latest") @(task.HasErrors ? "Errors" : "Succeeded") <a href="/log/@task.PackageId/@task.LogFileName">Log</a></p>
+}
+</body>
+</html>

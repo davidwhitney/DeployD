@@ -4,7 +4,6 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Deployd.Core;
-using Deployd.Core.Deployment;
 using Deployd.Core.Hosting;
 using Deployd.Core.Installation;
 using log4net;
@@ -21,9 +20,14 @@ namespace Deployd.Agent.Services.InstallationService
 
         public InstallationTaskQueue PendingInstalls { get; set; }
         public RunningInstallationTaskList RunningInstalls { get; set; }
+        public CompletedInstallationTaskList CompletedInstalls { get; set; }
 
-        public PackageInstallationService(InstallationTaskQueue pendingInstalls, RunningInstallationTaskList runningInstalls, IDeploymentService deploymentService)
+        public PackageInstallationService(InstallationTaskQueue pendingInstalls, 
+            RunningInstallationTaskList runningInstalls, 
+            CompletedInstallationTaskList completedInstalls,
+            IDeploymentService deploymentService)
         {
+            CompletedInstalls = completedInstalls;
             _deploymentService = deploymentService;
             PendingInstalls = pendingInstalls;
             RunningInstalls = runningInstalls;
@@ -79,43 +83,52 @@ namespace Deployd.Agent.Services.InstallationService
             nextPendingInstall.Task = new Task<InstallationResult>(() =>
             {
                 _deploymentService.InstallPackage(nextPendingInstall.PackageId, nextPendingInstall.Version, Guid.NewGuid().ToString(), new CancellationTokenSource(),
-                                                    progressReport =>
-                                                        {
-                                                            log4net.Core.Level level = log4net.Core.Level.Info;
-                                                            switch(progressReport.Level)
-                                                            {
-                                                                case "Debug":
-                                                                    level = log4net.Core.Level.Debug;
-                                                                    break;
-                                                                case "Warn":
-                                                                    level = log4net.Core.Level.Warn;
-                                                                    break;
-                                                                case "Error":
-                                                                    level = log4net.Core.Level.Error;
-                                                                    break;
-                                                                case "Fatal":
-                                                                    level = log4net.Core.Level.Fatal;
-                                                                    break;
-                                                                case "Info":
-                                                                default:
-                                                                    level = log4net.Core.Level.Info;
-                                                                    break;
-                                                            }
-
-                                                            progressReport.Context.GetLoggerFor(this).Logger.Log(
-                                                                progressReport.ReportingType,
-                                                                level,
-                                                                progressReport.Message,
-                                                                progressReport.Exception);
-
-                                                            nextPendingInstall.ProgressReports.Add(progressReport);
-                                                        });
+                                                    progressReport => HandleProgressReport(nextPendingInstall, progressReport));
                 return new InstallationResult();
             });
 
             nextPendingInstall.Task.ContinueWith(RemoveFromRunningInstallationList);
 
             nextPendingInstall.Task.Start();
+        }
+
+        private void HandleProgressReport(InstallationTask installationTask, ProgressReport progressReport)
+        {
+            log4net.Core.Level level = log4net.Core.Level.Info;
+            switch (progressReport.Level)
+            {
+                case "Debug":
+                    level = log4net.Core.Level.Debug;
+                    break;
+                case "Warn":
+                    level = log4net.Core.Level.Warn;
+                    break;
+                case "Error":
+                    level = log4net.Core.Level.Error;
+                    break;
+                case "Fatal":
+                    level = log4net.Core.Level.Fatal;
+                    break;
+                case "Info":
+                default:
+                    level = log4net.Core.Level.Info;
+                    break;
+            }
+
+            progressReport.Context.GetLoggerFor(this).Logger.Log(
+                progressReport.ReportingType,
+                level,
+                progressReport.Message,
+                progressReport.Exception);
+
+            installationTask.LogFileName = progressReport.Context.LogFileName;
+            installationTask.ProgressReports.Add(progressReport);
+
+            if (progressReport.Exception != null)
+            {
+                installationTask.HasErrors = true;
+                installationTask.Errors.Add(progressReport.Exception);
+            }
         }
 
         private void RemoveFromRunningInstallationList(Task<InstallationResult> completedInstallationTask)
@@ -126,6 +139,7 @@ namespace Deployd.Agent.Services.InstallationService
             {
                 RunningInstalls.Remove(installationTask);
             }
+            CompletedInstalls.Add(installationTask);
         }
     }
 }

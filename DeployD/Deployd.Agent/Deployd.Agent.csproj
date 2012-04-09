@@ -203,6 +203,9 @@
     <Content Include="WebUi\Views\index.cshtml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Content Include="WebUi\Views\installations\completed.cshtml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Deployd.Core\Deployd.Core.csproj">

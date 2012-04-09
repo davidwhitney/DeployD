@@ -2,7 +2,7 @@
 using System.IO;
 using Deployd.Agent.Services.AgentConfiguration;
 using Deployd.Core.AgentConfiguration;
-using Deployd.Core.Queries;
+using Deployd.Core.PackageTransport;
 using Moq;
 using NUnit.Framework;
 using NuGet;
@@ -24,7 +24,7 @@ namespace Deployd.Agent.Test.Unit.Services.AgentConfiguration
         {
             _agentSettingsManagerMock = new Mock<IAgentSettingsManager>();
             _nugetPackageMock = new Mock<IPackage>();
-            _nugetPackageFile = new PackageFileStub { Path = ConfigurationFiles.AGENT_CONFIGURATION_FILE };
+            _nugetPackageFile = new PackageFileStub { Path = ConfigurationFiles.AgentConfigurationFile };
             _agentConfigManagerMock = new Mock<IAgentConfigurationManager>();
             _retrieveQueryMock = new Mock<IRetrievePackageQuery>();
             _downloader = new AgentConfigurationDownloader(_agentConfigManagerMock.Object, _retrieveQueryMock.Object, _agentSettingsManagerMock.Object);
@@ -34,7 +34,7 @@ namespace Deployd.Agent.Test.Unit.Services.AgentConfiguration
         public void DownloadAgentConfiguration_WhenConfigPackageDoesntExist_ThrowsAgentConfigurationPackageNotFoundException()
         {
             IPackage packageFile = null;
-            _retrieveQueryMock.Setup(x => x.GetLatestPackage(AgentConfigurationDownloader.DEPLOYD_CONFIGURATION_PACKAGE_NAME)).Returns(packageFile);
+            _retrieveQueryMock.Setup(x => x.GetLatestPackage(AgentConfigurationDownloader.DeploydConfigurationPackageName)).Returns(packageFile);
 
             Assert.Throws<AgentConfigurationPackageNotFoundException>(() => _downloader.DownloadAgentConfiguration());
         }
@@ -44,7 +44,7 @@ namespace Deployd.Agent.Test.Unit.Services.AgentConfiguration
         {
             var packageFile =_nugetPackageMock.Object;
             _nugetPackageMock.Setup(x => x.GetFiles()).Returns(new List<IPackageFile>());
-            _retrieveQueryMock.Setup(x => x.GetLatestPackage(AgentConfigurationDownloader.DEPLOYD_CONFIGURATION_PACKAGE_NAME)).Returns(packageFile);
+            _retrieveQueryMock.Setup(x => x.GetLatestPackage(AgentConfigurationDownloader.DeploydConfigurationPackageName)).Returns(packageFile);
 
             Assert.Throws<AgentConfigurationNotFoundException>(() => _downloader.DownloadAgentConfiguration());
         }
@@ -75,7 +75,7 @@ namespace Deployd.Agent.Test.Unit.Services.AgentConfiguration
             var packageContents = new List<IPackageFile> {_nugetPackageFile};
             var packageFile = _nugetPackageMock.Object;
             _nugetPackageMock.Setup(x => x.GetFiles()).Returns(packageContents);
-            _retrieveQueryMock.Setup(x => x.GetLatestPackage(AgentConfigurationDownloader.DEPLOYD_CONFIGURATION_PACKAGE_NAME)).Returns(packageFile);
+            _retrieveQueryMock.Setup(x => x.GetLatestPackage(AgentConfigurationDownloader.DeploydConfigurationPackageName)).Returns(packageFile);
         }
     }
 

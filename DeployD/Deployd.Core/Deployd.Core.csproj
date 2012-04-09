@@ -81,23 +81,23 @@
     <Compile Include="AgentConfiguration\AgentSettings.cs" />
     <Compile Include="AgentConfiguration\IAgentSettings.cs" />
     <Compile Include="AgentConfiguration\IAgentSettingsManager.cs" />
-    <Compile Include="Caching\CurrentInstalledCache.cs" />
-    <Compile Include="Caching\ICurrentInstalledCache.cs" />
-    <Compile Include="Deployment\DeploymentContext.cs" />
-    <Compile Include="Deployment\DeploymentService.cs" />
-    <Compile Include="Deployment\Hooks\AppOfflineDeploymentHook.cs" />
-    <Compile Include="Deployment\Hooks\ConfigTransformationDeploymentHook.cs" />
-    <Compile Include="Deployment\Hooks\DeploymentHookBase.cs" />
-    <Compile Include="Deployment\Hooks\IDeploymentHook.cs" />
-    <Compile Include="Deployment\Hooks\MsDeployDeploymentHook.cs" />
-    <Compile Include="Deployment\Hooks\PowershellDeploymentHook.cs" />
-    <Compile Include="Deployment\Hooks\ServiceDeploymentHook.cs" />
-    <Compile Include="Deployment\Hooks\TryThis.cs" />
-    <Compile Include="Deployment\IDeploymentService.cs" />
-    <Compile Include="Deployment\PackageExtractor.cs" />
+    <Compile Include="PackageCaching\InstalledPackageArchive.cs" />
+    <Compile Include="PackageCaching\IInstalledPackageArchive.cs" />
+    <Compile Include="Installation\DeploymentContext.cs" />
+    <Compile Include="Installation\DeploymentService.cs" />
+    <Compile Include="Installation\Hooks\AppOfflineDeploymentHook.cs" />
+    <Compile Include="Installation\Hooks\ConfigTransformationDeploymentHook.cs" />
+    <Compile Include="Installation\Hooks\DeploymentHookBase.cs" />
+    <Compile Include="Installation\Hooks\IDeploymentHook.cs" />
+    <Compile Include="Installation\Hooks\MsDeployDeploymentHook.cs" />
+    <Compile Include="Installation\Hooks\PowershellDeploymentHook.cs" />
+    <Compile Include="Installation\Hooks\ServiceDeploymentHook.cs" />
+    <Compile Include="Installation\Hooks\TryThis.cs" />
+    <Compile Include="Installation\IDeploymentService.cs" />
+    <Compile Include="PackageFormats\NuGet\NuGetPackageExtractor.cs" />
     <Compile Include="FileSystemExtensions.cs" />
-    <Compile Include="Caching\INuGetPackageCache.cs" />
-    <Compile Include="Caching\NuGetPackageCache.cs" />
+    <Compile Include="PackageCaching\ILocalPackageCache.cs" />
+    <Compile Include="PackageCaching\NuGetPackageCache.cs" />
     <Compile Include="Hosting\ApplicationContext.cs" />
     <Compile Include="Hosting\IIocContainer.cs" />
     <Compile Include="Hosting\IWindowsService.cs" />
@@ -109,6 +109,7 @@
     </Compile>
     <Compile Include="Hosting\WcfService.cs" />
     <Compile Include="Hosting\WindowsServiceRunner.cs" />
+    <Compile Include="Installation\CompletedInstallationTaskList.cs" />
     <Compile Include="Installation\IInstallationManager.cs" />
     <Compile Include="Installation\InstallationManager.cs" />
     <Compile Include="Installation\InstallationResult.cs" />
@@ -117,9 +118,9 @@
     <Compile Include="Installation\ProgressReport.cs" />
     <Compile Include="Installation\RunningInstallationTaskList.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Queries\IRetrievePackageQuery.cs" />
-    <Compile Include="Queries\FeedLocation.cs" />
-    <Compile Include="Queries\RetrievePackageQuery.cs" />
+    <Compile Include="PackageTransport\IRetrievePackageQuery.cs" />
+    <Compile Include="PackageTransport\FeedLocation.cs" />
+    <Compile Include="PackageTransport\RetrieveNuGetPackageQuery.cs" />
     <Compile Include="TimedSingleExecutionTask.cs" />
   </ItemGroup>
   <ItemGroup>

@@ -1,11 +1,10 @@
 using System;
 using Deployd.Core.AgentConfiguration;
-using Deployd.Core.Caching;
 using Deployd.Agent.Services.AgentConfiguration;
-using Deployd.Core.Deployment;
-using Deployd.Core.Deployment.Hooks;
 using Deployd.Core.Installation;
-using Deployd.Core.Queries;
+using Deployd.Core.Installation.Hooks;
+using Deployd.Core.PackageCaching;
+using Deployd.Core.PackageTransport;
 using Ninject.Modules;
 using NuGet;
 using log4net;
@@ -21,19 +20,20 @@ namespace Deployd.Agent.Conventions
             Bind<IAgentSettings>().ToMethod(context => GetService<IAgentSettingsManager>().Settings);
             Bind<FeedLocation>().ToMethod(context => new FeedLocation { Source = GetService<IAgentSettings>().NuGetRepository });
 
-            Bind<IRetrievePackageQuery>().To<RetrievePackageQuery>();
+            Bind<IRetrievePackageQuery>().To<RetrieveNuGetPackageQuery>();
             Bind<IPackageRepositoryFactory>().To<PackageRepositoryFactory>();
-            Bind<INuGetPackageCache>().To<NuGetPackageCache>();
+            Bind<ILocalPackageCache>().To<NuGetPackageCache>();
             
             Bind<IAgentConfigurationDownloader>().To<AgentConfigurationDownloader>();
 
             Bind<IDeploymentService>().To<DeploymentService>();
 
-            Bind<ICurrentInstalledCache>().To<CurrentInstalledCache>();
+            Bind<IInstalledPackageArchive>().To<InstalledPackageArchive>();
 
             Bind<IInstallationManager>().To<InstallationManager>().InSingletonScope();
             Bind<RunningInstallationTaskList>().ToSelf().InSingletonScope();
             Bind<InstallationTaskQueue>().ToSelf().InSingletonScope();
+            Bind<CompletedInstallationTaskList>().ToSelf().InSingletonScope();
 
             Bind<IDeploymentHook>().To<PowershellDeploymentHook>();
             Bind<IDeploymentHook>().To<ServiceDeploymentHook>();

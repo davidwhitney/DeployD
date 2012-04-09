@@ -5,7 +5,7 @@ namespace Deployd.Agent.Services.AgentConfiguration
 {
     public class ConfigurationFiles
     {
-        public const string AGENT_CONFIGURATION_FILE = @"GlobalAgentConfiguration.xml";
-        public const string AGENT_CONFIGURATION_FILE_LOCATION = @"~\";
+        public const string AgentConfigurationFile = @"GlobalAgentConfiguration.xml";
+        public const string AgentConfigurationFileLocation = @"~\";
     }
 }

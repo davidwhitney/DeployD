@@ -12,7 +12,7 @@ namespace Deployd.Agent.Services.AgentConfiguration
     public class AgentConfigurationManager : IAgentConfigurationManager
     {
         private readonly object _fileLock;
-        private ILog _logger = LogManager.GetLogger(typeof (AgentConfigurationManager));
+        private readonly ILog _logger = LogManager.GetLogger(typeof (AgentConfigurationManager));
 
         public AgentConfigurationManager()
         {
@@ -26,7 +26,7 @@ namespace Deployd.Agent.Services.AgentConfiguration
 
         private string ApplicationFilePath(string fileName)
         {
-            return Path.Combine(ConfigurationFiles.AGENT_CONFIGURATION_FILE_LOCATION.MapVirtualPath(), fileName);
+            return Path.Combine(ConfigurationFiles.AgentConfigurationFileLocation.MapVirtualPath(), fileName);
             
         }
 
@@ -36,9 +36,9 @@ namespace Deployd.Agent.Services.AgentConfiguration
             return firstOrDefault != null ? firstOrDefault.Packages : new List<string>();
         }
 
-        public GlobalAgentConfiguration ReadFromDisk(string fileName = ConfigurationFiles.AGENT_CONFIGURATION_FILE)
+        public GlobalAgentConfiguration ReadFromDisk(string fileName = ConfigurationFiles.AgentConfigurationFile)
         {
-            string configurationPath = ApplicationFilePath(fileName);
+            var configurationPath = ApplicationFilePath(fileName);
             lock (_fileLock)
             {
                 using (var fs = new FileStream(configurationPath, FileMode.Open))
@@ -48,10 +48,11 @@ namespace Deployd.Agent.Services.AgentConfiguration
             }
         }
 
-        public void SaveToDisk(GlobalAgentConfiguration configuration, string fileName = ConfigurationFiles.AGENT_CONFIGURATION_FILE)
+        public void SaveToDisk(GlobalAgentConfiguration configuration, string fileName = ConfigurationFiles.AgentConfigurationFile)
         {
-            string configurationPath = ApplicationFilePath(fileName);
+            var configurationPath = ApplicationFilePath(fileName);
             _logger.DebugFormat("saving configuration file to {0}", configurationPath);
+            
             lock (_fileLock)
             {
                 using (var memoryStream = new MemoryStream())
@@ -63,17 +64,19 @@ namespace Deployd.Agent.Services.AgentConfiguration
             }
         }
 
-        public void SaveToDisk(byte[] configuration, string fileName = ConfigurationFiles.AGENT_CONFIGURATION_FILE)
+        public void SaveToDisk(byte[] configuration, string fileName = ConfigurationFiles.AgentConfigurationFile)
         {
-            string configurationPath = ApplicationFilePath(fileName);
+            var configurationPath = ApplicationFilePath(fileName);
             _logger.DebugFormat("saving configuration file to {0}", configurationPath);
+           
             try
             {
                 lock (_fileLock)
                 {
                     File.WriteAllBytes(configurationPath, configuration);
                 }
-            } catch (Exception ex)
+            }
+            catch (Exception ex)
             {
                 _logger.Error("Could not save configuration file " + fileName.MapVirtualPath(), ex);
             }

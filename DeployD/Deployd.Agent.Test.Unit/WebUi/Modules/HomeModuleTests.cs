@@ -3,10 +3,9 @@ using System.Collections.Generic;
 using System.Threading;
 using Deployd.Agent.WebUi;
 using Deployd.Agent.WebUi.Modules;
-using Deployd.Core.Caching;
-using Deployd.Core.Deployment;
 using Deployd.Core.Hosting;
 using Deployd.Core.Installation;
+using Deployd.Core.PackageCaching;
 using Moq;
 using NUnit.Framework;
 using Nancy;
@@ -26,7 +25,7 @@ namespace Deployd.Agent.Test.Unit.WebUi.Modules
         {
             _containerStub = new ContainerStub
                                  {
-                                     NuGetPackageCacheMock = new Mock<INuGetPackageCache>(),
+                                     NuGetPackageCacheMock = new Mock<ILocalPackageCache>(),
                                      DeploymentServiceMock = new Mock<IDeploymentService>(),
                                      InstallationManagerMock = new Mock<IInstallationManager>()
                                  };
@@ -93,13 +92,13 @@ namespace Deployd.Agent.Test.Unit.WebUi.Modules
 
         public class ContainerStub : IIocContainer
         {
-            public Mock<INuGetPackageCache> NuGetPackageCacheMock { get; set; }
+            public Mock<ILocalPackageCache> NuGetPackageCacheMock { get; set; }
             public Mock<IDeploymentService> DeploymentServiceMock { get; set; }
             public Mock<IInstallationManager> InstallationManagerMock { get; set; }
 
             public T GetType<T>()
             {
-                if (typeof(T) == typeof(INuGetPackageCache))
+                if (typeof(T) == typeof(ILocalPackageCache))
                 {
                     return (T)NuGetPackageCacheMock.Object;
                 }
