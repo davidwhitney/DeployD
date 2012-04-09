@@ -82,7 +82,10 @@ namespace Deployd.Core.Installation.Hooks
 
                     System.Configuration.Install.ManagedInstallerClass.InstallHelper(new[] {pathToExecutable});
                 }
+            }
 
+            using (var service = ServiceController.GetServices().SingleOrDefault(s => s.ServiceName == context.Package.Id))
+            {
                 // todo: recursively shut down dependent services
                 if (!service.Status.Equals(ServiceControllerStatus.Stopped) &&
                     !service.Status.Equals(ServiceControllerStatus.StopPending))
