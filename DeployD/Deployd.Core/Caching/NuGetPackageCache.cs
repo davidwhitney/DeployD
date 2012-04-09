@@ -90,19 +90,35 @@ namespace Deployd.Core.Caching
 
             _fileSystem.EnsureDirectoryExists(packageCache);
 
-            var packagePath = Path.Combine(packageCache, CachedPackageVersionFilename(package.Id, package.Version.ToString()));
+            var cachedPackagePath = Path.Combine(packageCache, CachedPackageVersionFilename(package.Id, package.Version.ToString()));
             
-            Logger.DebugFormat("Evaluating packageId: '{0}' - ver '{1}', cached item already exists.", package.Id, package.Version);
-
-            if (File.Exists(packagePath))
+            if (CachedVersionExistsAndIsUpToDate(package, cachedPackagePath))
             {
-                Logger.DebugFormat("Skpping caching '{0}', cached item already exists.", packagePath);
                 return;
             }
 
             Logger.InfoFormat("Downloading {0} to {1}.", package.Id, package);
-            File.WriteAllBytes(packagePath, package.GetStream().ReadAllBytes());
+            File.WriteAllBytes(cachedPackagePath, package.GetStream().ReadAllBytes());
             Logger.InfoFormat("Cached {0} to {1}.", package.Id, package);
+        }
+
+        private static bool CachedVersionExistsAndIsUpToDate(IPackage package, string packagePath)
+        {
+            bool exists = File.Exists(packagePath);
+            bool upToDate = !package.Published.HasValue
+                             || package.Published.Value.LocalDateTime < File.GetLastWriteTime(packagePath);
+            if (exists)
+            {
+                Logger.DebugFormat("Evaluating packageId: '{0}' - ver '{1}', cached item already exists.", package.Id, package.Version);
+            }
+            if (upToDate)
+            {
+                Logger.DebugFormat("Cached package is up to date");
+            } else
+            {
+                Logger.DebugFormat("Cached package needs updating");
+            }
+            return exists && upToDate;
         }
 
         private string PackageCacheLocation(IPackage package)
