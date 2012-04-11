@@ -46,6 +46,8 @@ namespace Deployd.Core.AgentConfiguration
                 {"PackageSyncIntervalMs", "60000"},
                 {"LatestDirectory", "~\\latest"},
                 {"CacheDirectory", "~\\package_cache"},
+                {"BaseInstallationPath", "c:\\installations"},
+                {"MsDeployServiceUrl", "localhost"},
                 {"Tags",""}
             };
         }

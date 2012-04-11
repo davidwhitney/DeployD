@@ -50,7 +50,7 @@ namespace Deployd.Core.Installation
         {
             var unpackFolder = Path.Combine(AgentSettings.AgentProgramDataPath, _agentSettings.UnpackingLocation);
             var workingFolder = Path.Combine(unpackFolder, package.GetFullName());
-            var targetInstallationFolder = Path.Combine(@"d:\wwwcom", package.Id);
+            var targetInstallationFolder = Path.Combine(_agentSettings.BaseInstallationPath, package.Id);
             var deploymentContext = new DeploymentContext(package, workingFolder, targetInstallationFolder, taskId);
 
             var logger = deploymentContext.GetLoggerFor(this);

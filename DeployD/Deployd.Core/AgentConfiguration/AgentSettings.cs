@@ -21,6 +21,10 @@ namespace Deployd.Core.AgentConfiguration
 
         public string UnpackingLocation { get; set; }
 
+        public string BaseInstallationPath { get; set; }
+
+        public string MsDeployServiceUrl { get; set; }
+
         public AgentSettings()
         {
             PackageSyncIntervalMs = 1000;

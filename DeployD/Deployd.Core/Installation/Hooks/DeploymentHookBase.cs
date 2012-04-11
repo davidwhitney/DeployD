@@ -14,12 +14,12 @@ namespace Deployd.Core.Installation.Hooks
     public abstract class DeploymentHookBase : IDeploymentHook
     {
         protected readonly IAgentSettings AgentSettings;
-        private readonly IFileSystem _fileSystem;
+        protected readonly IFileSystem FileSystem;
 
         protected DeploymentHookBase(IAgentSettings agentSettings, IFileSystem fileSystem)
         {
             AgentSettings = agentSettings;
-            _fileSystem = fileSystem;
+            FileSystem = fileSystem;
         }
 
         public abstract bool HookValidForPackage(DeploymentContext context);
@@ -55,7 +55,7 @@ namespace Deployd.Core.Installation.Hooks
             // wait 1 second for processes to release locks on destination files
             System.Threading.Thread.Sleep(1000);
 
-            new TryThis(() => _fileSystem.Directory.Delete(context.TargetInstallationFolder, true), logger)
+            new TryThis(() => FileSystem.Directory.Delete(context.TargetInstallationFolder, true), logger)
                 .UpTo(10).Times
                 .Go();
         }

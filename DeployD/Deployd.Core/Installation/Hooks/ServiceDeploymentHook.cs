@@ -10,6 +10,8 @@ namespace Deployd.Core.Installation.Hooks
 {
     public class ServiceDeploymentHook : DeploymentHookBase
     {
+        private string _serviceInstallationPath;
+
         public override bool HookValidForPackage(DeploymentContext context)
         {
             return context.Package.Tags.ToLower().Contains("service");
@@ -18,6 +20,7 @@ namespace Deployd.Core.Installation.Hooks
         public ServiceDeploymentHook(IFileSystem fileSystem, IAgentSettings agentSettings)
             : base(agentSettings, fileSystem)
         {
+            _serviceInstallationPath = Path.Combine(agentSettings.BaseInstallationPath, "services");
         }
 
         public override void BeforeDeploy(DeploymentContext context)
@@ -59,7 +62,7 @@ namespace Deployd.Core.Installation.Hooks
             }
 
             // services are installed in a '\services' subfolder
-            context.TargetInstallationFolder = Path.Combine(@"d:\wwwcom\services", context.Package.Id);
+            context.TargetInstallationFolder = Path.Combine(_serviceInstallationPath, context.Package.Id);
             
             CopyAllFilesToDestination(context);
         }

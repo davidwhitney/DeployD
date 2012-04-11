@@ -11,7 +11,8 @@
     <RootNamespace>Deployd.Core</RootNamespace>
     <AssemblyName>Deployd.Core</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
-    <TargetFrameworkProfile>Client</TargetFrameworkProfile>
+    <TargetFrameworkProfile>
+    </TargetFrameworkProfile>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
@@ -42,6 +43,10 @@
     </Reference>
     <Reference Include="log4net">
       <HintPath>..\packages\log4net.2.0.0\lib\net40-client\log4net.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Web.Administration, Version=7.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <Private>True</Private>
+      <HintPath>..\packages\Microsoft.Web.Administration.7.0.0.0\lib\net20\Microsoft.Web.Administration.dll</HintPath>
     </Reference>
     <Reference Include="NuGet.Core, Version=1.6.30117.9648, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -81,6 +86,7 @@
     <Compile Include="AgentConfiguration\AgentSettings.cs" />
     <Compile Include="AgentConfiguration\IAgentSettings.cs" />
     <Compile Include="AgentConfiguration\IAgentSettingsManager.cs" />
+    <Compile Include="Installation\Hooks\Iis7MsDeployDeploymentHook.cs" />
     <Compile Include="PackageCaching\InstalledPackageArchive.cs" />
     <Compile Include="PackageCaching\IInstalledPackageArchive.cs" />
     <Compile Include="Installation\DeploymentContext.cs" />
@@ -89,7 +95,7 @@
     <Compile Include="Installation\Hooks\ConfigTransformationDeploymentHook.cs" />
     <Compile Include="Installation\Hooks\DeploymentHookBase.cs" />
     <Compile Include="Installation\Hooks\IDeploymentHook.cs" />
-    <Compile Include="Installation\Hooks\MsDeployDeploymentHook.cs" />
+    <Compile Include="Installation\Hooks\IisMsDeployDeploymentHook.cs" />
     <Compile Include="Installation\Hooks\PowershellDeploymentHook.cs" />
     <Compile Include="Installation\Hooks\ServiceDeploymentHook.cs" />
     <Compile Include="Installation\Hooks\TryThis.cs" />

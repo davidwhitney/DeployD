@@ -50,5 +50,15 @@ namespace Deployd.Core.AgentConfiguration
         {
             get { return this["UnpackingLocation"]; }
         }
+
+        public string BaseInstallationPath
+        {
+            get { return this["BaseInstallationPath"]; }
+        }
+
+        public string MsDeployServiceUrl
+        {
+            get { return this["MsDeployServiceUrl"]; }
+        }
     }
 }

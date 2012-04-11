@@ -37,7 +37,8 @@ namespace Deployd.Agent.Conventions
 
             Bind<IDeploymentHook>().To<PowershellDeploymentHook>();
             Bind<IDeploymentHook>().To<ServiceDeploymentHook>();
-            Bind<IDeploymentHook>().To<MsDeployDeploymentHook>();
+            Bind<IDeploymentHook>().To<IisMsDeployDeploymentHook>();
+            Bind<IDeploymentHook>().To<Iis7MsDeployDeploymentHook>();
             Bind<IDeploymentHook>().To<ConfigTransformationDeploymentHook>(); // we want the config transform to run AfterDeploy() before the AppOffline hook does
             Bind<IDeploymentHook>().To<AppOfflineDeploymentHook>();
             Bind<System.IO.Abstractions.IFileSystem>().To<System.IO.Abstractions.FileSystem>();
