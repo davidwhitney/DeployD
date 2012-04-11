@@ -36,9 +36,20 @@
 		{
 			<text>Not installed</text>
 		}
-        @if (package.LastInstallationTask != null && package.LastInstallationTask.HasErrors)
+        @if (package.LastInstallationTask != null)
         {
-            <a href="/log/@package.PackageId/@package.LastInstallationTask.LogFileName">Errors</a>
+            <a href="/log/@package.PackageId/@package.LastInstallationTask.LogFileName">
+                @if (package.LastInstallationTask.HasErrors)
+                      {
+                          <text>Errors</text>
+                      } else
+                {
+                    <text>Log</text>
+                }
+            </a>
+        } else
+        {
+            <a href="/log/@package.PackageId">Logs</a>
         }
 		<br/>
 	</div>

@@ -9,7 +9,7 @@ namespace Deployd.Agent.WebUi.Converters
 {
     public static class RunningTasksToPackageListViewModelConverter
     {
-        public static PackageListViewModel Convert(ILocalPackageCache cache, RunningInstallationTaskList runningTasks, ICurrentInstalledCache installCache, CompletedInstallationTaskList completedTasks)
+        public static PackageListViewModel Convert(ILocalPackageCache cache, RunningInstallationTaskList runningTasks, IInstalledPackageArchive installPackageArchive, CompletedInstallationTaskList completedTasks)
         {
             var model = new PackageListViewModel();
 

@@ -68,31 +68,34 @@ namespace Deployd.Agent.WebUi.Modules
 
         private static PackageLogSetViewModel GetLogList(IFileSystem fileSystem, string packageId)
         {
+            PackageLogSetViewModel viewModel = new PackageLogSetViewModel();
+            viewModel.PackageId = packageId;
+            viewModel.Logs = new List<LogViewModel>();
             var packageLogPath = Path.Combine(LogDirectoryPath, packageId);
-            if (!fileSystem.Directory.Exists(packageLogPath))
+
+            if (fileSystem.Directory.Exists(packageLogPath))
             {
-                return new PackageLogSetViewModel();
+                var logFiles = fileSystem.Directory.GetFiles(packageLogPath, "*.log", SearchOption.TopDirectoryOnly);
+
+                if (logFiles != null)
+                {
+                    viewModel.Logs = logFiles.Select(f =>
+                                                         {
+                                                             var fileInfo1 = fileSystem.FileInfo.FromFileName(f);
+                                                             return new LogViewModel()
+                                                                        {
+                                                                            LogFilePath = fileInfo1.FullName,
+                                                                            LogFileName = fileInfo1.Name,
+                                                                            PackageId = packageId,
+                                                                            DateModified = fileInfo1.LastWriteTime,
+                                                                            DateCreated = fileInfo1.CreationTime
+                                                                        };
+                                                         }
+                        ).ToList();
+                }
             }
 
-            var logFiles = fileSystem.Directory.GetFiles(packageLogPath, "*.log", SearchOption.TopDirectoryOnly);
-
-            return new PackageLogSetViewModel
-                       {
-                           PackageId = packageId,
-                           Logs = logFiles.Select(f =>
-                                                      {
-                                                          var fileInfo1 = fileSystem.FileInfo.FromFileName(f);
-                                                          return new LogViewModel()
-                                                                     {
-                                                                         LogFilePath = fileInfo1.FullName,
-                                                                         LogFileName = fileInfo1.Name,
-                                                                         PackageId = packageId,
-                                                                         DateModified = fileInfo1.LastWriteTime,
-                                                                         DateCreated = fileInfo1.CreationTime
-                                                                     };
-                                                      }
-                               ).ToList()
-                       };
+            return viewModel;
         }
     }
 

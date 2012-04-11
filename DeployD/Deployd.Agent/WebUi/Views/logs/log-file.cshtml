@@ -1,14 +1,6 @@
-﻿<!DOCTYPE html>
-<html>
-    <head>
-        <title>Deployd.Agent</title>
-    </head>
-    <body>
-        <h1>Deployd.Agent</h1>
+﻿@{
+	Layout  = "layout.cshtml";
+}
+<h2><a href="/log/@Model.PackageId">@Model.PackageId</a> - @Model.LogFileName</h2>
         
-        <h2>@Model.PackageId - @Model.LogFileName</h2>
-        
-        <div id="log">@Html.Raw(Model.LogContents)</div>
-
-    </body>
-</html>
+<div id="log">@Html.Raw(Model.LogContents)</div>
