@@ -3,9 +3,11 @@ using System.Collections.Generic;
 using System.IO;
 using System.IO.Abstractions;
 using System.Linq;
+using Deployd.Core;
 using Deployd.Core.AgentConfiguration;
 using Deployd.Core.Hosting;
 using Nancy;
+using log4net;
 
 namespace Deployd.Agent.WebUi.Modules
 {
@@ -36,6 +38,29 @@ namespace Deployd.Agent.WebUi.Modules
                 LogViewModel log = GetLog(fileSystem, x.packageId, x.filename);
                 return this.ViewOrJson("logs/log-file.cshtml", log);
             };
+
+            Get["/server"] = x =>
+                                     {
+                                         var fileSystem = Container().GetType<IFileSystem>();
+                                         LogViewModel viewModel = new LogViewModel();
+                                         
+                                         string logFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory,
+                                                                           "DeployD.Agent.log");
+                                         viewModel.LogFileName = "DeployD.Agent.log";
+
+                                         using(var stream = new FileStream(logFilePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
+                                         using (var reader = new StreamReader(stream))
+                                         {
+                                             viewModel.LogContents = reader.ReadToEnd();
+                                         }
+                                         viewModel.LogContents = viewModel.LogContents.Replace("\r\n", "<br/>");
+
+                                         //viewModel.LogContents = fileSystem.File.ReadAllText(logFilePath);
+                                         viewModel.PackageId = "server";
+                                         viewModel.DateCreated = fileSystem.File.GetCreationTime(logFilePath);
+                                         viewModel.DateModified = fileSystem.File.GetLastWriteTime(logFilePath);
+                                         return this.ViewOrJson("logs/log-file.cshtml", viewModel);
+                                     };
         }
 
         private LogViewModel GetLog(IFileSystem fileSystem, string packageId, string filename)
