@@ -25,6 +25,8 @@ namespace Deployd.Core.AgentConfiguration
 
         public string MsDeployServiceUrl { get; set; }
 
+        public string LogsDirectory { get; set; }
+
         public AgentSettings()
         {
             PackageSyncIntervalMs = 1000;

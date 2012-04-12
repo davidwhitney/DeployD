@@ -1,14 +1,13 @@
-﻿<!DOCTYPE html>
-<html>
-    <head>
-        <title>Deployd.Agent</title>
-    </head>
-    <body>
+﻿@{
+	Layout  = "layout.cshtml";
+}
+<ul>
+    <li><a href="/installations">Queued/Running</a></li>
+    <li><a href="/installations/completed">Completed</a></li>
+</ul>
 <h2>Completed Installations</h2>
 
 @foreach (var task in Model.Tasks)
 {
-	<p>@task.PackageId @(task.Version ?? "latest") @(task.HasErrors ? "Errors" : "Succeeded") <a href="/log/@task.PackageId/@task.LogFileName">Log</a></p>
+	<p>@task.DateCompleted - @task.PackageId @(task.Version ?? "latest") @(task.HasErrors ? "Errors" : "Succeeded") <a href="/log/@task.PackageId/@task.LogFileName">Log</a></p>
 }
-</body>
-</html>

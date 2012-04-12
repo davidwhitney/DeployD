@@ -48,7 +48,8 @@ namespace Deployd.Core.AgentConfiguration
                 {"CacheDirectory", "~\\package_cache"},
                 {"BaseInstallationPath", "c:\\installations"},
                 {"MsDeployServiceUrl", "localhost"},
-                {"Tags",""}
+                {"Tags",""},
+                {"LogsDirectory", "~\\logs"},
             };
         }
 

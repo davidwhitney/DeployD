@@ -17,6 +17,8 @@ namespace Deployd.Core.Installation
             CancellationTokenSource = cancellationTokenSource;
             ProgressReports = new List<ProgressReport>();
             Errors = new List<Exception>();
+            DateStarted = DateTime.Now;
+            DateCompleted = DateTime.Now;
         }
 
         public Task<InstallationResult> Task { get; set; }
@@ -32,5 +34,8 @@ namespace Deployd.Core.Installation
         public List<Exception> Errors { get; set; }
 
         public string LogFileName { get; set; }
+
+        public DateTime DateStarted { get; set; }
+        public DateTime DateCompleted { get; set; }
     }
 }

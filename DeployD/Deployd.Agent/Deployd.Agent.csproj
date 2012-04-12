@@ -144,6 +144,8 @@
     <Compile Include="WebUi\Models\InstallationsViewModel.cs" />
     <Compile Include="WebUi\Models\InstallTaskViewModel.cs" />
     <Compile Include="WebUi\Models\LocalPackageInformation.cs" />
+    <Compile Include="WebUi\Models\LogListViewModel.cs" />
+    <Compile Include="WebUi\Models\LogViewModel.cs" />
     <Compile Include="WebUi\Models\PackageListViewModel.cs" />
     <Compile Include="WebUi\CustomFormatterExtensions.cs" />
     <Compile Include="WebUi\Modules\InstallationsModule.cs" />
@@ -173,15 +175,18 @@
     <None Include="DebugPackageSource\justgiving-sdk-1.5.4.nupkg">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <Content Include="log4net.config">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <None Include="packages.config" />
     <Content Include="Scripts\PS\Services.ps1">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <None Include="web.config" />
-    <Content Include="WebUi\Views\logs\log-file.cshtml">
+    <Content Include="WebUi\Views\logs\log.cshtml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="WebUi\Views\logs\package-logs.cshtml">
+    <Content Include="WebUi\Views\logs\list.cshtml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="WebUi\Views\logs\packages.cshtml">
@@ -193,7 +198,7 @@
     <Content Include="WebUi\Views\layout.cshtml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="WebUi\Views\installations.cshtml">
+    <Content Include="WebUi\Views\installations\current.cshtml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="WebUi\Views\package-details.cshtml">

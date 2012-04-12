@@ -11,31 +11,35 @@ namespace Deployd.Core.Installation
     public class DeploymentContext
     {
         private readonly IPackage _package;
+        private readonly IAgentSettings _agentSettings;
         private readonly string _workingFolder;
         private readonly string _installationTaskId;
         private readonly DateTime _contextCreateTime = DateTime.Now;
         private log4net.Appender.IAppender _appender;
         private readonly string _logAppenderName;
         private readonly string _logFileName;
+        private readonly string _logDirectory;
 
-        public DeploymentContext(IPackage package, string workingFolder, string targetInstallationFolder, string installationTaskId)
+        public DeploymentContext(IPackage package, IAgentSettings agentSettings, string workingFolder, string targetInstallationFolder, string installationTaskId)
         {
             _package = package;
+            _agentSettings = agentSettings;
             _workingFolder = workingFolder;
             _installationTaskId = installationTaskId;
             TargetInstallationFolder = targetInstallationFolder;
 
+            _logDirectory = _agentSettings.LogsDirectory.MapVirtualPath();
             _logFileName = string.Format("{0:dd-MM-yyyy-HH-mm-ss}.log", _contextCreateTime);
             _logAppenderName = string.Format("Install.{0}.{1:dd.MM.yyyy.HH.mm.ss}", _package.Id, _contextCreateTime);
 
             var layout = new log4net.Layout.PatternLayout();
-            layout.ConversionPattern = "%d{dd-MM-yyyy HH:mm:ss} [%thread] %-5level %logger - %message%newline";
-            layout.Header = "Time;Level;Description;";
+            layout.ConversionPattern = "<div class='%-5level'>%d{dd-MM-yyyy HH:mm:ss} %logger - %message</div>";
+            layout.ActivateOptions();
 
             var plainTextAppender = new log4net.Appender.FileAppender
                                         {
                                             Name = _logAppenderName,
-                                            File = Path.Combine(AgentSettings.AgentProgramDataPath, Path.Combine("installation_logs", Path.Combine(_package.Id, _logFileName))),
+                                            File = Path.Combine(AgentSettings.AgentProgramDataPath, Path.Combine(_logDirectory, Path.Combine(_package.Id, _logFileName))),
                                             AppendToFile = true,
                                             ImmediateFlush = true,
                                             Layout = layout,

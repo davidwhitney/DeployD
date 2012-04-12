@@ -126,6 +126,9 @@ namespace Deployd.Agent.Services.InstallationService
             installationTask.LogFileName = progressReport.Context.LogFileName;
             installationTask.ProgressReports.Add(progressReport);
 
+            // update completed datetime in case an exception occurs
+            installationTask.DateCompleted = DateTime.Now;
+
             if (progressReport.Exception == null)
             {
                 return;
@@ -133,6 +136,8 @@ namespace Deployd.Agent.Services.InstallationService
 
             installationTask.HasErrors = true;
             installationTask.Errors.Add(progressReport.Exception);
+
+            
         }
 
         private void RemoveFromRunningInstallationList(Task<InstallationResult> completedInstallationTask)

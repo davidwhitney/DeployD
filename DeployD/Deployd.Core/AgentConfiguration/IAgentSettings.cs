@@ -15,5 +15,6 @@ namespace Deployd.Core.AgentConfiguration
         string CacheDirectory { get; }
         string BaseInstallationPath { get; }
         string MsDeployServiceUrl { get; }
+        string LogsDirectory { get; }
     }
 }

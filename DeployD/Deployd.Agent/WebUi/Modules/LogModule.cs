@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.IO.Abstractions;
 using System.Linq;
+using Deployd.Agent.WebUi.Models;
+using Deployd.Core;
 using Deployd.Core.AgentConfiguration;
 using Deployd.Core.Hosting;
 using Nancy;
@@ -11,88 +13,127 @@ namespace Deployd.Agent.WebUi.Modules
 {
     public class LogModule : NancyModule
     {
-        static readonly string LogDirectoryPath = Path.Combine(AgentSettings.AgentProgramDataPath, "installation_logs");
         public static Func<IIocContainer> Container { get; set; }
 
         public LogModule() : base("/log")
         {
             Get["/"] = x =>
             {
+                var agentSettings = Container().GetType<IAgentSettings>();
                 var fileSystem = Container().GetType<IFileSystem>();
-                var packageList = GetPackageLogDirectories(fileSystem);
+                var packageList = GetPackageLogDirectories(fileSystem, agentSettings);
                 return this.ViewOrJson("logs/packages.cshtml", packageList);
             };
 
             Get["/{packageId}"] = x =>
             {
+                var agentSettings = Container().GetType<IAgentSettings>();
                 var fileSystem = Container().GetType<IFileSystem>();
-                PackageLogSetViewModel logList = GetLogList(fileSystem, x.packageId);
-                return this.ViewOrJson("logs/package-logs.cshtml", logList);
+                LogListViewModel logList = GetLogList(fileSystem, agentSettings, x.packageId);
+                return this.ViewOrJson("logs/list.cshtml", logList);
             };
 
             Get["/{packageId}/{filename}"] = x =>
             {
+                var agentSettings = Container().GetType<IAgentSettings>();
                 var fileSystem = Container().GetType<IFileSystem>();
-                LogViewModel log = GetLog(fileSystem, x.packageId, x.filename);
-                return this.ViewOrJson("logs/log-file.cshtml", log);
+                LogViewModel log = GetLog(fileSystem, agentSettings, x.packageId, x.filename);
+                return this.ViewOrJson("logs/log.cshtml", log);
             };
 
             Get["/server"] = x =>
             {
+                var agentSettings = Container().GetType<IAgentSettings>();
                 var fileSystem = Container().GetType<IFileSystem>();
-                var viewModel = new LogViewModel();
-                                         
-                var logFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory,
-                                                "DeployD.Agent.log");
-                viewModel.LogFileName = "DeployD.Agent.log";
+                var viewModel = LoadServerLogList(fileSystem, agentSettings);
+                return this.ViewOrJson("logs/list.cshtml", viewModel);
+            };
 
-                using(var stream = new FileStream(logFilePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
-                using (var reader = new StreamReader(stream))
+            Get["/server/{filename}"] = x =>
+                                            {
+                string logFilename = string.IsNullOrWhiteSpace(x.filename)
+                                        ? "DeployD.Agent.log"
+                                        : x.filename;
+
+                try
                 {
-                    viewModel.LogContents = reader.ReadToEnd();
+                    var agentSettings = Container().GetType<IAgentSettings>();
+                    var fileSystem = Container().GetType<IFileSystem>();
+                    var viewModel = LoadLogViewModel(logFilename, fileSystem, agentSettings);
+                    return this.ViewOrJson("logs/log.cshtml", viewModel);
+                }catch(ArgumentException)
+                {
+                    return new NotFoundResponse();
                 }
-                viewModel.LogContents = viewModel.LogContents.Replace("\r\n", "<br/>");
-
-                //viewModel.LogContents = fileSystem.File.ReadAllText(logFilePath);
-                viewModel.PackageId = "server";
-                viewModel.DateCreated = fileSystem.File.GetCreationTime(logFilePath);
-                viewModel.DateModified = fileSystem.File.GetLastWriteTime(logFilePath);
-                return this.ViewOrJson("logs/log-file.cshtml", viewModel);
             };
         }
 
-        private static LogViewModel GetLog(IFileSystem fileSystem, string packageId, string filename)
+        private static string GetLogDirectory(IAgentSettings agentSettings)
         {
-            var logFilePath = Path.Combine(LogDirectoryPath, Path.Combine(packageId, filename));
+            return agentSettings.LogsDirectory.MapVirtualPath();
+        }
+
+        private static LogListViewModel LoadServerLogList(IFileSystem fileSystem, IAgentSettings agentSettings)
+        {
+            var logDirectoryPath = GetLogDirectory(agentSettings);
+            var fileList = fileSystem.Directory.GetFiles(logDirectoryPath, "*.log", SearchOption.TopDirectoryOnly);
+
+            return new LogListViewModel(fileList.Select(f => LoadLogViewModel(f, fileSystem, agentSettings))){Group="server"};
+        }
+
+        private static LogViewModel LoadLogViewModel(string logFilename, IFileSystem fileSystem, IAgentSettings agentSettings, string subFolder=null)
+        {
+            string logDirectory = "";
+            if (string.IsNullOrWhiteSpace(subFolder))
+            {
+                logDirectory = GetLogDirectory(agentSettings);
+            } else
+            {
+                logDirectory = Path.Combine(GetLogDirectory(agentSettings), subFolder);
+            }
+
+            var logFilePath = Path.Combine(logDirectory, logFilename);
             
             if (!fileSystem.File.Exists(logFilePath))
             {
-                throw new ArgumentException("Log not found", "filename");
+                throw new ArgumentOutOfRangeException("filename");
             }
 
-            var fileInfo = fileSystem.FileInfo.FromFileName(logFilePath);
-            return new LogViewModel
+            var fileInfo = fileSystem.FileInfo.FromFileName(logFilename);
+            var viewModel = new LogViewModel()
+                                {
+                                    LogFileName = fileInfo.Name,
+                                    Group = subFolder ?? "server",
+                                    DateCreated = fileSystem.File.GetCreationTime(logFilePath),
+                                    DateModified = fileSystem.File.GetLastWriteTime(logFilePath)
+                                };
+
+
+            using (var stream = new FileStream(logFilePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
+            using (var reader = new StreamReader(stream))
             {
-                LogFilePath = fileInfo.FullName,
-                LogFileName = fileInfo.Name,
-                PackageId = packageId,
-                DateModified = fileInfo.LastWriteTime,
-                LogContents = fileSystem.File.ReadAllText(fileInfo.FullName).Replace("\n","<br/>"),
-                DateCreated = fileInfo.CreationTime
-            };
+                viewModel.LogContents = reader.ReadToEnd();
+            }
+            return viewModel;
         }
 
-        private static List<string> GetPackageLogDirectories(IFileSystem fileSystem)
+        private static LogViewModel GetLog(IFileSystem fileSystem, IAgentSettings agentSettings, string packageId, string filename)
         {
-            return !fileSystem.Directory.Exists(LogDirectoryPath)
+            return LoadLogViewModel(filename, fileSystem, agentSettings, packageId);
+        }
+
+        private static List<string> GetPackageLogDirectories(IFileSystem fileSystem, IAgentSettings agentSettings)
+        {
+            var logDirectory = GetLogDirectory(agentSettings);
+            return !fileSystem.Directory.Exists(logDirectory)
                        ? new List<string>()
-                       : fileSystem.Directory.GetDirectories(LogDirectoryPath).Select(Path.GetFileName).ToList();
+                       : fileSystem.Directory.GetDirectories(logDirectory).Select(Path.GetFileName).ToList();
         }
 
-        private static PackageLogSetViewModel GetLogList(IFileSystem fileSystem, string packageId)
+        private static LogListViewModel GetLogList(IFileSystem fileSystem, IAgentSettings agentSettings, string packageId)
         {
-            var viewModel = new PackageLogSetViewModel {PackageId = packageId, Logs = new List<LogViewModel>()};
-            var packageLogPath = Path.Combine(LogDirectoryPath, packageId);
+            var viewModel = new LogListViewModel {Group = packageId};
+            var packageLogPath = Path.Combine(GetLogDirectory(agentSettings), packageId);
 
             if (fileSystem.Directory.Exists(packageLogPath))
             {
@@ -100,38 +141,23 @@ namespace Deployd.Agent.WebUi.Modules
 
                 if (logFiles != null)
                 {
-                    viewModel.Logs = logFiles.Select(f =>
+                    viewModel.AddRange(logFiles.Select(f =>
                     {
                         var fileInfo1 = fileSystem.FileInfo.FromFileName(f);
                         return new LogViewModel
                                 {
                                     LogFilePath = fileInfo1.FullName,
                                     LogFileName = fileInfo1.Name,
-                                    PackageId = packageId,
+                                    Group = packageId,
                                     DateModified = fileInfo1.LastWriteTime,
                                     DateCreated = fileInfo1.CreationTime
                                 };
-                    }).ToList();
+                    })
+                    .OrderByDescending(f=>f.DateModified));
                 }
             }
 
             return viewModel;
         }
-    }
-
-    public class PackageLogSetViewModel
-    {
-        public List<LogViewModel> Logs { get; set; }
-        public string PackageId { get; set; }
-    }
-
-    public class LogViewModel
-    {
-        public string LogFilePath { get; set; }
-        public DateTime DateModified { get; set; }
-        public DateTime DateCreated { get; set; }
-        public string LogFileName { get; set; }
-        public string PackageId { get; set; }
-        public string LogContents { get; set; }
     }
 }

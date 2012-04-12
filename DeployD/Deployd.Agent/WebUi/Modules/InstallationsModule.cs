@@ -19,7 +19,7 @@ namespace Deployd.Agent.WebUi.Modules
             {
                 var taskQueue = Container().GetType<InstallationTaskQueue>();
                 var runningTasks = Container().GetType<RunningInstallationTaskList>();
-                return this.ViewOrJson("installations.cshtml", new InstallationsViewModel {TaskQueue = taskQueue, Tasks = runningTasks.ToList()});
+                return this.ViewOrJson("installations/current.cshtml", new InstallationsViewModel {TaskQueue = taskQueue, Tasks = runningTasks.ToList()});
             };
 
             Get["/completed"] = x =>

@@ -60,5 +60,10 @@ namespace Deployd.Core.AgentConfiguration
         {
             get { return this["MsDeployServiceUrl"]; }
         }
+
+        public string LogsDirectory
+        {
+            get { return this["LogsDirectory"]; }
+        }
     }
 }
