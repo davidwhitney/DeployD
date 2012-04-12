@@ -89,7 +89,7 @@ namespace Deployd.Agent.Services.InstallationService
 
             nextPendingInstall.Task
                 .ContinueWith(RemoveFromRunningInstallationList)
-                .ContinueWith(HandleAnyErrors, TaskContinuationOptions.OnlyOnFaulted);
+                .ContinueWith(task => Logger.Error("Installation task failed.", task.Exception), TaskContinuationOptions.OnlyOnFaulted);
 
             nextPendingInstall.Task.Start();
         }
@@ -142,14 +142,6 @@ namespace Deployd.Agent.Services.InstallationService
                 RunningInstalls.Remove(installationTask);
             }
             CompletedInstalls.Add(installationTask);
-        }
-
-        private void HandleAnyErrors(Task task)
-        {
-            if (task.IsFaulted)
-            {
-                Logger.Error("Installation task failed.", task.Exception);
-            }
         }
     }
 }
