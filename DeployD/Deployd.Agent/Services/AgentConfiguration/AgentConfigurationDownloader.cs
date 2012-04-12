@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Deployd.Core;
 using Deployd.Core.AgentConfiguration;
 using Deployd.Core.PackageTransport;
 using NuGet;
@@ -28,50 +29,71 @@ namespace Deployd.Agent.Services.AgentConfiguration
 
         public void DownloadAgentConfiguration()
         {
-            Logger.Debug("downloading " + DeploydConfigurationPackageName);
-            var configPackage = _packageQuery.GetLatestPackage(DeploydConfigurationPackageName);
+            var configPackage = DownloadConfigurationPackage();
 
-            if (configPackage == null)
-            {
-                Logger.Error("configuration package is null");
-                throw new AgentConfigurationPackageNotFoundException(DeploydConfigurationPackageName);
-            }
-            
-            Logger.Debug("package downloaded");
-            
             try
             {
-                var files = configPackage.GetFiles();
-                var agentConfigurationFile = ExtractAgentConfigurationFile(ConfigurationFiles.AgentConfigurationFile, files);
-                Logger.Debug("extracted");
-               
-                var agentConfigurationFileStream = agentConfigurationFile.GetStream();
-
-                byte[] configBytes;
-                
-                using (var memoryStream = new MemoryStream())
-                {
-                    agentConfigurationFileStream.CopyTo(memoryStream);
-                    configBytes = memoryStream.ToArray();
-                    memoryStream.Close();
-                }
-                
-                Logger.Debug("save");
-                
-                _agentConfigurationManager.SaveToDisk(configBytes);
-                _agentSettingsManager.UnloadSettings();
-                
-                Logger.Debug("saved configuration package");
-            } 
+                var agentConfigurationFile = ExtractConfig(configPackage);
+                SaveToDisk(agentConfigurationFile);
+            }
             catch (Exception ex)
             {
                 Logger.Error("failed", ex);
             }
         }
 
+        private IPackage DownloadConfigurationPackage()
+        {
+            using (new DebugTimer("Downloading " + DeploydConfigurationPackageName))
+            {
+                var configPackage = _packageQuery.GetLatestPackage(DeploydConfigurationPackageName);
+
+                if (configPackage == null)
+                {
+                    throw new AgentConfigurationPackageNotFoundException(DeploydConfigurationPackageName);
+                }
+
+                return configPackage;
+            }
+        }
+
+        private static IPackageFile ExtractConfig(IPackage configPackage)
+        {
+            using (new DebugTimer("Extracting config from " + DeploydConfigurationPackageName))
+            {
+                var files = configPackage.GetFiles();
+                var agentConfigurationFile = ExtractAgentConfigurationFile(ConfigurationFiles.AgentConfigurationFile, files);
+                return agentConfigurationFile;
+            }
+        }
+
+        private void SaveToDisk(IPackageFile agentConfigurationFile)
+        {
+            using (new DebugTimer("Saving config from " + DeploydConfigurationPackageName))
+            {
+                var configBytes = GetConfigurationFileAsBytes(agentConfigurationFile);
+                _agentConfigurationManager.SaveToDisk(configBytes);
+                _agentSettingsManager.UnloadSettings();
+            }
+        }
+
+        private static byte[] GetConfigurationFileAsBytes(IPackageFile agentConfigurationFile)
+        {
+            var agentConfigurationFileStream = agentConfigurationFile.GetStream();
+
+            byte[] configBytes;
+
+            using (var memoryStream = new MemoryStream())
+            {
+                agentConfigurationFileStream.CopyTo(memoryStream);
+                configBytes = memoryStream.ToArray();
+                memoryStream.Close();
+            }
+            return configBytes;
+        }
+
         private static IPackageFile ExtractAgentConfigurationFile(string targetFile, IEnumerable<IPackageFile> files)
         {
-            Logger.Debug("extracting ");
             var agentConfigFileList = files.Where(x => x.Path == targetFile).ToList();
 
             if (agentConfigFileList.Count == 0)

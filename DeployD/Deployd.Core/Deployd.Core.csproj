@@ -86,6 +86,7 @@
     <Compile Include="AgentConfiguration\AgentSettings.cs" />
     <Compile Include="AgentConfiguration\IAgentSettings.cs" />
     <Compile Include="AgentConfiguration\IAgentSettingsManager.cs" />
+    <Compile Include="DebugTimer.cs" />
     <Compile Include="Installation\Hooks\Iis7MsDeployDeploymentHook.cs" />
     <Compile Include="PackageCaching\InstalledPackageArchive.cs" />
     <Compile Include="PackageCaching\IInstalledPackageArchive.cs" />

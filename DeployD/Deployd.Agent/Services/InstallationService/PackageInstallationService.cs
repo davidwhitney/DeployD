@@ -7,6 +7,7 @@ using Deployd.Core;
 using Deployd.Core.Hosting;
 using Deployd.Core.Installation;
 using log4net;
+using log4net.Core;
 
 namespace Deployd.Agent.Services.InstallationService
 {
@@ -96,24 +97,23 @@ namespace Deployd.Agent.Services.InstallationService
 
         private void HandleProgressReport(InstallationTask installationTask, ProgressReport progressReport)
         {
-            log4net.Core.Level level = log4net.Core.Level.Info;
+            Level level;
             switch (progressReport.Level)
             {
                 case "Debug":
-                    level = log4net.Core.Level.Debug;
+                    level = Level.Debug;
                     break;
                 case "Warn":
-                    level = log4net.Core.Level.Warn;
+                    level = Level.Warn;
                     break;
                 case "Error":
-                    level = log4net.Core.Level.Error;
+                    level = Level.Error;
                     break;
                 case "Fatal":
-                    level = log4net.Core.Level.Fatal;
+                    level = Level.Fatal;
                     break;
-                case "Info":
                 default:
-                    level = log4net.Core.Level.Info;
+                    level = Level.Info;
                     break;
             }
 
@@ -126,17 +126,18 @@ namespace Deployd.Agent.Services.InstallationService
             installationTask.LogFileName = progressReport.Context.LogFileName;
             installationTask.ProgressReports.Add(progressReport);
 
-            if (progressReport.Exception != null)
+            if (progressReport.Exception == null)
             {
-                installationTask.HasErrors = true;
-                installationTask.Errors.Add(progressReport.Exception);
+                return;
             }
+
+            installationTask.HasErrors = true;
+            installationTask.Errors.Add(progressReport.Exception);
         }
 
         private void RemoveFromRunningInstallationList(Task<InstallationResult> completedInstallationTask)
         {
-            var installationTask =
-                RunningInstalls.SingleOrDefault(install => install.Task.Id == completedInstallationTask.Id);
+            var installationTask = RunningInstalls.SingleOrDefault(install => install.Task.Id == completedInstallationTask.Id);
             if (installationTask != null)
             {
                 RunningInstalls.Remove(installationTask);
