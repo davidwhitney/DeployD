@@ -87,7 +87,9 @@ namespace Deployd.Agent.Services.InstallationService
                 return new InstallationResult();
             });
 
-            nextPendingInstall.Task.ContinueWith(RemoveFromRunningInstallationList);
+            nextPendingInstall.Task
+                .ContinueWith(RemoveFromRunningInstallationList)
+                .ContinueWith(HandleAnyErrors);
 
             nextPendingInstall.Task.Start();
         }
@@ -140,6 +142,14 @@ namespace Deployd.Agent.Services.InstallationService
                 RunningInstalls.Remove(installationTask);
             }
             CompletedInstalls.Add(installationTask);
+        }
+
+        private void HandleAnyErrors(Task task)
+        {
+            if (task.IsFaulted)
+            {
+                Logger.Error("Installation task failed.", task.Exception);
+            }
         }
     }
 }
