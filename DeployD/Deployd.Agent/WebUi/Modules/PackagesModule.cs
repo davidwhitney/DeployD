@@ -27,8 +27,7 @@ namespace Deployd.Agent.WebUi.Modules
                 var model = RunningTasksToPackageListViewModelConverter.Convert(cache, runningTasks, installCache, completedTasks);
                 return this.ViewOrJson("packages.cshtml", model);
             };
-
-
+            
             Get["/{packageId}"] = x =>
             {
                 var cache = Container().GetType<ILocalPackageCache>();

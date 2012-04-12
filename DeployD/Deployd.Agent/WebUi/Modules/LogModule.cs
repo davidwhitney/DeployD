@@ -3,11 +3,9 @@ using System.Collections.Generic;
 using System.IO;
 using System.IO.Abstractions;
 using System.Linq;
-using Deployd.Core;
 using Deployd.Core.AgentConfiguration;
 using Deployd.Core.Hosting;
 using Nancy;
-using log4net;
 
 namespace Deployd.Agent.WebUi.Modules
 {
@@ -40,30 +38,30 @@ namespace Deployd.Agent.WebUi.Modules
             };
 
             Get["/server"] = x =>
-                                     {
-                                         var fileSystem = Container().GetType<IFileSystem>();
-                                         LogViewModel viewModel = new LogViewModel();
+            {
+                var fileSystem = Container().GetType<IFileSystem>();
+                var viewModel = new LogViewModel();
                                          
-                                         string logFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory,
-                                                                           "DeployD.Agent.log");
-                                         viewModel.LogFileName = "DeployD.Agent.log";
+                var logFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory,
+                                                "DeployD.Agent.log");
+                viewModel.LogFileName = "DeployD.Agent.log";
 
-                                         using(var stream = new FileStream(logFilePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
-                                         using (var reader = new StreamReader(stream))
-                                         {
-                                             viewModel.LogContents = reader.ReadToEnd();
-                                         }
-                                         viewModel.LogContents = viewModel.LogContents.Replace("\r\n", "<br/>");
+                using(var stream = new FileStream(logFilePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
+                using (var reader = new StreamReader(stream))
+                {
+                    viewModel.LogContents = reader.ReadToEnd();
+                }
+                viewModel.LogContents = viewModel.LogContents.Replace("\r\n", "<br/>");
 
-                                         //viewModel.LogContents = fileSystem.File.ReadAllText(logFilePath);
-                                         viewModel.PackageId = "server";
-                                         viewModel.DateCreated = fileSystem.File.GetCreationTime(logFilePath);
-                                         viewModel.DateModified = fileSystem.File.GetLastWriteTime(logFilePath);
-                                         return this.ViewOrJson("logs/log-file.cshtml", viewModel);
-                                     };
+                //viewModel.LogContents = fileSystem.File.ReadAllText(logFilePath);
+                viewModel.PackageId = "server";
+                viewModel.DateCreated = fileSystem.File.GetCreationTime(logFilePath);
+                viewModel.DateModified = fileSystem.File.GetLastWriteTime(logFilePath);
+                return this.ViewOrJson("logs/log-file.cshtml", viewModel);
+            };
         }
 
-        private LogViewModel GetLog(IFileSystem fileSystem, string packageId, string filename)
+        private static LogViewModel GetLog(IFileSystem fileSystem, string packageId, string filename)
         {
             var logFilePath = Path.Combine(LogDirectoryPath, Path.Combine(packageId, filename));
             
@@ -93,9 +91,7 @@ namespace Deployd.Agent.WebUi.Modules
 
         private static PackageLogSetViewModel GetLogList(IFileSystem fileSystem, string packageId)
         {
-            PackageLogSetViewModel viewModel = new PackageLogSetViewModel();
-            viewModel.PackageId = packageId;
-            viewModel.Logs = new List<LogViewModel>();
+            var viewModel = new PackageLogSetViewModel {PackageId = packageId, Logs = new List<LogViewModel>()};
             var packageLogPath = Path.Combine(LogDirectoryPath, packageId);
 
             if (fileSystem.Directory.Exists(packageLogPath))
@@ -105,18 +101,17 @@ namespace Deployd.Agent.WebUi.Modules
                 if (logFiles != null)
                 {
                     viewModel.Logs = logFiles.Select(f =>
-                                                         {
-                                                             var fileInfo1 = fileSystem.FileInfo.FromFileName(f);
-                                                             return new LogViewModel()
-                                                                        {
-                                                                            LogFilePath = fileInfo1.FullName,
-                                                                            LogFileName = fileInfo1.Name,
-                                                                            PackageId = packageId,
-                                                                            DateModified = fileInfo1.LastWriteTime,
-                                                                            DateCreated = fileInfo1.CreationTime
-                                                                        };
-                                                         }
-                        ).ToList();
+                    {
+                        var fileInfo1 = fileSystem.FileInfo.FromFileName(f);
+                        return new LogViewModel
+                                {
+                                    LogFilePath = fileInfo1.FullName,
+                                    LogFileName = fileInfo1.Name,
+                                    PackageId = packageId,
+                                    DateModified = fileInfo1.LastWriteTime,
+                                    DateCreated = fileInfo1.CreationTime
+                                };
+                    }).ToList();
                 }
             }
 
