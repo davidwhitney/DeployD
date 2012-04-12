@@ -89,7 +89,7 @@ namespace Deployd.Agent.Services.InstallationService
 
             nextPendingInstall.Task
                 .ContinueWith(RemoveFromRunningInstallationList)
-                .ContinueWith(HandleAnyErrors);
+                .ContinueWith(HandleAnyErrors, TaskContinuationOptions.OnlyOnFaulted);
 
             nextPendingInstall.Task.Start();
         }
