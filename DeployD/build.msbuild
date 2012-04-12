@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Package" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<PropertyGroup>
+	<Configuration>Release</Configuration>
+</PropertyGroup>
+
+<Target Name="Package">
+	<CallTarget Targets="Build" />
+	<CallTarget Targets="BuildMsi"/>
+</Target>
+
+<Target Name="Build">
+	<msbuild
+		Projects="Deployd.sln"
+		Targets="Clean;Build"
+		BuildInParallel="true"
+		Properties="Configuration=$(Configuration)" />
+</Target>
+
+<Target Name="BuildMsi">
+  <Message Text="Building package $(Vdproj)" />
+  <Exec WorkingDirectory="DeployD.Agent.Installer"
+  Command='$(MSBuildProjectDirectory)\packages\wix.3.5\candle.exe -d"DevEnvDir=C:\Program Files (x86)\Microsoft Visual Studio 10.0\Common7\IDE\\" -dSolutionDir=D:\workspace\DeployD\DeployD\ -dSolutionExt=.sln -dSolutionFileName=DeployD.sln -dSolutionName=DeployD -dSolutionPath=D:\workspace\DeployD\DeployD\DeployD.sln -dConfiguration=$(Configuration) -dOutDir=bin\$(Configuration)\ -dPlatform=x86 -dProjectDir=D:\workspace\DeployD\DeployD\Deployd.Agent.Installer\ -dProjectExt=.wixproj -dProjectFileName=Deployd.Agent.Installer.wixproj -dProjectName=Deployd.Agent.Installer -dProjectPath=D:\workspace\DeployD\DeployD\Deployd.Agent.Installer\Deployd.Agent.Installer.wixproj -dTargetDir=D:\workspace\DeployD\DeployD\Deployd.Agent.Installer\bin\$(Configuration)\ -dTargetExt=.msi -dTargetFileName=Deployd.Agent.Installer.msi -dTargetName=Deployd.Agent.Installer -dTargetPath=D:\workspace\DeployD\DeployD\Deployd.Agent.Installer\bin\$(Configuration)\Deployd.Agent.Installer.msi -dDeployd.Agent.Configuration=$(Configuration) -d"Deployd.Agent.FullConfiguration=$(Configuration)|x86" -dDeployd.Agent.Platform=x86 -dDeployd.Agent.ProjectDir=D:\workspace\DeployD\DeployD\Deployd.Agent\ -dDeployd.Agent.ProjectExt=.csproj -dDeployd.Agent.ProjectFileName=Deployd.Agent.csproj -dDeployd.Agent.ProjectName=Deployd.Agent -dDeployd.Agent.ProjectPath=D:\workspace\DeployD\DeployD\Deployd.Agent\Deployd.Agent.csproj -dDeployd.Agent.TargetDir=D:\workspace\DeployD\DeployD\Deployd.Agent\bin\$(Configuration)\ -dDeployd.Agent.TargetExt=.exe -dDeployd.Agent.TargetFileName=Deployd.Agent.exe -dDeployd.Agent.TargetName=Deployd.Agent -dDeployd.Agent.TargetPath=D:\workspace\DeployD\DeployD\Deployd.Agent\bin\$(Configuration)\Deployd.Agent.exe -out obj\$(Configuration)\ -arch x86 Deployd.Agent.Installer.wxs obj\$(Configuration)\Product.Generated.wxs'/>
+  <Exec WorkingDirectory="DeployD.Agent.Installer"
+  Command='$(MSBuildProjectDirectory)\packages\wix.3.5\Light.exe -cultures:null -out D:\workspace\DeployD\DeployD\Deployd.Agent.Installer\bin\$(Configuration)\Deployd.Agent.Installer.msi -pdbout D:\workspace\DeployD\DeployD\Deployd.Agent.Installer\bin\$(Configuration)\Deployd.Agent.Installer.wixpdb obj\$(Configuration)\Deployd.Agent.Installer.wixobj obj\$(Configuration)\Product.Generated.wixobj'/>
+</Target>
+
+</Project>

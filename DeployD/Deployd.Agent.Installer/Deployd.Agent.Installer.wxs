@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+	<Product Id="592defd6-fe76-41c5-a876-517fd9428fe1" Name="Deployd.Agent" Language="1033" Version="1.0.0.0" Manufacturer="Deployd" UpgradeCode="c27cbeec-032a-4fda-ba93-6419b80770db">
+		<Package InstallerVersion="200" Compressed="yes" />
+
+		<Media Id="1" Cabinet="media1.cab" EmbedCab="yes" />
+        <InstallExecuteSequence>
+            <RemoveExistingProducts Before="InstallInitialize" />
+        </InstallExecuteSequence>
+
+		<Directory Id="TARGETDIR" Name="SourceDir">
+			<Directory Id="ProgramFilesFolder">
+				<Directory Id="INSTALLLOCATION" Name="Deployd.Agent">
+					<!-- TODO: Remove the comments around this Component element and the ComponentRef below in order to add resources to this installer. -->
+					<Component Id="ProductComponent" Guid="8eb5eec7-adfb-4788-8402-ce9c2e28e24a">
+						<!-- TODO: Insert files, registry keys, and other resources here. -->
+                        <File Id="AgentEXE" Name="$(var.Deployd.Agent.TargetFileName)" DiskId="1" Source="$(var.Deployd.Agent.TargetPath)" />
+                        <File Id="AgentCONFIG" Name="$(var.Deployd.Agent.TargetFileName).config" DiskId="1" Source="$(var.Deployd.Agent.TargetPath).config" />
+					</Component>
+				</Directory>
+			</Directory>
+		</Directory>
+
+		<Feature Id="ProductFeature" Title="Deployd.Agent" Level="1"
+                 Display="expand"
+                 ConfigurableDirectory="INSTALLLOCATION">
+			<!-- TODO: Remove the comments around this ComponentRef element and the Component above in order to add resources to this installer. -->
+			<ComponentRef Id="ProductComponent" />
+			
+			<!-- Note: The following ComponentGroupRef is required to pull in generated authoring from project references. -->
+			<ComponentGroupRef Id="Product.Generated" />
+		</Feature>
+	</Product>
+</Wix>
