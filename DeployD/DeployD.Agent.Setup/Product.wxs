@@ -87,6 +87,12 @@
             <Component Id="cmp375F226751B298CD70903C1646985757" Directory="INSTALLDIR" Guid="{139C7143-3436-4973-840A-8DBDF4E5E6D9}">
                 <File Id="filBF38EEDD7B5695007E9582D7EF347826" KeyPath="yes" Source="$(var.Deployd.Agent.ProjectDir)\bin\$(var.Deployd.Agent.Configuration)\log4net.config" />
             </Component>
+            <Component Id="cmp13D6573EA8CF3F99F44BAE837E2771F1" Directory="INSTALLDIR" Guid="{028c50b1-9f10-496b-83bd-73cb4bac6e64}">
+                <File Id="fil2991F53D601CDF7142D0A9E1B42E116F" KeyPath="yes" Source="$(var.Deployd.Agent.ProjectDir)\bin\$(var.Deployd.Agent.Configuration)\Nuget.Core.dll" />
+            </Component>
+            <Component Id="cmp13D6573EA8CF3F99F44BAE837E2771F2" Directory="INSTALLDIR" Guid="{b9533cbb-6810-4ef0-9410-9f91399a760d}">
+                <File Id="fil2991F53D601CDF7142D0A9E1B42E116G" KeyPath="yes" Source="$(var.Deployd.Agent.ProjectDir)\bin\$(var.Deployd.Agent.Configuration)\Microsoft.CSharp.dll" />
+            </Component>
             <Component Id="cmp13D6573EA8CF3F99F44BAE837E2771F0" Directory="INSTALLDIR" Guid="{E3D8A6E3-6C1F-401D-B035-8BFCC0510BF5}">
                 <File Id="fil2991F53D601CDF7142D0A9E1B42E116E" KeyPath="yes" Source="$(var.Deployd.Agent.ProjectDir)\bin\$(var.Deployd.Agent.Configuration)\log4net.dll" />
             </Component>
