@@ -1,0 +1,22 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+    <Fragment>
+        <DirectoryRef Id="Deployd.Agent.Binaries" />
+    </Fragment>
+    <Fragment>
+        <ComponentGroup Id="Deployd.Agent.Binaries">
+            <ComponentRef Id="cmp5F262F050E2451E1C0C5DA99759C367E" />
+            <ComponentRef Id="cmp18AF0512835F0DEC4EFFA5D87C7B1483" />
+        </ComponentGroup>
+    </Fragment>
+    <Fragment>
+        <ComponentGroup Id="ProductComponent">
+            <Component Id="cmp5F262F050E2451E1C0C5DA99759C367E" Directory="Deployd.Agent.Binaries" Guid="{954305D3-137C-4DF8-A013-F4660F3FE9E8}">
+                <File Id="filB0F150D9E21AE08BCC6A2274FE282046" Source="$(var.Deployd.Agent.TargetDir)\Deployd.Agent.exe" />
+            </Component>
+            <Component Id="cmp18AF0512835F0DEC4EFFA5D87C7B1483" Directory="Deployd.Agent.Binaries" Guid="{11D7A3C9-83B9-4F28-A31A-03F41253B164}">
+                <File Id="fil6DA950DD7CBD6D2078F23565B71FC292" Source="$(var.Deployd.Agent.TargetDir)\Deployd.Agent.exe.config" />
+            </Component>
+        </ComponentGroup>
+    </Fragment>
+</Wix>

@@ -2,24 +2,10 @@
 <GlobalAgentConfiguration xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <Environments>
     <DeploymentEnvironment>
-      <Name>Staging</Name>
+      <Name>Production</Name>
       <Packages>
-        <string>justgiving-sdk</string>
-		<string>GG.Search.Indexing.Service</string>
-          <string>GG.GlobalGiving.FeedConsumer.Service</string>
-          <string>GG.PaymentProcessing.Agent</string>
-          <string>GG.GlobalGiving.FeedConsumer.Service</string>
-          <string>GG.Integration.EmailVision.MsmqService</string>
-          <string>GG.Integration.EmailVision.NmpClient</string>
-          <string>GG.Service.MsmqListenerService</string>
-          <string>GG.Web.Website.Charity.ReportingServices</string>
-		<string>GG.Web.Website</string>
-		<string>GG.Api.Services</string>
-		<string>GG.Olr2</string>
-		<string>GG.Api.Services.Sms</string>
-		<string>GG.Api.Services.Data</string>
-		<string>GG.Web.Website.Charity</string>
-		<string>GG.Web.Website.Companies</string>
+        <string>TicketMuffin.Web</string>
+		<string>EmailRelayService</string>
       </Packages>
     </DeploymentEnvironment>
   </Environments>

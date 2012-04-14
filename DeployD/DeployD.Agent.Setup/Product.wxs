@@ -1,0 +1,228 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi"
+     xmlns:util="http://schemas.microsoft.com/wix/UtilExtension">
+    <Product Id="{EB183C22-1C47-4D06-A955-0ED97E7908D7}" Language="1033" Manufacturer="DeployD" Name="DeployD Agent" UpgradeCode="{E35443AE-FDAE-47FB-9DD4-72A510F063FF}" Version="1.0.0.0">
+        <Package 
+            Compressed="yes" InstallerVersion="200" Keywords="Installer" Languages="1033" SummaryCodepage="1252" />
+        <Directory Id="TARGETDIR" Name="SourceDir">
+            <Directory Id="ProgramFilesFolder">
+                <Directory Id="INSTALLDIR" Name="Deployd.Agent">
+                    <Directory Id="dir4AEF4F9FBCEE0807380C28E0D6A0FC3F" Name="DebugPackageSource" />
+                    <Directory Id="dir6A74B01B541131EEB415EF48EE377D49" Name="Scripts" />
+                    <Directory Id="dirC23EAAD2B1C85D53E3C3FD04F7ABA8F2" Name="Tools" />
+                    <Directory Id="dir87840717F317940223B660A677F57D7A" Name="WebUi" />
+                </Directory>
+            </Directory>
+        </Directory>
+        <Feature Id="ProductFeature" Level="1" Title="DeployD Agent" Description="The complete package" Display="expand" ConfigurableDirectory="INSTALLDIR">
+            <ComponentGroupRef Id="DeployD.Agent.Binaries"/>
+
+        </Feature>
+        <Media Id="1" Cabinet="product.cab" EmbedCab="yes" />
+        <UIRef Id="WixUI_Mondo" />
+        <UIRef Id="WixUI_ErrorProgressText" />
+        <Property Id="WIXUI_INSTALLDIR" Value="INSTALLDIR" />
+        <Property Id="NUGETFEEDURL" Value="http://feedserver/someurl" />
+        <UI>
+            <Dialog Id="MyDialog" Width="370" Height="270" Title="DeployD Agent" NoMinimize="yes">
+                <Control Id="FeedUrlLabel" X="10" Y="10" Type="Text" Text="Nuget feed url:" Width="70" Height="15" />
+                <Control Id="NugetFeedUrlEdit" 
+                         X="80" Y="10" Type="Edit" 
+                         Property="NUGETFEEDURL" Indirect="no" Text="[NUGETFEEDURL]" 
+                         Width="200" Height="15" />
+                <Control Id="Cancel" Type="PushButton" X="240" Y="243" Width="56" Height="17" Default="no" Text="Cancel">
+                    <Publish Event="EndDialog" Value="Exit"/>
+                </Control>
+                <Control Id="Install" Type="PushButton" X="304" Y="243" Width="56" Height="17" Default="yes" Text="Next">
+                    <Publish Event="EndDialog" Value="Return" />
+                </Control>
+            </Dialog>
+            <InstallUISequence>
+                <Show Dialog="MyDialog" Before="ExecuteAction" />
+            </InstallUISequence>
+        </UI>
+</Product>
+
+    <Fragment>
+        <ComponentGroup Id="DeployD.Agent.Binaries">
+            <Component Id="cmp66EB1842F6EC4B5E33CBF12BCD5ABBBC" Directory="INSTALLDIR" Guid="{F6070E0A-1B92-41CD-8D18-B06F516060ED}">
+                <File Id="fil446A4D8A8E07F64EE1D7B8ACA87F0376" KeyPath="yes" Source="$(var.Deployd.Agent.ProjectDir)\bin\$(var.Deployd.Agent.Configuration)\Deployd.Agent.application" />
+            </Component>
+            <Component Id="cmp68D6DC3BDEA47A52D962423FA8747688" Directory="INSTALLDIR" Guid="{8EED8300-C2D4-483C-B840-04C1F7E85A7C}">
+                <File Id="filC92427964CCBF4CD9956EB39F3DDCDDC" KeyPath="yes" Source="$(var.Deployd.Agent.ProjectDir)\bin\$(var.Deployd.Agent.Configuration)\Deployd.Agent.exe.config" />
+                <util:XmlFile Id="AppConfigSetNugetFeedUrl" Action="setValue" Permanent="yes" 
+                              File="[#filC92427964CCBF4CD9956EB39F3DDCDDC]"
+                     ElementPath="/configuration/appSettings/add[\[]@key='NuGetRepository'[\]]" Name="value"
+                     Value="[NUGETFEEDURL]" />
+            </Component>
+            <Component Id="cmp5E349D3672329D785B20746C1A2AF860" Directory="INSTALLDIR" Guid="{39DD14EC-CDA6-406A-AEE3-77014531BC0C}">
+                <File Id="filCF497FD778BA054CB95DCE2EE1DC9ABC" KeyPath="yes" Source="$(var.Deployd.Agent.ProjectDir)\bin\$(var.Deployd.Agent.Configuration)\Deployd.Agent.exe" />
+                <ServiceInstall
+                          Id="ServiceInstaller"
+                          Type="ownProcess"
+                          Vital="yes"
+                          Name="DeployD.Agent"
+                          DisplayName="DeployD Agent Service"
+                          Description="Monitoring and management service for DeployD Agent"
+                          Start="auto"
+                          Account="LocalSystem"
+                          ErrorControl="ignore"
+                          Interactive="no">
+                </ServiceInstall>
+                <ServiceControl Id="StopOrRemoveService" Stop="both" Remove="uninstall" Name="DeployD.Agent" Wait="yes" />
+            </Component>
+            <Component Id="cmpBDB6129C6D400E4422AD7ACE6F581921" Directory="INSTALLDIR" Guid="{50669155-9CA6-4860-BA3A-5FE703E6F055}">
+                <File Id="fil60E162362BE1221A4E7CFC0C9EE322F5" KeyPath="yes" Source="$(var.Deployd.Agent.ProjectDir)\bin\$(var.Deployd.Agent.Configuration)\Deployd.Agent.exe.manifest" />
+            </Component>
+            <Component Id="cmp25822868B7D60839F80C4B713375FE3B" Directory="INSTALLDIR" Guid="{12360C73-26DE-43E8-8E1B-5109967DC0C1}">
+                <File Id="fil79E0EB1F9B7643235E551EA49DF1CC07" KeyPath="yes" Source="$(var.Deployd.Agent.ProjectDir)\bin\$(var.Deployd.Agent.Configuration)\Deployd.Agent.pdb" />
+            </Component>
+            <Component Id="cmp35692E5EAB8CBA7FB2BB0A80F4076148" Directory="INSTALLDIR" Guid="{30FA8990-7B2D-47C5-9E6B-71F0E84EA21E}">
+                <File Id="fil871CE0844F5811A00A09880EBBA893EB" KeyPath="yes" Source="$(var.Deployd.Agent.ProjectDir)\bin\$(var.Deployd.Agent.Configuration)\Deployd.Agent.vshost.application" />
+            </Component>
+            <Component Id="cmp5ADCCB416AE19BBDC33A0607CE775352" Directory="INSTALLDIR" Guid="{24DE1A98-12FF-46C1-9779-9548583C0D82}">
+                <File Id="fil5B17D1084B29FFBB39BFA831A809AC69" KeyPath="yes" Source="$(var.Deployd.Agent.ProjectDir)\bin\$(var.Deployd.Agent.Configuration)\Deployd.Agent.vshost.exe" />
+            </Component>
+            <Component Id="cmp8679CB4570ED9D124401E61290A17B46" Directory="INSTALLDIR" Guid="{2F60CC66-EF01-479C-BD05-6FAB0F08CF44}">
+                <File Id="filF062AA1DC1EB6D8BC14BC751839ABA1C" KeyPath="yes" Source="$(var.Deployd.Agent.ProjectDir)\bin\$(var.Deployd.Agent.Configuration)\Deployd.Agent.vshost.exe.config" />
+            </Component>
+            <Component Id="cmp3113C563AFB1D52392F75A9C2E6E1BEF" Directory="INSTALLDIR" Guid="{BC252ACA-ED16-4730-BB7E-6B42BEFD6D9B}">
+                <File Id="fil5EBD11AB00F2E7ADB832C9DF801EDA08" KeyPath="yes" Source="$(var.Deployd.Agent.ProjectDir)\bin\$(var.Deployd.Agent.Configuration)\Deployd.Agent.vshost.exe.manifest" />
+            </Component>
+            <Component Id="cmp933E31A24769DEF6D05C16BF8FBB7150" Directory="INSTALLDIR" Guid="{3D8ECC5D-57AA-446F-A248-ABC57E3F471C}">
+                <File Id="fil5ED9AAB7009636EC65F2C02E4D84A1CF" KeyPath="yes" Source="$(var.Deployd.Agent.ProjectDir)\bin\$(var.Deployd.Agent.Configuration)\Deployd.Core.dll" />
+            </Component>
+            <Component Id="cmp8B05BBE43ECD2E08A6E9CC5667406011" Directory="INSTALLDIR" Guid="{4D1E996F-F25D-43F2-BCCB-459ECBA0ECC1}">
+                <File Id="fil5067669D71CC42C3CFBA87B60250EF85" KeyPath="yes" Source="$(var.Deployd.Agent.ProjectDir)\bin\$(var.Deployd.Agent.Configuration)\Deployd.Core.pdb" />
+            </Component>
+            <Component Id="cmp375F226751B298CD70903C1646985757" Directory="INSTALLDIR" Guid="{139C7143-3436-4973-840A-8DBDF4E5E6D9}">
+                <File Id="filBF38EEDD7B5695007E9582D7EF347826" KeyPath="yes" Source="$(var.Deployd.Agent.ProjectDir)\bin\$(var.Deployd.Agent.Configuration)\log4net.config" />
+            </Component>
+            <Component Id="cmp13D6573EA8CF3F99F44BAE837E2771F0" Directory="INSTALLDIR" Guid="{E3D8A6E3-6C1F-401D-B035-8BFCC0510BF5}">
+                <File Id="fil2991F53D601CDF7142D0A9E1B42E116E" KeyPath="yes" Source="$(var.Deployd.Agent.ProjectDir)\bin\$(var.Deployd.Agent.Configuration)\log4net.dll" />
+            </Component>
+            <Component Id="cmp01E20E7E5B034CCFC702911F4CB8D8D3" Directory="INSTALLDIR" Guid="{94FCA45A-86EE-4D5A-B340-B6B6D4962CE6}">
+                <File Id="filB985A413DD2217836B18C18553E7FDF4" KeyPath="yes" Source="$(var.Deployd.Agent.ProjectDir)\bin\$(var.Deployd.Agent.Configuration)\log4net.xml" />
+            </Component>
+            <Component Id="cmpBCE2F968D0F85C4587A9143FAF53D35C" Directory="INSTALLDIR" Guid="{F02A74C3-3829-498B-AFD9-052F8098E315}">
+                <File Id="fil0105F5F5015A1C209AE2CE38F29AE04B" KeyPath="yes" Source="$(var.Deployd.Agent.ProjectDir)\bin\$(var.Deployd.Agent.Configuration)\Nancy.dll" />
+            </Component>
+            <Component Id="cmpDC03A5E8FCE935B5CDF24C40839B32ED" Directory="INSTALLDIR" Guid="{0A0BC04C-2F3F-436D-B0B7-CD2E15B7E610}">
+                <File Id="fil31937B2018D4E424EBFDAE1AB8B14C4B" KeyPath="yes" Source="$(var.Deployd.Agent.ProjectDir)\bin\$(var.Deployd.Agent.Configuration)\Nancy.Hosting.Self.dll" />
+            </Component>
+            <Component Id="cmpBAE23BE89AE810D7893F476B6F110749" Directory="INSTALLDIR" Guid="{61499695-5754-415C-B5EC-B00EEC242A1C}">
+                <File Id="filD4B0F302C6FAE6849C9DBF16D28C9D12" KeyPath="yes" Source="$(var.Deployd.Agent.ProjectDir)\bin\$(var.Deployd.Agent.Configuration)\Nancy.Hosting.Wcf.dll" />
+            </Component>
+            <Component Id="cmpD639077C1B09696DE1AD33D44ED9B0B5" Directory="INSTALLDIR" Guid="{C8E3F6C9-A745-4A7E-97FA-ECE006C03403}">
+                <File Id="fil79B23C5C7186D395F205A943AA415838" KeyPath="yes" Source="$(var.Deployd.Agent.ProjectDir)\bin\$(var.Deployd.Agent.Configuration)\Nancy.ViewEngines.Razor.dll" />
+            </Component>
+            <Component Id="cmpA79F29C273A2521709044123D03040FE" Directory="INSTALLDIR" Guid="{1E1A0D8F-B852-4983-9B0F-A466A0FF675A}">
+                <File Id="filA0A7A9406F380561C37B0C8475AE7026" KeyPath="yes" Source="$(var.Deployd.Agent.ProjectDir)\bin\$(var.Deployd.Agent.Configuration)\Nancy.ViewEngines.Spark.dll" />
+            </Component>
+            <Component Id="cmp6C6E3A4782B29A777EAFACCECDE25A75" Directory="INSTALLDIR" Guid="{455FCE9A-4A2D-4DEE-9AA5-93981233580D}">
+                <File Id="fil61E2178807DDF4CB67E717F57A0B45E1" KeyPath="yes" Source="$(var.Deployd.Agent.ProjectDir)\bin\$(var.Deployd.Agent.Configuration)\Ninject.dll" />
+            </Component>
+            <Component Id="cmp5749FD83B3EEAEBE3B077B1E007052C7" Directory="INSTALLDIR" Guid="{76C86A0B-F1CE-4B3C-A549-53F61C4F10CB}">
+                <File Id="fil29CDEA61E45DDA2CF2DD980582A05DF4" KeyPath="yes" Source="$(var.Deployd.Agent.ProjectDir)\bin\$(var.Deployd.Agent.Configuration)\Ninject.pdb" />
+            </Component>
+            <Component Id="cmp5C51B63316FC79F8CB959D7C4711AACD" Directory="INSTALLDIR" Guid="{C3593DB0-342D-4374-917C-6E4F5ACE88FC}">
+                <File Id="fil306122A20210E68AE18CCA2D0E6EDE51" KeyPath="yes" Source="$(var.Deployd.Agent.ProjectDir)\bin\$(var.Deployd.Agent.Configuration)\Ninject.xml" />
+            </Component>
+            <Component Id="cmpE64455536329F5AAD499724114DC0AFA" Directory="INSTALLDIR" Guid="{CEAFBEFD-40F5-47F5-8AF3-0922AE80DA9B}">
+                <File Id="filB2CB86B1A666C5D3D8B32E0D297E30D0" KeyPath="yes" Source="$(var.Deployd.Agent.ProjectDir)\bin\$(var.Deployd.Agent.Configuration)\Spark.dll" />
+            </Component>
+            <Component Id="cmp1963A319253DB4ED15AA63534B133CB0" Directory="INSTALLDIR" Guid="{A0F97E69-07D6-4176-B2D8-999151FB2DF0}">
+                <File Id="filEDC3E6680E96C7725812F7EDF4988D99" KeyPath="yes" Source="$(var.Deployd.Agent.ProjectDir)\bin\$(var.Deployd.Agent.Configuration)\System.IO.Abstractions.dll" />
+            </Component>
+            <Component Id="cmp13B490DFF91D6C9B1C803F42C4514886" Directory="INSTALLDIR" Guid="{F4FD571E-EFF1-4D72-A1CE-4C5E79286DE2}">
+                <File Id="fil245255D736A65FF450551627D2DD773A" KeyPath="yes" Source="$(var.Deployd.Agent.ProjectDir)\bin\$(var.Deployd.Agent.Configuration)\System.Web.Razor.dll" />
+            </Component>
+            <Component Id="cmp695E5AA8857BB8EA2C3982C3A4011ED0" Directory="dir4AEF4F9FBCEE0807380C28E0D6A0FC3F" Guid="{1F57B0A3-889B-47AA-989A-183D3727A5F8}">
+                <File Id="fil04492AD9BE768565C9EA7B76988E6CDA" KeyPath="yes" Source="$(var.Deployd.Agent.ProjectDir)\bin\$(var.Deployd.Agent.Configuration)\DebugPackageSource\Deployd.Configuration.1.0.0.nupkg" />
+            </Component>
+            <Component Id="cmpB10A8BDBAA17EC63BDD34933860FF729" Directory="dir4AEF4F9FBCEE0807380C28E0D6A0FC3F" Guid="{D3CB3AEA-12AD-44DB-9C87-94625086867C}">
+                <File Id="fil4F3D454B323AD6890419EA7B2DAD9B4B" KeyPath="yes" Source="$(var.Deployd.Agent.ProjectDir)\bin\$(var.Deployd.Agent.Configuration)\DebugPackageSource\justgiving-sdk-1.5.4.nupkg" />
+            </Component>
+            <Component Id="cmp7543DF3AC9C559E7F95603B59D23CD49" Directory="dirA08C2232C473BA8E08953F09698450A6" Guid="{8E596A2D-1E4D-4020-83E0-0CEA6DEC5087}">
+                <File Id="filF5CA0DAAFE04881556524FE2CFB4C267" KeyPath="yes" Source="$(var.Deployd.Agent.ProjectDir)\bin\$(var.Deployd.Agent.Configuration)\Scripts\PS\Services.ps1" />
+            </Component>
+            <Component Id="cmp90000CD04F7749B864F0636B97A91BDD" Directory="dirC23EAAD2B1C85D53E3C3FD04F7ABA8F2" Guid="{20239620-D18B-4B21-A3CF-285B5688FC6A}">
+                <File Id="filBCE2E355FAF51632D9FF9D12609C3AC1" KeyPath="yes" Source="$(var.Deployd.Agent.ProjectDir)\bin\$(var.Deployd.Agent.Configuration)\Tools\Microsoft.Web.Publishing.Tasks.Dll" />
+            </Component>
+            <Component Id="cmpE32D00E7AB4F2C30B460DE02F0825A36" Directory="dirC23EAAD2B1C85D53E3C3FD04F7ABA8F2" Guid="{89FD3619-8D4C-4200-A0AB-ABD33A94632A}">
+                <File Id="fil74BA0DB2EF9D3C09A51A60FC5B0C3677" KeyPath="yes" Source="$(var.Deployd.Agent.ProjectDir)\bin\$(var.Deployd.Agent.Configuration)\Tools\NDesk.Options.dll" />
+            </Component>
+            <Component Id="cmpCCBAD50CF0261F1544C5734FAE9A3E7F" Directory="dirC23EAAD2B1C85D53E3C3FD04F7ABA8F2" Guid="{7213F171-39F8-4744-B8F8-334FF9460D1F}">
+                <File Id="fil5CBD2B90EC4803B0A3EE113616172B49" KeyPath="yes" Source="$(var.Deployd.Agent.ProjectDir)\bin\$(var.Deployd.Agent.Configuration)\Tools\TransformVsConfiguration.exe" />
+            </Component>
+            <Component Id="cmpA0A213ED8EE37DB7D0F3EE22A3FDE9C6" Directory="dir94337FEAF6EF05B58D75988A55824316" Guid="{00399B2D-67D5-4D28-8B81-033A39DCE388}">
+                <File Id="fil617D4850FA883B1F445653A5F1CDD7EB" KeyPath="yes" Source="$(var.Deployd.Agent.ProjectDir)\bin\$(var.Deployd.Agent.Configuration)\WebUi\Views\index.cshtml" />
+            </Component>
+            <Component Id="cmp795D2AC195605554CFD48CA84CC63D1F" Directory="dir94337FEAF6EF05B58D75988A55824316" Guid="{D6127754-FF04-4AA8-A240-3ECAAF4040C3}">
+                <File Id="fil700CFEE08EBA6E51A9A3E65BA161DAB8" KeyPath="yes" Source="$(var.Deployd.Agent.ProjectDir)\bin\$(var.Deployd.Agent.Configuration)\WebUi\Views\layout.cshtml" />
+            </Component>
+            <Component Id="cmpDF66CDF5493D324F2740D3B5BBB2139A" Directory="dir94337FEAF6EF05B58D75988A55824316" Guid="{6BC73B8B-C928-4794-952B-7C3AE1D3F240}">
+                <File Id="filAEE92A12C277E09B3FB3E7054196C89A" KeyPath="yes" Source="$(var.Deployd.Agent.ProjectDir)\bin\$(var.Deployd.Agent.Configuration)\WebUi\Views\package-details.cshtml" />
+            </Component>
+            <Component Id="cmpDE6D0B8B625197FE082F0327FBA37A42" Directory="dir94337FEAF6EF05B58D75988A55824316" Guid="{F7A61854-986F-499C-A554-93CC1DFFE1FB}">
+                <File Id="fil3A56DCA0DA07A62FD4D87061A95BBD2C" KeyPath="yes" Source="$(var.Deployd.Agent.ProjectDir)\bin\$(var.Deployd.Agent.Configuration)\WebUi\Views\packages.cshtml" />
+            </Component>
+            <Component Id="cmp88A4BA9F7C6C9961CA0520E2AB2836F1" Directory="dir94337FEAF6EF05B58D75988A55824316" Guid="{49A9AB8C-EE48-4B91-9D1B-56A5FAD95576}">
+                <File Id="filD0D4C40EEFA0349124C7E160DDE08EAC" KeyPath="yes" Source="$(var.Deployd.Agent.ProjectDir)\bin\$(var.Deployd.Agent.Configuration)\WebUi\Views\sitrep.cshtml" />
+            </Component>
+            <Component Id="cmp3EE68AA7BCC0719FF8C86BD1C0DE7404" Directory="dirF92A0AA50EE6D965EFDC0F45769BFA6B" Guid="{7DB8E0F7-94A8-4084-AD15-256889A7B07A}">
+                <File Id="fil23CB98E19A1DEC6C61840765EBFF71FC" KeyPath="yes" Source="$(var.Deployd.Agent.ProjectDir)\bin\$(var.Deployd.Agent.Configuration)\WebUi\Views\installations\completed.cshtml" />
+            </Component>
+            <Component Id="cmp168487347A25E33C1022DE27B4F1775F" Directory="dirF92A0AA50EE6D965EFDC0F45769BFA6B" Guid="{C0D55627-3FB8-4C97-B10D-1C9F1CCECBAB}">
+                <File Id="fil29454BEBA655432088E196C67C4A9268" KeyPath="yes" Source="$(var.Deployd.Agent.ProjectDir)\bin\$(var.Deployd.Agent.Configuration)\WebUi\Views\installations\current.cshtml" />
+            </Component>
+            <Component Id="cmp903B55DEC109D7EAFAC726FBF062C349" Directory="dir3123ED679E4E2D092C943CF5FAE06A3B" Guid="{57EED961-502A-4E58-A8EA-B6C8ADBAB2DF}">
+                <File Id="filF04166332443DEC8FE6FD60A2D12BDF2" KeyPath="yes" Source="$(var.Deployd.Agent.ProjectDir)\bin\$(var.Deployd.Agent.Configuration)\WebUi\Views\logs\list.cshtml" />
+            </Component>
+            <Component Id="cmp07C327FEE7F358DEF882610A0033C47F" Directory="dir3123ED679E4E2D092C943CF5FAE06A3B" Guid="{D92F00A0-07B5-4A29-91DB-9FEA8C190363}">
+                <File Id="filBC1C1A87884DED53F72D1911E894347C" KeyPath="yes" Source="$(var.Deployd.Agent.ProjectDir)\bin\$(var.Deployd.Agent.Configuration)\WebUi\Views\logs\log.cshtml" />
+            </Component>
+            <Component Id="cmp002CBFACC84B356E41FD3DA247C51A4B" Directory="dir3123ED679E4E2D092C943CF5FAE06A3B" Guid="{E270EF4C-4748-4289-9F8C-4922008DC4E5}">
+                <File Id="fil567F8D963CDEC5433253A48694893A33" KeyPath="yes" Source="$(var.Deployd.Agent.ProjectDir)\bin\$(var.Deployd.Agent.Configuration)\WebUi\Views\logs\packages.cshtml" />
+            </Component>
+        </ComponentGroup>
+    </Fragment>
+    <Fragment>
+        <DirectoryRef Id="dirF92A0AA50EE6D965EFDC0F45769BFA6B" />
+    </Fragment>
+    <Fragment>
+        <DirectoryRef Id="dir4AEF4F9FBCEE0807380C28E0D6A0FC3F" />
+    </Fragment>
+    <Fragment>
+        <DirectoryRef Id="dirA08C2232C473BA8E08953F09698450A6" />
+    </Fragment>
+    <Fragment>
+        <DirectoryRef Id="dirC23EAAD2B1C85D53E3C3FD04F7ABA8F2" />
+    </Fragment>
+    <Fragment>
+        <DirectoryRef Id="dir3123ED679E4E2D092C943CF5FAE06A3B" />
+    </Fragment>
+    <Fragment>
+        <DirectoryRef Id="dir94337FEAF6EF05B58D75988A55824316" />
+    </Fragment>
+    <Fragment>
+        <DirectoryRef Id="dir94337FEAF6EF05B58D75988A55824316">
+            <Directory Id="dir3123ED679E4E2D092C943CF5FAE06A3B" Name="logs" />
+        </DirectoryRef>
+    </Fragment>
+    <Fragment>
+        <DirectoryRef Id="dir87840717F317940223B660A677F57D7A">
+            <Directory Id="dir94337FEAF6EF05B58D75988A55824316" Name="Views" />
+        </DirectoryRef>
+    </Fragment>
+    <Fragment>
+        <DirectoryRef Id="dir6A74B01B541131EEB415EF48EE377D49">
+            <Directory Id="dirA08C2232C473BA8E08953F09698450A6" Name="PS" />
+        </DirectoryRef>
+    </Fragment>
+    <Fragment>
+        <DirectoryRef Id="dir94337FEAF6EF05B58D75988A55824316">
+            <Directory Id="dirF92A0AA50EE6D965EFDC0F45769BFA6B" Name="installations" />
+        </DirectoryRef>
+    </Fragment>
+</Wix>

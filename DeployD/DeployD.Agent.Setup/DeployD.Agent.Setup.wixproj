@@ -1,13 +1,13 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
-	<ToolPath>$(WixToolPath)</ToolPath>
+      <WixToolsPath Condition=" '$(WixToolsPath)' == ''">..\packages\wix.3.5</WixToolsPath>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
     <ProductVersion>3.5</ProductVersion>
-    <ProjectGuid>{ffa1068f-ab74-4d3e-9fbb-c3ad032e29f6}</ProjectGuid>
+    <ProjectGuid>{e5c46369-9fc6-4fee-b2f1-06a5b98bfaab}</ProjectGuid>
     <SchemaVersion>2.0</SchemaVersion>
-    <OutputName>Deployd.Agent.Installer</OutputName>
+    <OutputName>DeployD.Agent.Setup</OutputName>
     <OutputType>Package</OutputType>
     <WixTargetsPath Condition=" '$(WixTargetsPath)' == '' AND '$(MSBuildExtensionsPath32)' != '' ">$(MSBuildExtensionsPath32)\Microsoft\WiX\v3.x\Wix.targets</WixTargetsPath>
     <WixTargetsPath Condition=" '$(WixTargetsPath)' == '' ">$(MSBuildExtensionsPath)\Microsoft\WiX\v3.x\Wix.targets</WixTargetsPath>
@@ -15,25 +15,31 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
     <OutputPath>bin\$(Configuration)\</OutputPath>
     <IntermediateOutputPath>obj\$(Configuration)\</IntermediateOutputPath>
-    <DefineConstants>Debug</DefineConstants>
+    <DefineConstants>Debug;Version=1.0.0.0</DefineConstants>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
     <OutputPath>bin\$(Configuration)\</OutputPath>
     <IntermediateOutputPath>obj\$(Configuration)\</IntermediateOutputPath>
+      <DefineConstants>Version=$(Version)</DefineConstants>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="Deployd.Agent.Installer.wxs" />
+    <Compile Include="Product.wxs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Deployd.Agent\Deployd.Agent.csproj">
       <Name>Deployd.Agent</Name>
       <Project>{a14cafbc-947d-4381-8090-ac03d005af66}</Project>
       <Private>True</Private>
-      <DoNotHarvest>True</DoNotHarvest>
+      <DoNotHarvest>False</DoNotHarvest>
       <RefProjectOutputGroups>Binaries;Content;Satellites</RefProjectOutputGroups>
-      <RefTargetDir>INSTALLLOCATION</RefTargetDir>
+      <RefTargetDir>INSTALLDIR</RefTargetDir>
     </ProjectReference>
   </ItemGroup>
+    <!-- Item group for the libraries needed by the installer -->
+    <ItemGroup>
+        <WixExtension Include="..\packages\wix.3.5\WixUIExtension.dll"></WixExtension>
+		<WixExtension Include="..\packages\wix.3.5\WixUtilExtension.dll"></WixExtension>
+    </ItemGroup>
   <Import Project="$(WixTargetsPath)" />
   <!--
 	To modify your build process, add your task inside one of the targets below and uncomment it.

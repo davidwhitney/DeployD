@@ -1,0 +1,27 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+    <Product Id="{EBC1109E-2E70-48D8-9F9B-BC531801D648}" Language="1033" Manufacturer="PUT-COMPANY-NAME-HERE" Name="PUT-PRODUCT-NAME-HERE" UpgradeCode="{E5AF39E4-2335-4FCB-B833-F436EDEF7BEB}" Version="1.0.0.0">
+        <Package Compressed="yes" InstallerVersion="200" />
+        <Directory Id="TARGETDIR" Name="SourceDir" />
+        <Feature Id="ProductFeature" Level="1" Title="PUT-FEATURE-TITLE-HERE">
+            <ComponentGroupRef Id="Deployd.Agent.Symbols" />
+            <ComponentGroupRef Id="DeployDAgentSattelites" />
+        </Feature>
+        <Media Id="1" Cabinet="product.cab" EmbedCab="yes" />
+    </Product>
+    <Fragment>
+        <DirectoryRef Id="Deployd.Agent.Symbols" />
+    </Fragment>
+    <Fragment>
+        <ComponentGroup Id="Deployd.Agent.Symbols">
+            <ComponentRef Id="cmpE32CC10964C8EB61D9BC12C926F3669B" />
+        </ComponentGroup>
+    </Fragment>
+    <Fragment>
+        <ComponentGroup Id="DeployDAgentSattelites">
+            <Component Id="cmpE32CC10964C8EB61D9BC12C926F3669B" Directory="Deployd.Agent.Symbols" Guid="{F8C41EA2-832B-45CC-A02A-F05583BC59AD}">
+                <File Id="fil35FE3A0193B46902235201B92BE81180" Source="$(var.Deployd.Agent.TargetDir)\Deployd.Agent.pdb" />
+            </Component>
+        </ComponentGroup>
+    </Fragment>
+</Wix>

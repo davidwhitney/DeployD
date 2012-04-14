@@ -1,0 +1,31 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+    <Product Id="{32FA0752-2B4E-420F-A6CE-19CCC62733D2}" Language="1033" Manufacturer="PUT-COMPANY-NAME-HERE" Name="PUT-PRODUCT-NAME-HERE" UpgradeCode="{EB05EB73-AD35-4375-BBD2-2A1E9191D2B3}" Version="1.0.0.0">
+        <Package Compressed="yes" InstallerVersion="200" />
+        <Directory Id="TARGETDIR" Name="SourceDir" />
+        <Feature Id="ProductFeature" Level="1" Title="PUT-FEATURE-TITLE-HERE">
+            <ComponentGroupRef Id="Deployd.Agent.Binaries" />
+            <ComponentGroupRef Id="DeployDAgentBinaries" />
+        </Feature>
+        <Media Id="1" Cabinet="product.cab" EmbedCab="yes" />
+    </Product>
+    <Fragment>
+        <DirectoryRef Id="Deployd.Agent.Binaries" />
+    </Fragment>
+    <Fragment>
+        <ComponentGroup Id="Deployd.Agent.Binaries">
+            <ComponentRef Id="cmp5F262F050E2451E1C0C5DA99759C367E" />
+            <ComponentRef Id="cmp18AF0512835F0DEC4EFFA5D87C7B1483" />
+        </ComponentGroup>
+    </Fragment>
+    <Fragment>
+        <ComponentGroup Id="DeployDAgentBinaries">
+            <Component Id="cmp5F262F050E2451E1C0C5DA99759C367E" Directory="Deployd.Agent.Binaries" Guid="{50BCD34F-188D-4DF0-B4F2-4F84594D2838}">
+                <File Id="filB0F150D9E21AE08BCC6A2274FE282046" Source="$(var.Deployd.Agent.TargetDir)\Deployd.Agent.exe" />
+            </Component>
+            <Component Id="cmp18AF0512835F0DEC4EFFA5D87C7B1483" Directory="Deployd.Agent.Binaries" Guid="{42039E2F-DD76-476D-B224-F8E6CA0A1078}">
+                <File Id="fil6DA950DD7CBD6D2078F23565B71FC292" Source="$(var.Deployd.Agent.TargetDir)\Deployd.Agent.exe.config" />
+            </Component>
+        </ComponentGroup>
+    </Fragment>
+</Wix>
