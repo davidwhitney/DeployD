@@ -78,18 +78,6 @@
             <Component Id="cmp25822868B7D60839F80C4B713375FE3B" Directory="INSTALLDIR" Guid="{12360C73-26DE-43E8-8E1B-5109967DC0C1}">
                 <File Id="fil79E0EB1F9B7643235E551EA49DF1CC07" KeyPath="yes" Source="$(var.Deployd.Agent.ProjectDir)\bin\$(var.Deployd.Agent.Configuration)\Deployd.Agent.pdb" />
             </Component>
-            <Component Id="cmp35692E5EAB8CBA7FB2BB0A80F4076148" Directory="INSTALLDIR" Guid="{30FA8990-7B2D-47C5-9E6B-71F0E84EA21E}">
-                <File Id="fil871CE0844F5811A00A09880EBBA893EB" KeyPath="yes" Source="$(var.Deployd.Agent.ProjectDir)\bin\$(var.Deployd.Agent.Configuration)\Deployd.Agent.vshost.application" />
-            </Component>
-            <Component Id="cmp5ADCCB416AE19BBDC33A0607CE775352" Directory="INSTALLDIR" Guid="{24DE1A98-12FF-46C1-9779-9548583C0D82}">
-                <File Id="fil5B17D1084B29FFBB39BFA831A809AC69" KeyPath="yes" Source="$(var.Deployd.Agent.ProjectDir)\bin\$(var.Deployd.Agent.Configuration)\Deployd.Agent.vshost.exe" />
-            </Component>
-            <Component Id="cmp8679CB4570ED9D124401E61290A17B46" Directory="INSTALLDIR" Guid="{2F60CC66-EF01-479C-BD05-6FAB0F08CF44}">
-                <File Id="filF062AA1DC1EB6D8BC14BC751839ABA1C" KeyPath="yes" Source="$(var.Deployd.Agent.ProjectDir)\bin\$(var.Deployd.Agent.Configuration)\Deployd.Agent.vshost.exe.config" />
-            </Component>
-            <Component Id="cmp3113C563AFB1D52392F75A9C2E6E1BEF" Directory="INSTALLDIR" Guid="{BC252ACA-ED16-4730-BB7E-6B42BEFD6D9B}">
-                <File Id="fil5EBD11AB00F2E7ADB832C9DF801EDA08" KeyPath="yes" Source="$(var.Deployd.Agent.ProjectDir)\bin\$(var.Deployd.Agent.Configuration)\Deployd.Agent.vshost.exe.manifest" />
-            </Component>
             <Component Id="cmp933E31A24769DEF6D05C16BF8FBB7150" Directory="INSTALLDIR" Guid="{3D8ECC5D-57AA-446F-A248-ABC57E3F471C}">
                 <File Id="fil5ED9AAB7009636EC65F2C02E4D84A1CF" KeyPath="yes" Source="$(var.Deployd.Agent.ProjectDir)\bin\$(var.Deployd.Agent.Configuration)\Deployd.Core.dll" />
             </Component>
