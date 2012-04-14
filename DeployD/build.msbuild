@@ -9,7 +9,7 @@
 		Projects="Deployd.sln"
 		Targets="Clean;Build"
 		BuildInParallel="true"
-		Properties="Configuration=$(Configuration)" />
+		Properties="Configuration=$(Configuration);WixToolPath=$(MSBuildProjectDirectory)\packages\Wix.3.5" />
 </Target>
 
 <Target Name="BuildMsi">
