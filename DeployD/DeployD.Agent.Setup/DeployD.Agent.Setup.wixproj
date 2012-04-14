@@ -7,7 +7,7 @@
     <ProductVersion>3.5</ProductVersion>
     <ProjectGuid>{e5c46369-9fc6-4fee-b2f1-06a5b98bfaab}</ProjectGuid>
     <SchemaVersion>2.0</SchemaVersion>
-    <OutputName>DeployD.Agent.Setup</OutputName>
+    <OutputName>DeployD.Agent.Setup.$(Version)</OutputName>
     <OutputType>Package</OutputType>
     <WixTargetsPath Condition=" '$(WixTargetsPath)' == '' AND '$(MSBuildExtensionsPath32)' != '' ">$(MSBuildExtensionsPath32)\Microsoft\WiX\v3.x\Wix.targets</WixTargetsPath>
     <WixTargetsPath Condition=" '$(WixTargetsPath)' == '' ">$(MSBuildExtensionsPath)\Microsoft\WiX\v3.x\Wix.targets</WixTargetsPath>
