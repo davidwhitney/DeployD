@@ -6,6 +6,8 @@
 
 <h2>Available Packages</h2>
 
+<p>Feed Url: @Model.NugetRepository</p>
+
 <form method="post" action="/packages/UpdateAllTo">
 	<input type="submit" value="Update all to:"/> <select name="specificVersion">
 					   @foreach(string version in Model.AvailableVersions)

@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Threading.Tasks;
 using Deployd.Agent.WebUi.Models;
+using Deployd.Core.AgentConfiguration;
 using Deployd.Core.Installation;
 using Deployd.Core.PackageCaching;
 
@@ -9,7 +10,7 @@ namespace Deployd.Agent.WebUi.Converters
 {
     public static class RunningTasksToPackageListViewModelConverter
     {
-        public static PackageListViewModel Convert(ILocalPackageCache cache, RunningInstallationTaskList runningTasks, IInstalledPackageArchive installPackageArchive, CompletedInstallationTaskList completedTasks)
+        public static PackageListViewModel Convert(ILocalPackageCache cache, RunningInstallationTaskList runningTasks, IInstalledPackageArchive installPackageArchive, CompletedInstallationTaskList completedTasks, IAgentSettings agentSettings)
         {
             var model = new PackageListViewModel();
 
@@ -70,6 +71,7 @@ namespace Deployd.Agent.WebUi.Converters
             model.AvailableVersions =
                 cache.AllCachedPackages().Select(p => p.Version.ToString()).Distinct().OrderByDescending(s => s);
 
+            model.NugetRepository = agentSettings.NuGetRepository;
             return model;
         }
     }

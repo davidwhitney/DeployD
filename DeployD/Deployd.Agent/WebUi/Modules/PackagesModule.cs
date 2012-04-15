@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Deployd.Agent.WebUi.Converters;
 using Deployd.Agent.WebUi.Models;
+using Deployd.Core.AgentConfiguration;
 using Deployd.Core.Hosting;
 using Deployd.Core.Installation;
 using Deployd.Core.PackageCaching;
@@ -24,7 +25,8 @@ namespace Deployd.Agent.WebUi.Modules
                 var runningTasks = Container().GetType<RunningInstallationTaskList>();
                 var installCache = Container().GetType<IInstalledPackageArchive>();
                 var completedTasks = Container().GetType<CompletedInstallationTaskList>();
-                var model = RunningTasksToPackageListViewModelConverter.Convert(cache, runningTasks, installCache, completedTasks);
+                var agentSettings = Container().GetType<IAgentSettings>();
+                var model = RunningTasksToPackageListViewModelConverter.Convert(cache, runningTasks, installCache, completedTasks, agentSettings);
                 return this.ViewOrJson("packages.cshtml", model);
             };
             
