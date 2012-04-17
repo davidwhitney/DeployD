@@ -98,9 +98,16 @@
 
 <script type="text/template" id="agent-log-packages-list-template">
     <p><a href="/#">&lt; up to agent list</a></p>
+    <h2>Server logs for <%=hostname%></h2>
+    <ul>
+        <% _(serverLogCollection.models).each(function(log) {%>
+            <%console.log('log file: ' + log.get('LogFileName'));%>
+            <li><a href="/#/logs/<%=hostname%>/server/<%=log.get('LogFileName')%>"><%=log.get('LogFileName')%> <%=log.get('DateCreatedString')%></a></li>
+        <%});%>
+    </ul>
     <h2>Package logs for <%=hostname%></h2>
     <ul>
-        <% _(models).each(function(logFileFolder) {%>
+        <% _(logs.models).each(function(logFileFolder) {%>
             <li><a href="#/logs/<%=hostname%>/<%=logFileFolder.get('PackageId')%>"><%=logFileFolder.get('PackageId')%></a></li>
         <%});%>
     </ul>

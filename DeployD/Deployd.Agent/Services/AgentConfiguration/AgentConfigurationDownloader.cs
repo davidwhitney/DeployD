@@ -29,7 +29,15 @@ namespace Deployd.Agent.Services.AgentConfiguration
 
         public void DownloadAgentConfiguration()
         {
-            var configPackage = DownloadConfigurationPackage();
+            IPackage configPackage = null;
+            try
+            {
+                configPackage = DownloadConfigurationPackage();
+            } catch(Exception ex)
+            {
+                Logger.Error("Could not download configuration package", ex);
+                return;
+            }
 
             try
             {

@@ -25,6 +25,8 @@ namespace Deployd.Agent.Services.Management
             InstallationsModule.Container = AppContext.Container;
             LogModule.Container = AppContext.Container;
 
+            Nancy.Json.JsonSettings.MaxJsonLength = 1024*1024*5; // 5mb max
+
             try
             {
                 WebUiAddress = new Uri("http://localhost:9999/");

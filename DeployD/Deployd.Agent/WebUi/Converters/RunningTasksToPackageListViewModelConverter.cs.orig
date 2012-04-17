@@ -1,0 +1,80 @@
+﻿using System;
+using System.Linq;
+using System.Threading.Tasks;
+using Deployd.Agent.WebUi.Models;
+using Deployd.Core.Installation;
+using Deployd.Core.PackageCaching;
+
+namespace Deployd.Agent.WebUi.Converters
+{
+    public static class RunningTasksToPackageListViewModelConverter
+    {
+<<<<<<< HEAD
+        public static PackageListViewModel Convert(INuGetPackageCache cache, RunningInstallationTaskList runningTasks, ICurrentInstalledCache installCache, CompletedInstallationTaskList completedTasks)
+=======
+        public static PackageListViewModel Convert(ILocalPackageCache cache, RunningInstallationTaskList runningTasks, IInstalledPackageArchive installPackageArchive)
+>>>>>>> d459994be1e0a58aa2fe1240aeb1b6f69da4f6dc
+        {
+            var model = new PackageListViewModel();
+
+            foreach(var packageId in cache.AvailablePackages)
+            {
+                var package = new LocalPackageInformation
+                                  {
+                                      PackageId = packageId,
+                                      LatestAvailableVersion = cache.GetLatestVersion(packageId).Version.ToString()
+                                  };
+
+                var installedPackage = installPackageArchive.GetCurrentInstalledVersion(packageId);
+                package.InstalledVersion = installedPackage == null ? "0.0.0.0" : installedPackage.Version.ToString();
+
+                package.LastInstallationTask =
+                    completedTasks
+                        .Where(t => t.PackageId == packageId).OrderByDescending(t => t.LogFileName).
+                        FirstOrDefault();
+
+                package.CurrentTask = runningTasks.Count > 0 ? runningTasks
+                           .Where(t => t.PackageId == packageId)
+                           .Select(t =>
+                                       {
+                                           var lastOrDefault = t.ProgressReports.LastOrDefault();
+                                           return lastOrDefault != null ? new InstallTaskViewModel
+                                                                               {
+                                                                                   Messages = t.ProgressReports.Select(pr => pr.Message).ToArray(),
+                                                                                   Status = Enum.GetName(typeof(TaskStatus), t.Task.Status),
+                                                                                   PackageId = t.PackageId,
+                                                                                   Version = t.Version,
+                                                                                   LastMessage = t.ProgressReports.Count > 0 ? lastOrDefault.Message : ""
+                                                                               } : null;
+                                       }).FirstOrDefault()
+                           : null;
+
+                package.AvailableVersions = cache.AvailablePackageVersions(packageId).ToList();
+                model.Packages.Add(package);
+            }
+
+            model.CurrentTasks = runningTasks
+                .Select(t =>
+                            {
+                                var progressReport = t.ProgressReports.LastOrDefault();
+                                return progressReport != null
+                                           ? new InstallTaskViewModel
+                                                 {
+                                                     Messages = t.ProgressReports.Select(pr => pr.Message).ToArray(),
+                                                     Status = Enum.GetName(typeof (TaskStatus), t.Task.Status),
+                                                     PackageId = t.PackageId,
+                                                     Version = t.Version,
+                                                     LastMessage =
+                                                         t.ProgressReports.Count > 0 ? progressReport.Message : ""
+                                                 }
+                                           : null;
+                            }).ToList();
+
+
+            model.AvailableVersions =
+                cache.AllCachedPackages().Select(p => p.Version.ToString()).Distinct().OrderByDescending(s => s);
+
+            return model;
+        }
+    }
+}

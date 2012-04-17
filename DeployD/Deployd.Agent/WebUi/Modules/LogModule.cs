@@ -59,7 +59,7 @@ namespace Deployd.Agent.WebUi.Modules
                 {
                     var agentSettings = Container().GetType<IAgentSettings>();
                     var fileSystem = Container().GetType<IFileSystem>();
-                    var viewModel = LoadLogViewModel(logFilename, fileSystem, agentSettings);
+                    var viewModel = LoadLogViewModel(logFilename, fileSystem, agentSettings, true);
                     return this.ViewOrJson("logs/log.cshtml", viewModel);
                 }catch(ArgumentException)
                 {
@@ -78,10 +78,10 @@ namespace Deployd.Agent.WebUi.Modules
             var logDirectoryPath = GetLogDirectory(agentSettings);
             var fileList = fileSystem.Directory.GetFiles(logDirectoryPath, "*.log", SearchOption.TopDirectoryOnly);
 
-            return new LogListViewModel(fileList.Select(f => LoadLogViewModel(f, fileSystem, agentSettings))){Group="server"};
+            return new LogListViewModel(fileList.Select(f => LoadLogViewModel(f, fileSystem, agentSettings, false))){Group="server"};
         }
 
-        private static LogViewModel LoadLogViewModel(string logFilename, IFileSystem fileSystem, IAgentSettings agentSettings, string subFolder=null)
+        private static LogViewModel LoadLogViewModel(string logFilename, IFileSystem fileSystem, IAgentSettings agentSettings, bool includeContents, string subFolder=null)
         {
             string logDirectory = "";
             if (string.IsNullOrWhiteSpace(subFolder))
@@ -108,18 +108,20 @@ namespace Deployd.Agent.WebUi.Modules
                                     DateModified = fileSystem.File.GetLastWriteTime(logFilePath)
                                 };
 
-
-            using (var stream = new FileStream(logFilePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
-            using (var reader = new StreamReader(stream))
+            if (includeContents)
             {
-                viewModel.LogContents = reader.ReadToEnd();
+                using (var stream = new FileStream(logFilePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
+                using (var reader = new StreamReader(stream))
+                {
+                    viewModel.LogContents = reader.ReadToEnd();
+                }
             }
             return viewModel;
         }
 
         private static LogViewModel GetLog(IFileSystem fileSystem, IAgentSettings agentSettings, string packageId, string filename)
         {
-            return LoadLogViewModel(filename, fileSystem, agentSettings, packageId);
+            return LoadLogViewModel(filename, fileSystem, agentSettings, true, packageId);
         }
 
         private static List<string> GetPackageLogDirectories(IFileSystem fileSystem, IAgentSettings agentSettings)
@@ -141,7 +143,7 @@ namespace Deployd.Agent.WebUi.Modules
 
                 if (logFiles != null)
                 {
-                    viewModel.AddRange(logFiles.Select(f =>
+                    viewModel.Logs.AddRange(logFiles.Select(f =>
                     {
                         var fileInfo1 = fileSystem.FileInfo.FromFileName(f);
                         return new LogViewModel

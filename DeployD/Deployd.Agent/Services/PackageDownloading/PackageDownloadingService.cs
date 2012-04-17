@@ -1,10 +1,12 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using Deployd.Agent.Services.AgentConfiguration;
 using Deployd.Core;
 using Deployd.Core.AgentConfiguration;
 using Deployd.Core.Hosting;
 using Deployd.Core.PackageCaching;
 using Deployd.Core.PackageTransport;
+using NuGet;
 using log4net;
 
 namespace Deployd.Agent.Services.PackageDownloading
@@ -44,10 +46,24 @@ namespace Deployd.Agent.Services.PackageDownloading
         public void FetchPackages()
         {
             var packages = _agentConfigurationManager.GetWatchedPackages(_settings.DeploymentEnvironment);
-            
-            foreach (var latestPackageOfType in packages.Select(packageId => AllPackagesQuery.GetLatestPackage(packageId)).Where(latestPackageOfType => latestPackageOfType != null))
+
+            foreach(var packageId in packages)
             {
-                AgentCache.Add(latestPackageOfType);
+                IPackage latestPackage = null;
+                try
+                {
+                    latestPackage = AllPackagesQuery.GetLatestPackage(packageId);
+                }
+                catch (Exception ex)
+                {
+                    Logger.Error("Failed to download latest version of " + packageId, ex);
+                    continue;
+                }
+
+                if (latestPackage == null)
+                    continue;
+
+                AgentCache.Add(latestPackage);
             }
         }
     }
