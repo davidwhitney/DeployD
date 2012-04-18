@@ -22,6 +22,7 @@ namespace Deployd.Agent.WebUi.Modules
                 var agentSettings = Container().GetType<IAgentSettings>();
                 var fileSystem = Container().GetType<IFileSystem>();
                 var packageList = GetPackageLogDirectories(fileSystem, agentSettings);
+                packageList.Insert(0,"server");
                 return this.ViewOrJson("logs/packages.cshtml", packageList);
             };
 
