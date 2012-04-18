@@ -132,10 +132,10 @@
             <Component Id="cmp13B490DFF91D6C9B1C803F42C4514886" Directory="INSTALLDIR" Guid="{F4FD571E-EFF1-4D72-A1CE-4C5E79286DE2}">
                 <File Id="fil245255D736A65FF450551627D2DD773A" KeyPath="yes" Source="$(var.Deployd.Agent.ProjectDir)\bin\$(var.Deployd.Agent.Configuration)\System.Web.Razor.dll" />
             </Component>
-            <Component Id="cmp13B490DFF91D6C9B1C803F42C4514886" Directory="INSTALLDIR" Guid="{4361D93D-88A8-4315-95F7-24C23CB54011}">
+            <Component Id="cmp13B490DFF91D6C9B1C803F42C4514887" Directory="INSTALLDIR" Guid="{4361D93D-88A8-4315-95F7-24C23CB54011}">
                 <File Id="fil245255D736A65FF450551627D2DD773B" KeyPath="yes" Source="$(var.Deployd.Agent.ProjectDir)\bin\$(var.Deployd.Agent.Configuration)\Microsoft.Web.Administration.dll" />
             </Component>
-            <Component Id="cmp13B490DFF91D6C9B1C803F42C4514886" Directory="INSTALLDIR" Guid="{1689DA9A-FC8A-4D9B-99AE-80E61AD641D2}">
+            <Component Id="cmp13B490DFF91D6C9B1C803F42C4514888" Directory="INSTALLDIR" Guid="{1689DA9A-FC8A-4D9B-99AE-80E61AD641D2}">
                 <File Id="fil245255D736A65FF450551627D2DD773C" KeyPath="yes" Source="$(var.Deployd.Agent.ProjectDir)\bin\$(var.Deployd.Agent.Configuration)\Microsoft.Web.Infrastructure.dll" />
             </Component>
             <Component Id="cmp695E5AA8857BB8EA2C3982C3A4011ED0" Directory="dir4AEF4F9FBCEE0807380C28E0D6A0FC3F" Guid="{1F57B0A3-889B-47AA-989A-183D3727A5F8}">
