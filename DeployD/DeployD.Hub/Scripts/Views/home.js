@@ -213,7 +213,8 @@ var _manageAgentDialogOpen = false;
         events: {
             'click a.close-dialog': 'closeDialog',
             'submit form#apply-versions-form': 'startInstall',
-            'click button.update-agent': 'startInstallSpecificPackage'
+            'click button.update-agent': 'startInstallSpecificPackage',
+            'change input.select-package' : 'togglePackageOptions'
         },
         initialize: function () {
             _.bindAll(this, 'render');
@@ -234,10 +235,19 @@ var _manageAgentDialogOpen = false;
             }
         },
         update: function() {
+            if (this.userInteracting())
+                return;
+            
             this.model.fetch({ success: this.render });
         },
         render: function () {
             _manageAgentDialogOpen = true;
+            
+            if (this.userInteracting())
+            {
+                return;
+            }
+
             var viewModel = {
                 hostname: this.model.get('id'),
                 packages: this.model.get('packages')
@@ -255,12 +265,15 @@ var _manageAgentDialogOpen = false;
         startInstall: function () {
             var url = $('form', this.$el).attr('action');
             var data = '';
-            var selectors = $('form select', this.$el);
-            $(selectors).each(function (index, element) {
+            var selectedPackages = $('input.select-package:checked', this.$el);
+            $(selectedPackages).each(function (index, element) {
+                var packageId = $(element).attr('data-id');
+                var selectedVersion = $('select[name="'+packageId+'"]', this.$el).val();
+                
                 if (data.length > 0) {
                     data += '&';
                 }
-                data += $(element).attr('name') + '=' + $(element).val();
+                data += packageId + '=' + selectedVersion;
             });
             $.post(url, data);
 
@@ -279,6 +292,19 @@ var _manageAgentDialogOpen = false;
             function () { agentsListView.updateAll(); });
             
             return false;
+        },
+        togglePackageOptions: function (event) {
+            
+            var packageId = $(event.target).attr('data-id');
+            var control = $(".package-control", $(event.target).parent());
+            if ($(control).css('display')=='none') {
+                $(control).show();
+            } else {
+                control.hide();
+            }
+        },
+        userInteracting: function() {
+            return ($('input.select-package:checked', this.$el).length > 0);
         }
     });
 

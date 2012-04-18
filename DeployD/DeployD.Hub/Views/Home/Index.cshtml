@@ -76,13 +76,18 @@
     <ul class="manage-agent">
         <form id="apply-versions-form" method="POST" action="/api/agent/<%=hostname%>/applyVersions">
     <%_.each(packages, function(package) {%>
-        <li><%=package.packageId%><%if (package.installed) {%>(<%=package.installedVersion%>)<%} else {%>Not installed<%}%>
+        <li>
+            <input type="checkbox" id="select-<%=package.packageId%>" name="select-<%=package.packageId%>" data-id="<%=package.packageId%>" class="select-package" />
+            <label for="select-<%=package.packageId%>" data-id="<%=package.packageId%>"><%=package.packageId%> <%if (package.installed) {%>(<%=package.installedVersion%>)<%}%></label>
+            &nbsp; <a href="/#/logs/<%=hostname%>/<%=package.packageId%>">Logs</a>
+            <div class="package-control" style="display:none">
             <select name="<%=package.packageId%>">
                 <%_.each(package.availableVersions, function(version) {%>
                     <option value="<%=version%>"><%=version%></option>
                 <%});%>
-            </select> <button class="update-agent" data-packageid="<%=package.packageId%>">Update</button>
-            &nbsp; <a href="/#/logs/<%=hostname%>/<%=package.packageId%>">Logs</a>
+            </select> <button style="display:none" class="update-agent" data-packageid="<%=package.packageId%>">Update</button>
+            </div>
+            
         <div class="manage-agent-current-task"><%if (package.currentTask!= null) {%>-> <%=package.currentTask.version%>: <%=package.currentTask.status%>, <%=package.currentTask.lastMessage%><%}%></div>
         </li>
     <%});%>
