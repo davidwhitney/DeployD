@@ -24,13 +24,14 @@ namespace Deployd.Agent
     {
         private const string NAME = "Deployd.Agent";
 
-        protected static readonly ILog Logger = LogManager.GetLogger(NAME);
+        protected static ILog Logger;
         private static IKernel _kernel;
         private static ContainerWrapper _containerWrapper;
 
         static void Main(string[] args)
         {
             XmlConfigurator.Configure();
+            Logger = LogManager.GetLogger(NAME);
 
             try
             {
