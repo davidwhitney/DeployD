@@ -29,17 +29,21 @@ namespace Deployd.Core.Installation.Hooks
 
         private IEnumerable<ApplicationPool> GetApplicationPoolsForWebsite(string websiteName)
         {
-            var site = FindIis7Website(websiteName);
-            var serverManager = new ServerManager();
-            if (site != null)
+            Site site = null;
+            if (TryFindIis7Website(websiteName, out site))
             {
-                foreach (var application in site.Applications)
+                var serverManager = new ServerManager();
+                if (site != null)
                 {
-                    var appPool =
-                        serverManager.ApplicationPools.SingleOrDefault(ap => ap.Name == application.ApplicationPoolName);
-                    if (appPool != null)
+                    foreach (var application in site.Applications)
                     {
-                        yield return appPool;
+                        var appPool =
+                            serverManager.ApplicationPools.SingleOrDefault(
+                                ap => ap.Name == application.ApplicationPoolName);
+                        if (appPool != null)
+                        {
+                            yield return appPool;
+                        }
                     }
                 }
             }
@@ -79,10 +83,16 @@ namespace Deployd.Core.Installation.Hooks
         {
             Site site;
             LocateMsDeploy(context.GetLoggerFor(this));
-            var iis7SiteInstance = FindIis7Website(context.Package.Title);
-            return context.Package.Tags.ToLower().Split(' ', ',', ';').Contains("website")
-                   && !string.IsNullOrEmpty(MsWebDeployPath)
-                   && TryFindIis7Website(context.Package.Id, out site);
+            Site iis7SiteInstance = null;
+            if (TryFindIis7Website(context.Package.Title, out iis7SiteInstance))
+            {
+                return context.Package.Tags.ToLower().Split(' ', ',', ';').Contains("website")
+                       && !string.IsNullOrEmpty(MsWebDeployPath)
+                       && TryFindIis7Website(context.Package.Id, out site);
+            } else
+            {
+                return false;
+            }
         }
     }
 }
