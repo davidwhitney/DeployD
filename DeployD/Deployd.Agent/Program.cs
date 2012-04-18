@@ -32,34 +32,39 @@ namespace Deployd.Agent
         {
             XmlConfigurator.Configure();
 
-            _kernel = new StandardKernel(new INinjectModule[]{new ContainerConfiguration()});
-            _containerWrapper = new ContainerWrapper(_kernel);
+            try
+            {
+                _kernel = new StandardKernel(new INinjectModule[] {new ContainerConfiguration()});
+                _containerWrapper = new ContainerWrapper(_kernel);
 
-            var agentSettings = _containerWrapper.GetType<IAgentSettings>();
+                var agentSettings = _containerWrapper.GetType<IAgentSettings>();
 
-            SetLogAppenderPaths(agentSettings);
+                SetLogAppenderPaths(agentSettings);
 
-            new WindowsServiceRunner(args,
-                                        () => new IWindowsService[]
-                                                {
-                                                    _kernel.Get<AgentConfigurationService>(),
-                                                    _kernel.Get<PackageDownloadingService>(),
-                                                    _kernel.Get<ManagementInterfaceHost>(),
-                                                    _kernel.Get<PackageInstallationService>()
-                                                },
-                                        installationSettings: (serviceInstaller, serviceProcessInstaller) =>
-                                                                {
-                                                                    serviceInstaller.ServiceName = NAME;
-                                                                    serviceInstaller.StartType =
-                                                                        ServiceStartMode.Manual;
-                                                                    serviceProcessInstaller.Account =
-                                                                        ServiceAccount.User;
-                                                                },
-                                        registerContainer: () => _containerWrapper,
-                                        configureContext: x => { x.Log = s => Logger.Info(s); })
-                .Host();
+                new WindowsServiceRunner(args,
+                                         () => new IWindowsService[]
+                                                   {
+                                                       _kernel.Get<AgentConfigurationService>(),
+                                                       _kernel.Get<PackageDownloadingService>(),
+                                                       _kernel.Get<ManagementInterfaceHost>(),
+                                                       _kernel.Get<PackageInstallationService>()
+                                                   },
+                                         installationSettings: (serviceInstaller, serviceProcessInstaller) =>
+                                                                   {
+                                                                       serviceInstaller.ServiceName = NAME;
+                                                                       serviceInstaller.StartType =
+                                                                           ServiceStartMode.Manual;
+                                                                       serviceProcessInstaller.Account =
+                                                                           ServiceAccount.User;
+                                                                   },
+                                         registerContainer: () => _containerWrapper,
+                                         configureContext: x => { x.Log = s => Logger.Info(s); })
+                    .Host();
+            } catch (Exception ex)
+            {
+                Logger.Error("Unhandled exception", ex);
+            }
 
-            
         }
 
         private static void SetLogAppenderPaths(IAgentSettings agentSettings)
