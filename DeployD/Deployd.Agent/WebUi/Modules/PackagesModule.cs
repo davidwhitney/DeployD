@@ -40,7 +40,8 @@ namespace Deployd.Agent.WebUi.Modules
                 var currentInstallTask = runningTasks.SingleOrDefault(t => t.PackageId == x.packageId);
                 IPackage currentInstalledPackage = installCache.GetCurrentInstalledVersion(x.packageId);
 
-                return this.ViewOrJson("package-details.cshtml", new PackageVersionsViewModel(x.packageId, packageVersions, currentInstalledPackage.Version.ToString(), currentInstallTask));
+                var latestVersion = currentInstalledPackage != null ? currentInstalledPackage.Version.ToString() : "";
+                return this.ViewOrJson("package-details.cshtml", new PackageVersionsViewModel(x.packageId, packageVersions, latestVersion, currentInstallTask));
             };
 
             Post["/{packageId}/install", y => true] = x =>
