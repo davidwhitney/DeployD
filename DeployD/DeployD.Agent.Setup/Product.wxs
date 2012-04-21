@@ -15,9 +15,9 @@
                 </Directory>
             </Directory>
         </Directory>
-        <Feature Id="ProductFeature" Level="1" Title="DeployD Agent" Description="The complete package" Display="expand" ConfigurableDirectory="INSTALLDIR">
+        <Feature Id="ApplicationFiles" Level="1" Title="Application" Description="Agent application" Display="expand" ConfigurableDirectory="INSTALLDIR">
             <ComponentGroupRef Id="DeployD.Agent.Binaries"/>
-
+            <ComponentGroupRef Id="DeployD.Agent.ConfigurationFiles"/>
         </Feature>
         <Media Id="1" Cabinet="product.cab" EmbedCab="yes" />
         <UIRef Id="WixUI_Mondo" />
@@ -38,23 +38,25 @@
                     <Publish Event="EndDialog" Value="Return" />
                 </Control>
             </Dialog>
-            <InstallUISequence>
-                <Show Dialog="MyDialog" Before="ExecuteAction" />
-            </InstallUISequence>
         </UI>
 </Product>
 
     <Fragment>
-        <ComponentGroup Id="DeployD.Agent.Binaries">
-            <Component Id="cmp66EB1842F6EC4B5E33CBF12BCD5ABBBC" Directory="INSTALLDIR" Guid="{F6070E0A-1B92-41CD-8D18-B06F516060ED}">
-                <File Id="fil446A4D8A8E07F64EE1D7B8ACA87F0376" KeyPath="yes" Source="$(var.Deployd.Agent.ProjectDir)\bin\$(var.Deployd.Agent.Configuration)\Deployd.Agent.application" />
-            </Component>
-            <Component Id="cmp68D6DC3BDEA47A52D962423FA8747688" Directory="INSTALLDIR" Guid="{8EED8300-C2D4-483C-B840-04C1F7E85A7C}">
+        <ComponentGroup Id="DeployD.Agent.ConfigurationFiles">
+            <Component Id="ConfigurationFiles" Directory="INSTALLDIR" Guid="{8EED8300-C2D4-483C-B840-04C1F7E85A7C}">
                 <File Id="filC92427964CCBF4CD9956EB39F3DDCDDC" KeyPath="yes" Source="$(var.Deployd.Agent.ProjectDir)\bin\$(var.Deployd.Agent.Configuration)\Deployd.Agent.exe.config" />
-                <util:XmlFile Id="AppConfigSetNugetFeedUrl" Action="setValue" Permanent="yes" 
+                <util:XmlFile Id="AppConfigSetNugetFeedUrl" Action="setValue" Permanent="yes"
                               File="[#filC92427964CCBF4CD9956EB39F3DDCDDC]"
                      ElementPath="/configuration/appSettings/add[\[]@key='NuGetRepository'[\]]" Name="value"
                      Value="[NUGETFEEDURL]" />
+            </Component>
+            <Component Id="cmp375F226751B298CD70903C1646985757" Directory="INSTALLDIR" Guid="{139C7143-3436-4973-840A-8DBDF4E5E6D9}">
+                <File Id="filBF38EEDD7B5695007E9582D7EF347826" KeyPath="yes" Source="$(var.Deployd.Agent.ProjectDir)\bin\$(var.Deployd.Agent.Configuration)\log4net.config" />
+            </Component>
+        </ComponentGroup>
+        <ComponentGroup Id="DeployD.Agent.Binaries">
+            <Component Id="cmp66EB1842F6EC4B5E33CBF12BCD5ABBBC" Directory="INSTALLDIR" Guid="{F6070E0A-1B92-41CD-8D18-B06F516060ED}">
+                <File Id="fil446A4D8A8E07F64EE1D7B8ACA87F0376" KeyPath="yes" Source="$(var.Deployd.Agent.ProjectDir)\bin\$(var.Deployd.Agent.Configuration)\Deployd.Agent.application" />
             </Component>
             <Component Id="cmp5E349D3672329D785B20746C1A2AF860" Directory="INSTALLDIR" Guid="{39DD14EC-CDA6-406A-AEE3-77014531BC0C}">
                 <File Id="filCF497FD778BA054CB95DCE2EE1DC9ABC" KeyPath="yes" Source="$(var.Deployd.Agent.ProjectDir)\bin\$(var.Deployd.Agent.Configuration)\Deployd.Agent.exe" />
@@ -83,9 +85,6 @@
             </Component>
             <Component Id="cmp8B05BBE43ECD2E08A6E9CC5667406011" Directory="INSTALLDIR" Guid="{4D1E996F-F25D-43F2-BCCB-459ECBA0ECC1}">
                 <File Id="fil5067669D71CC42C3CFBA87B60250EF85" KeyPath="yes" Source="$(var.Deployd.Agent.ProjectDir)\bin\$(var.Deployd.Agent.Configuration)\Deployd.Core.pdb" />
-            </Component>
-            <Component Id="cmp375F226751B298CD70903C1646985757" Directory="INSTALLDIR" Guid="{139C7143-3436-4973-840A-8DBDF4E5E6D9}">
-                <File Id="filBF38EEDD7B5695007E9582D7EF347826" KeyPath="yes" Source="$(var.Deployd.Agent.ProjectDir)\bin\$(var.Deployd.Agent.Configuration)\log4net.config" />
             </Component>
             <Component Id="cmp13D6573EA8CF3F99F44BAE837E2771F1" Directory="INSTALLDIR" Guid="{028c50b1-9f10-496b-83bd-73cb4bac6e64}">
                 <File Id="fil2991F53D601CDF7142D0A9E1B42E116F" KeyPath="yes" Source="$(var.Deployd.Agent.ProjectDir)\bin\$(var.Deployd.Agent.Configuration)\Nuget.Core.dll" />
@@ -131,6 +130,12 @@
             </Component>
             <Component Id="cmp13B490DFF91D6C9B1C803F42C4514886" Directory="INSTALLDIR" Guid="{F4FD571E-EFF1-4D72-A1CE-4C5E79286DE2}">
                 <File Id="fil245255D736A65FF450551627D2DD773A" KeyPath="yes" Source="$(var.Deployd.Agent.ProjectDir)\bin\$(var.Deployd.Agent.Configuration)\System.Web.Razor.dll" />
+            </Component>
+            <Component Id="cmp13B490DFF91D6C9B1C803F42C4514887" Directory="INSTALLDIR" Guid="{4361D93D-88A8-4315-95F7-24C23CB54011}">
+                <File Id="fil245255D736A65FF450551627D2DD773B" KeyPath="yes" Source="$(var.Deployd.Agent.ProjectDir)\bin\$(var.Deployd.Agent.Configuration)\Microsoft.Web.Administration.dll" />
+            </Component>
+            <Component Id="cmp13B490DFF91D6C9B1C803F42C4514888" Directory="INSTALLDIR" Guid="{1689DA9A-FC8A-4D9B-99AE-80E61AD641D2}">
+                <File Id="fil245255D736A65FF450551627D2DD773C" KeyPath="yes" Source="$(var.Deployd.Agent.ProjectDir)\bin\$(var.Deployd.Agent.Configuration)\Microsoft.Web.Infrastructure.dll" />
             </Component>
             <Component Id="cmp695E5AA8857BB8EA2C3982C3A4011ED0" Directory="dir4AEF4F9FBCEE0807380C28E0D6A0FC3F" Guid="{1F57B0A3-889B-47AA-989A-183D3727A5F8}">
                 <File Id="fil04492AD9BE768565C9EA7B76988E6CDA" KeyPath="yes" Source="$(var.Deployd.Agent.ProjectDir)\bin\$(var.Deployd.Agent.Configuration)\DebugPackageSource\Deployd.Configuration.1.0.0.nupkg" />

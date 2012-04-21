@@ -81,7 +81,6 @@ var _manageAgentDialogOpen = false;
         },
         render : function () {
             var that = this;
-            console.log('render log file');
             var content = _.template(_logFileTemplate, this.model);
             this.$el.html(content);
             this.$el.detach();
@@ -97,17 +96,14 @@ var _manageAgentDialogOpen = false;
        container: 'div#app',
        initialize: function () {
            _.bindAll(this, 'render');
-           console.log('initialise agent log folder view');
            this.collection = new AgentLogCollection();
        },
        load: function (hostname, packageId) {
-           console.log('load log files for package ' + packageId + ' on agent ' + hostname);
            this.collection.hostname = hostname;
            this.collection.packageId = packageId;
            this.collection.fetch({ success: this.render });
        },
        render: function () {
-           console.log('render logs for ' + this.collection.packageId + ' on agent ' + this.collection.hostname);
            var content = _.template(_logFileListTemplate, this.collection);
            this.$el.html(content);
            this.$el.detach();
@@ -123,22 +119,28 @@ var _manageAgentDialogOpen = false;
        container: 'div#app',
        initialize: function () {
            _.bindAll(this, 'render');
-           console.log('initialise agent log folder collection view');
-           this.collection = new AgentLogFolderCollection();
-            this.collection.bind('change', this.update);
-            this.collection.bind('destroy', this.render);
-            this.collection.bind('add', this.render);
-           
+           this.logs = new AgentLogFolderCollection();
+            this.logs.bind('change', this.update);
+            this.logs.bind('destroy', this.render);
+            this.logs.bind('add', this.render);
+
+           this.serverLogCollection = new AgentLogCollection();
+           this.serverLogCollection.bind('change', this.update);
+           this.serverLogCollection.bind('destroy', this.render);
+           this.serverLogCollection.bind('add', this.render);
        },
        load: function (hostname) {
-           console.log('load log folders for ' + hostname);
-           this.collection.hostname = hostname;
-           this.collection.fetch({ success:this.render });
+           this.hostname = hostname;
+           this.logs.hostname = hostname;
+           this.logs.fetch({ success:this.render });
+
+           this.serverLogCollection.hostname = hostname;
+           this.serverLogCollection.packageId = 'server';
+           this.serverLogCollection.fetch({ success: this.render });
        },
        render: function () {
            var that = this;
-           console.log('render log folders for ' + this.collection.hostname);
-           var content = _.template(_agentPackageLogFolderTemplate, this.collection);
+           var content = _.template(_agentPackageLogFolderTemplate, this);
            this.$el.html(content);
            this.$el.detach();
            $(this.container).append(this.$el);
@@ -166,7 +168,6 @@ var _manageAgentDialogOpen = false;
         update: function (agent) {
             this.model = agent;
             this.render();
-            console.log('agent updated');
         },
         render: function (target) {
             var checked = $('input:checked', this.$el).length > 0;
@@ -181,12 +182,6 @@ var _manageAgentDialogOpen = false;
                 selected: this.selected,
                 contacted: this.model.get('contacted')
             };
-
-            _(viewModel.packages).each(function (package) {
-                if (package.currentTask != null) {
-                    console.log(package.packageId + ' current task is ' + package.currentTask);
-                }
-            });
 
             var template = _.template(_agentTemplate, viewModel);
 
@@ -207,7 +202,6 @@ var _manageAgentDialogOpen = false;
             manageAgentDialog.load(id);
         },
         viewLogs: function () {
-            console.log("navigate to agent logs");
             app_router.navigate('logs/' + this.model.get('id'), {trigger: true});
             return true;
         }
@@ -219,7 +213,8 @@ var _manageAgentDialogOpen = false;
         events: {
             'click a.close-dialog': 'closeDialog',
             'submit form#apply-versions-form': 'startInstall',
-            'click button.update-agent': 'startInstallSpecificPackage'
+            'click button.update-agent': 'startInstallSpecificPackage',
+            'change input.select-package' : 'togglePackageOptions'
         },
         initialize: function () {
             _.bindAll(this, 'render');
@@ -235,18 +230,24 @@ var _manageAgentDialogOpen = false;
         },
         load: function (hostname) {
             if (this.model) {
-                console.log('load ' + hostname);
                 this.model.id = hostname;
                 this.model.fetch({ success: this.render });
             }
         },
         update: function() {
+            if (this.userInteracting())
+                return;
+            
             this.model.fetch({ success: this.render });
-            console.log('update dialog');
         },
         render: function () {
-            console.log('render dialog');
             _manageAgentDialogOpen = true;
+            
+            if (this.userInteracting())
+            {
+                return;
+            }
+
             var viewModel = {
                 hostname: this.model.get('id'),
                 packages: this.model.get('packages')
@@ -264,12 +265,15 @@ var _manageAgentDialogOpen = false;
         startInstall: function () {
             var url = $('form', this.$el).attr('action');
             var data = '';
-            var selectors = $('form select', this.$el);
-            $(selectors).each(function (index, element) {
+            var selectedPackages = $('input.select-package:checked', this.$el);
+            $(selectedPackages).each(function (index, element) {
+                var packageId = $(element).attr('data-id');
+                var selectedVersion = $('select[name="'+packageId+'"]', this.$el).val();
+                
                 if (data.length > 0) {
                     data += '&';
                 }
-                data += $(element).attr('name') + '=' + $(element).val();
+                data += packageId + '=' + selectedVersion;
             });
             $.post(url, data);
 
@@ -278,7 +282,6 @@ var _manageAgentDialogOpen = false;
         startInstallSpecificPackage: function (event) {
             var packageId = $(event.target).attr('data-packageid');
             var selectedVersion = $('select[name="' + packageId + '"]', '#manage-agent').val();
-            console.log('Update ' + packageId + ' to version ' + selectedVersion);
 
             var dataString = 'agents=' + this.model.get('id') + '&PackageId=' + packageId + '&Version=' + selectedVersion;
 
@@ -289,6 +292,19 @@ var _manageAgentDialogOpen = false;
             function () { agentsListView.updateAll(); });
             
             return false;
+        },
+        togglePackageOptions: function (event) {
+            
+            var packageId = $(event.target).attr('data-id');
+            var control = $(".package-control", $(event.target).parent());
+            if ($(control).css('display')=='none') {
+                $(control).show();
+            } else {
+                control.hide();
+            }
+        },
+        userInteracting: function() {
+            return ($('input.select-package:checked', this.$el).length > 0);
         }
     });
 
@@ -368,7 +384,6 @@ var _manageAgentDialogOpen = false;
         },
         addAgent: function () {
             var hostname = $('input[name=hostname]', this.$el).val();
-            console.log('add agent ' + hostname);
             agentsListView.addAgent(hostname);
             $('input[name=hostname]', this.$el).val('');
         },
@@ -430,7 +445,6 @@ var _manageAgentDialogOpen = false;
             }
         },
         change: function (agent) {
-            console.log('listView.change()');
             var viewToUpdate = _(this.agentViews).select(function (cv) { return cv.model === agent; })[0];
             if (this._rendered) {
                 viewToUpdate.render();
@@ -447,19 +461,7 @@ var _manageAgentDialogOpen = false;
             $('input[name=hostname]', this.$el).val(addHostnameValue);
 
 
-            _(this.collection.models).each(function (agent) {
-                console.log('collection has agent ' + agent.id);
-                console.log('with packages:');
-                _(agent.get('packages')).each(function (package) {
-                    console.log(package.packageId);
-                    if (package.currentTask != null) {
-                        console.log('current task ' + package.currentTask.lastMessage);
-                    }
-                });
-            });
-
             _(this.agentViews).each(function (dv) {
-                console.log('agentview render()');
                 var agentId = dv.model.get("id");
                 var matchingAgents = self.collection.where({ id: agentId });
                 if (matchingAgents.length == 1) {
@@ -540,7 +542,6 @@ var _manageAgentDialogOpen = false;
         },
         defaultRoute: function( actions ){
             // The variable passed in matches the variable in the route definition "actions"
-            console.log("default route");
             logFoldersView.hide();
             logFolderView.hide();
             logFileView.hide();
@@ -550,7 +551,6 @@ var _manageAgentDialogOpen = false;
             updateAgentsToVersionView.show();
         },
         logsForPackage: function (hostname, packageId) {
-            console.log("show logs for " + packageId + " on agent " + hostname);
             manageAgentDialog.closeDialog();
             agentsListView.hide();
             addAgentFormView.hide();
@@ -562,7 +562,6 @@ var _manageAgentDialogOpen = false;
             logFolderView.show();
         },
         logFile: function (hostname, packageId, logFileName) {
-            console.log("show log " + packageId + "/" + logFileName + " on agent " + hostname);
             manageAgentDialog.closeDialog();
             agentsListView.hide();
             addAgentFormView.hide();
@@ -574,7 +573,6 @@ var _manageAgentDialogOpen = false;
             logFileView.show();
         },
         logsForAgent: function (hostname) {
-            console.log("show logs for agent " + hostname);
             manageAgentDialog.closeDialog();
             agentsListView.hide();
             addAgentFormView.hide();

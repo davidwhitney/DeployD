@@ -24,20 +24,23 @@ namespace Deployd.Agent
     {
         private const string NAME = "Deployd.Agent";
 
-        protected static readonly ILog Logger = LogManager.GetLogger(NAME);
+        protected static ILog Logger;
         private static IKernel _kernel;
         private static ContainerWrapper _containerWrapper;
 
         static void Main(string[] args)
         {
             XmlConfigurator.Configure();
+            Logger = LogManager.GetLogger(NAME);
 
-            _kernel = new StandardKernel(new INinjectModule[]{new ContainerConfiguration()});
-            _containerWrapper = new ContainerWrapper(_kernel);
+            try
+            {
+                _kernel = new StandardKernel(new INinjectModule[] {new ContainerConfiguration()});
+                _containerWrapper = new ContainerWrapper(_kernel);
 
-            var agentSettings = _containerWrapper.GetType<IAgentSettings>();
+                var agentSettings = _containerWrapper.GetType<IAgentSettings>();
 
-            SetLogAppenderPaths(agentSettings);
+                SetLogAppenderPaths(agentSettings);
 
             new WindowsServiceRunner(args,
                                         () => _kernel.GetAll<IWindowsService>().ToArray(),
@@ -52,8 +55,10 @@ namespace Deployd.Agent
                                         registerContainer: () => _containerWrapper,
                                         configureContext: x => { x.Log = s => Logger.Info(s); })
                 .Host();
-
-            
+ } catch (Exception ex)
+            {
+                Logger.Error("Unhandled exception", ex);
+            }
         }
 
         private static void SetLogAppenderPaths(IAgentSettings agentSettings)

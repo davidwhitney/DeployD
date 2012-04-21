@@ -43,8 +43,9 @@ namespace Deployd.Agent.WebUi.Modules
                 IPackage currentInstalledPackage = installCache.GetCurrentInstalledVersion(x.packageId);
                 var availableActions = actionsRepository.GetActionsForPackage(x.packageId);
 
+				var latestVersion = currentInstalledPackage != null ? currentInstalledPackage.Version.ToString() : "";
                 return this.ViewOrJson("packages/package.cshtml",
-                    new PackageVersionsViewModel(x.packageId, packageVersions, currentInstalledPackage.Version.ToString(), currentInstallTask, availableActions));
+                    new PackageVersionsViewModel(x.packageId, packageVersions, latestVersion, currentInstallTask, availableActions));
             };
 
             Get["/{packageId}/actions"] = x =>

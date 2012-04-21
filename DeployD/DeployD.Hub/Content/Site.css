@@ -66,3 +66,8 @@ textarea
 {
     display: none;
 }
+
+/* log files */
+div.DEBUG { color: green;}
+div.WARN { color: orangered;}
+div.ERROR,div.FATAL { color: red;}
