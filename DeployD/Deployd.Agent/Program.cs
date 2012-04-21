@@ -40,13 +40,7 @@ namespace Deployd.Agent
             SetLogAppenderPaths(agentSettings);
 
             new WindowsServiceRunner(args,
-                                        () => new IWindowsService[]
-                                                {
-                                                    _kernel.Get<AgentConfigurationService>(),
-                                                    _kernel.Get<PackageDownloadingService>(),
-                                                    _kernel.Get<ManagementInterfaceHost>(),
-                                                    _kernel.Get<PackageInstallationService>()
-                                                },
+                                        () => _kernel.GetAll<IWindowsService>().ToArray(),
                                         installationSettings: (serviceInstaller, serviceProcessInstaller) =>
                                                                 {
                                                                     serviceInstaller.ServiceName = NAME;

@@ -1,6 +1,12 @@
 using System;
+using Deployd.Agent.Services;
+using Deployd.Agent.Services.InstallationService;
+using Deployd.Agent.Services.Management;
+using Deployd.Agent.Services.PackageDownloading;
 using Deployd.Core.AgentConfiguration;
 using Deployd.Agent.Services.AgentConfiguration;
+using Deployd.Core.AgentManagement;
+using Deployd.Core.Hosting;
 using Deployd.Core.Installation;
 using Deployd.Core.Installation.Hooks;
 using Deployd.Core.PackageCaching;
@@ -15,6 +21,13 @@ namespace Deployd.Agent.Conventions
     {
         public override void Load()
         {
+            // services
+            Bind<IWindowsService>().To<AgentConfigurationService>().InSingletonScope();
+            Bind<IWindowsService>().To<PackageDownloadingService>().InSingletonScope();
+            Bind<IWindowsService>().To<ManagementInterfaceHost>().InSingletonScope();
+            Bind<IWindowsService>().To<PackageInstallationService>().InSingletonScope();
+            Bind<IWindowsService>().To<ActionExecutionService>().InSingletonScope();
+
             Bind<IAgentConfigurationManager>().ToMethod(context => new AgentConfigurationManager() );
             Bind<IAgentSettingsManager>().To<AgentSettingsManager>().InSingletonScope();
             Bind<IAgentSettings>().ToMethod(context => GetService<IAgentSettingsManager>().Settings);
@@ -25,15 +38,21 @@ namespace Deployd.Agent.Conventions
             Bind<ILocalPackageCache>().To<NuGetPackageCache>();
             
             Bind<IAgentConfigurationDownloader>().To<AgentConfigurationDownloader>();
-
             Bind<IDeploymentService>().To<DeploymentService>();
-
             Bind<IInstalledPackageArchive>().To<InstalledPackageArchive>();
 
+            // installations management
             Bind<IInstallationManager>().To<InstallationManager>().InSingletonScope();
             Bind<RunningInstallationTaskList>().ToSelf().InSingletonScope();
             Bind<InstallationTaskQueue>().ToSelf().InSingletonScope();
             Bind<CompletedInstallationTaskList>().ToSelf().InSingletonScope();
+            
+            // actions management
+            Bind<IAgentActionsService>().To<AgentActionsService>().InSingletonScope();
+            Bind<IAgentActionsRepository>().To<AgentActionsRepository>().InSingletonScope();
+            Bind<PendingActionsQueue>().ToSelf().InSingletonScope();
+            Bind<CompletedActionsList>().ToSelf().InSingletonScope();
+            Bind<RunningActionsList>().ToSelf().InSingletonScope();
 
             Bind<IDeploymentHook>().To<PowershellDeploymentHook>();
             Bind<IDeploymentHook>().To<ServiceDeploymentHook>();

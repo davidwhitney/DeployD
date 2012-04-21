@@ -1,0 +1,18 @@
+﻿@{
+	Layout  = "layout.cshtml";
+}
+
+<h2>@Model.PackageId Actions</h2>
+
+<ul>
+@foreach(var agentAction in Model.Actions)
+{
+    <li>
+        <a href="/actions/@agentAction.PackageId/@agentAction.ScriptName">@agentAction.ScriptName</a>
+        <form method="POST" action="/actions/@agentAction.PackageId/@agentAction.ScriptName/run" 
+        style="display:inline">
+            <input type="submit" value="Start"/>
+        </form>
+    </li>
+}
+</ul>

@@ -1,0 +1,65 @@
+﻿@using Deployd.Agent.WebUi.Models
+@using Deployd.Core.Installation
+@{
+	Layout  = "layout.cshtml";
+}
+
+<h2>Available Packages</h2>
+
+<p>Feed Url: @Model.NugetRepository</p>
+
+<form method="post" action="/packages/UpdateAllTo">
+	<input type="submit" value="Update all to:"/> <select name="specificVersion">
+					   @foreach(string version in Model.AvailableVersions)
+					   {
+						   <option>@version</option>
+					   }
+				   </select>
+</form>
+
+@foreach(LocalPackageInformation package in Model.Packages)
+{
+	<div style="clear:both">
+		<a href="/packages/@package.PackageId">@package.PackageId</a><div style="float:right;margin-right:80px"><form style="display:inline" action="/packages/@package.PackageId/install" method="POST"><input type="submit" value="Install Latest"></input></form></div><br/>
+		@if (package.CurrentTask != null)
+		{
+			<text>@package.CurrentTask.Status: @package.CurrentTask.LastMessage<br/></text>
+		}
+
+		@if(!string.IsNullOrWhiteSpace(package.LatestAvailableVersion))
+		{
+			<text>Latest: @package.LatestAvailableVersion<br/></text>
+		}
+		@if (!string.IsNullOrWhiteSpace(package.InstalledVersion))
+		{
+			<text>Installed: @package.InstalledVersion</text>
+		}
+		else
+		{
+			<text>Not installed</text>
+		}
+        <a href="/packages/@package.PackageId/actions">Actions</a>
+        @if (package.LastInstallationTask != null)
+        {
+            <a href="/log/@package.PackageId/@package.LastInstallationTask.LogFileName">
+                @if (package.LastInstallationTask.HasErrors)
+                      {
+                          <text>Errors</text>
+                      } else
+                {
+                    <text>Log</text>
+                }
+            </a>
+        } else
+        {
+            <a href="/log/@package.PackageId">Logs</a>
+        }
+		<br/>
+	</div>
+	
+}
+
+@foreach (InstallTaskViewModel task in Model.CurrentTasks)
+{
+	<p>@task.PackageId @task.Version @task.Status @task.LastMessage</p>
+}

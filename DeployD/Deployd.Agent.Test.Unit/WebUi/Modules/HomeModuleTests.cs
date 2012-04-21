@@ -76,7 +76,7 @@ namespace Deployd.Agent.Test.Unit.WebUi.Modules
             var result = _browser.Post("/packages/mypackage/install", with => with.HttpRequest());
 
             Assert.That(result.StatusCode, Is.EqualTo(HttpStatusCode.SeeOther));
-            //_containerStub.DeploymentServiceMock.Verify(x=>x.Deploy(It.IsAny<string>(), mockPackage.Object, It.IsAny<CancellationTokenSource>(), It.IsAny<Action<ProgressReport>>()));
+            //_containerStub.DeploymentServiceMock.Verify(x=>x.Deploy(It.IsAny<string>(), mockPackage.Object, It.IsAny<CancellationTokenSource>(), It.IsAny<ScriptName<ProgressReport>>()));
             _containerStub.InstallationManagerMock.Verify(x=>x.StartInstall("mypackage", null));
 
         }

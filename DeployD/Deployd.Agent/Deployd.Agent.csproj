@@ -127,6 +127,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Conventions\ContainerConfiguration.cs" />
+    <Compile Include="Services\ActionExecutionService.cs" />
     <Compile Include="Services\AgentConfiguration\AgentConfigurationDownloader.cs" />
     <Compile Include="Services\AgentConfiguration\AgentConfigurationManager.cs" />
     <Compile Include="Services\AgentConfiguration\AgentConfigurationNotFoundException.cs" />
@@ -143,6 +144,7 @@
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="WebUi\Converters\RunningTasksToPackageListViewModelConverter.cs" />
+    <Compile Include="WebUi\Models\ActionListViewModel.cs" />
     <Compile Include="WebUi\Models\AgentStatusViewModel.cs" />
     <Compile Include="WebUi\Models\InstallationsViewModel.cs" />
     <Compile Include="WebUi\Models\InstallTaskViewModel.cs" />
@@ -151,6 +153,8 @@
     <Compile Include="WebUi\Models\LogViewModel.cs" />
     <Compile Include="WebUi\Models\PackageListViewModel.cs" />
     <Compile Include="WebUi\CustomFormatterExtensions.cs" />
+    <Compile Include="WebUi\Modules\ActionDetailsViewModel.cs" />
+    <Compile Include="WebUi\Modules\ActionsModule.cs" />
     <Compile Include="WebUi\Modules\InstallationsModule.cs" />
     <Compile Include="WebUi\Modules\LogModule.cs" />
     <Compile Include="WebUi\NancyModuleExtensions.cs" />
@@ -204,16 +208,31 @@
     <Content Include="WebUi\Views\installations\current.cshtml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="WebUi\Views\package-details.cshtml">
+    <Content Include="WebUi\Views\packages\package.cshtml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="WebUi\Views\packages.cshtml">
+    <Content Include="WebUi\Views\packages\index.cshtml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="WebUi\Views\index.cshtml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="WebUi\Views\installations\completed.cshtml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="WebUi\Views\actions\index.cshtml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="WebUi\Views\actions\list.cshtml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="WebUi\Views\actions\action.cshtml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="WebUi\Views\packages\actions.cshtml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="WebUi\Views\actions\task.cshtml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>

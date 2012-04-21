@@ -1,0 +1,10 @@
+﻿@{
+	Layout  = "layout.cshtml";
+}
+
+<ul>
+@foreach(var package in Model)
+{
+    <li><a href="/actions/@package.Id">@package.Id</a></li>
+}
+</ul>
