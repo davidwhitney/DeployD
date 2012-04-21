@@ -96,6 +96,7 @@
     <Compile Include="AgentManagement\IAgentActionsRepository.cs" />
     <Compile Include="AgentManagement\IAgentActionsService.cs" />
     <Compile Include="DebugTimer.cs" />
+    <Compile Include="Installation\Hooks\CustomActionsExtractionDeploymentHook.cs" />
     <Compile Include="Installation\Hooks\Iis7MsDeployDeploymentHook.cs" />
     <Compile Include="PackageCaching\InstalledPackageArchive.cs" />
     <Compile Include="PackageCaching\IInstalledPackageArchive.cs" />
