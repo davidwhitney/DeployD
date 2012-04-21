@@ -1,4 +1,5 @@
 ﻿using System.Collections.Specialized;
+using System.Configuration;
 using System.IO.Abstractions;
 using Deployd.Core.AgentConfiguration;
 using Moq;
@@ -40,7 +41,7 @@ namespace Deployd.Core.Test.Unit.AgentConfiguration
         [Test]
         public void LoadSettings_WhenSuppliedWithConfiguration_TakesConfiguration()
         {
-            var dictionary = new NameValueCollection
+            var dictionary = new KeyValueConfigurationCollection
                                  {
                                      {"ConfigurationSyncIntervalMs","1"},
                                      {"DeploymentEnvironment","2"},
