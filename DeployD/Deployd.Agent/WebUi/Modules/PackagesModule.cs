@@ -66,7 +66,7 @@ namespace Deployd.Agent.WebUi.Modules
 
             Post["/{packageId}/install", y => true] = x =>
             {
-                Logger = Container().GetType<ILog>();
+                Logger = LogManager.GetLogger(typeof(PackagesModule));
                 var installationManager = Container().GetType<InstallationTaskQueue>();
                 SemanticVersion version;
                 string versionString = null;

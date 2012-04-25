@@ -24,6 +24,7 @@ namespace Deployd.Agent.Services.HubCommunication
         private readonly RunningInstallationTaskList _runningTasks;
         private readonly IInstalledPackageArchive _installCache;
         private Timer _pingTimer = null;
+        private int _pingIntervalInMilliseconds = 1000;
 
         public HubCommunicationService(IAgentSettings agentSettings, ILog log, ILocalPackageCache cache, RunningInstallationTaskList runningTasks, IInstalledPackageArchive installCache)
         {
@@ -36,7 +37,7 @@ namespace Deployd.Agent.Services.HubCommunication
 
         public void Start(string[] args)
         {
-            _pingTimer = new Timer(1000);
+            _pingTimer = new Timer(_pingIntervalInMilliseconds);
             _pingTimer.Elapsed += SendStatusToHub;
             _pingTimer.Enabled = true;
         }
@@ -69,6 +70,7 @@ namespace Deployd.Agent.Services.HubCommunication
             catch (Exception ex)
             {
                 _log.Warn("Could not load agent status", ex);
+                SlowPingIntervalUpToFiveMinutes();
                 return;
             }
 
@@ -87,6 +89,7 @@ namespace Deployd.Agent.Services.HubCommunication
                     {
                         _log.Info("Agent has not been authorised by hub");
                     }
+                    SetPingIntervalToDefault();
                 }
             }
             catch (WebException exception)
@@ -109,11 +112,25 @@ namespace Deployd.Agent.Services.HubCommunication
                 {
                     _log.Warn("Unknown error pinging hub", exception);
                 }
+                SlowPingIntervalUpToFiveMinutes();
             }
             catch (Exception exception)
             {
                 _log.Warn("Unknown error pinging hub", exception);
+                SlowPingIntervalUpToFiveMinutes();
             }
+        }
+
+        private void SetPingIntervalToDefault()
+        {
+            _pingTimer.Interval = _pingIntervalInMilliseconds;
+        }
+
+        private void SlowPingIntervalUpToFiveMinutes()
+        {
+            _pingTimer.Interval *= 2;
+            if (_pingTimer.Interval > 5*60*1000)
+                _pingTimer.Interval = 5*60*1000;
         }
 
         private AgentStatusReport GetAgentStatus()
