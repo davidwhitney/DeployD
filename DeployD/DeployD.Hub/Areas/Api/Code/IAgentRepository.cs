@@ -10,6 +10,7 @@ namespace DeployD.Hub.Areas.Api.Code
         void Remove(AgentRecord agent);
         void Remove(string hostname);
         List<AgentRecord> List();
-        AgentRecord Get(Func<List<AgentRecord>, AgentRecord> predicate );
+        AgentRecord Get(Func<AgentRecord, bool> predicate );
+        void SetApproved(string hostname);
     }
 }

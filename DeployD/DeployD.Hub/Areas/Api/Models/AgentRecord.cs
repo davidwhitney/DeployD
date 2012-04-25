@@ -11,6 +11,7 @@ namespace DeployD.Hub.Areas.Api.Models
         public List<InstallTaskViewModel> CurrentTasks { get; set; }
         public string Environment { get; set; }
         public bool Contacted { get; set; }
+        public bool Approved { get; set; }
 
         public AgentRecord()
         {

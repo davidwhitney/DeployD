@@ -15,6 +15,7 @@ namespace Deployd.Core.PackageTransport
         {
             _packageRepositoryFactory = packageRepositoryFactory;
             _packageRepository = _packageRepositoryFactory.CreateRepository(feedLocation.Source);
+            
             _logger.InfoFormat("Nuget feed: {0}", feedLocation.Source);
         }
 

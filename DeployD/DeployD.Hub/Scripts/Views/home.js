@@ -38,7 +38,7 @@ var _manageAgentDialogOpen = false;
 
     var AgentList = Backbone.Collection.extend({
         model: Agent,
-        url: _apiBaseUrl + '/agent'
+        url: _apiBaseUrl + '/agent?includeUnapproved=true'
     });
 
     var VersionList = Backbone.Collection.extend({
@@ -415,7 +415,7 @@ var _manageAgentDialogOpen = false;
             this.collection.bind('add', this.add);
             this.collection.bind('remove', this.remove);
             this.collection.bind('destroy', this.render);
-            this.collection.fetch({ add: true, success: this.render });
+            this.collection.fetch({success: this.render });
 
             this.collection.each(function (agent) {
                 self.agentViews.push(new AgentView({
@@ -429,9 +429,10 @@ var _manageAgentDialogOpen = false;
             var that = this;
             var dv = new AgentView({
                 model: agent,
-                tagName: 'li'
+                tagName: 'li',
+                id: agent.id
             });
-            this.agentViews.push(dv);
+            that.agentViews.push(dv);
 
             if (this._rendered) {
                 $(this.el).append(dv.render().el);
@@ -460,6 +461,17 @@ var _manageAgentDialogOpen = false;
             $(this.el).html(_appTemplate);
             $('input[name=hostname]', this.$el).val(addHostnameValue);
 
+            var queryableViews = new jsinq.Enumerable(self.agentViews);
+            this.collection.each(function(agent) {
+                var viewExists = queryableViews
+                    .where(function(view) { return view.id == agent.id; })
+                    .select(function(view) { return view; })
+                    .any();
+                if (!viewExists) {
+                    self.add(agent);
+                    console.log('adding view for agent ' + agent.id);
+                }
+            });
 
             _(this.agentViews).each(function (dv) {
                 var agentId = dv.model.get("id");
@@ -513,7 +525,7 @@ var _manageAgentDialogOpen = false;
             }
         },
         updateAll: function () {
-            this.collection.fetch({ success: agentsListView.render });
+            this.collection.fetch({add:true, success: this.render });
         },
         show: function () {
             this.$el.show();

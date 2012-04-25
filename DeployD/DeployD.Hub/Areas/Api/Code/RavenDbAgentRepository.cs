@@ -57,11 +57,24 @@ namespace DeployD.Hub.Areas.Api.Code
             }
         }
 
-        public AgentRecord Get(Func<List<AgentRecord>, AgentRecord> predicate)
+        public AgentRecord Get(Func<AgentRecord, bool> predicate)
         {
             using (var session = _documentStore.OpenSession())
             {
-                return predicate.Invoke(session.Query<AgentRecord>().ToList());
+                return session.Query<AgentRecord>().SingleOrDefault(predicate);
+            }
+        }
+
+        public void SetApproved(string hostname)
+        {
+            using (var session = _documentStore.OpenSession())
+            {
+                var agent = session.Query<AgentRecord>().SingleOrDefault(a => a.Hostname == hostname);
+                if (agent != null)
+                {
+                    agent.Approved = true;
+                    session.SaveChanges();
+                }
             }
         }
     }

@@ -42,9 +42,18 @@ namespace DeployD.Hub.Areas.Api.Code
             return _agentList;
         }
 
-        public AgentRecord Get(Func<List<AgentRecord>, AgentRecord> predicate )
+        public AgentRecord Get(Func<AgentRecord, bool> predicate )
         {
-            return predicate.Invoke(_agentList);
+            return _agentList.SingleOrDefault(predicate);
+        }
+
+        public void SetApproved(string hostname)
+        {
+            var agent = _agentList.SingleOrDefault(a => a.Hostname == hostname);
+            if (agent != null)
+            {
+                agent.Approved = true;
+            }
         }
     }
 }

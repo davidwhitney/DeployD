@@ -9,5 +9,7 @@ namespace DeployD.Hub.Areas.Api.Code
         void StartUpdateOnAllAgents();
         void RegisterAgentAndGetStatus(string hostname);
         void UnregisterAgent(string hostname);
+        void ApproveAgent(string id);
+        AgentRecord GetAgent(string hostname);
     }
 }

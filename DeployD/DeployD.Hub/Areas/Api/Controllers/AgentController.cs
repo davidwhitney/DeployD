@@ -29,10 +29,15 @@ namespace DeployD.Hub.Areas.Api.Controllers
         // GET: /Api/Agent/
         [ActionName("List")]
         [HttpGet]
-        public ActionResult List() // list
+        public ActionResult List(bool? includeUnapproved) // list
         {
+            if (!includeUnapproved.HasValue)
+                includeUnapproved = false;
+
             _agentManager.StartUpdateOnAllAgents();
-            List<AgentRecord> agents = _agentManager.ListAgents();
+            List<AgentRecord> agents = _agentManager.ListAgents()
+                .Where(a => a.Approved || includeUnapproved.Value) 
+                    .ToList(); 
             var viewModel = agents.Select(AutoMapper.Mapper.Map<AgentRecord, AgentViewModel>).ToList();
 
             return _httpChannel.RepresentationOf(viewModel, HttpContext);
@@ -113,6 +118,33 @@ namespace DeployD.Hub.Areas.Api.Controllers
 
             return new HttpStatusCodeResult((int)HttpStatusCode.Accepted);
 
+        }
+
+        [AcceptVerbs("PUT")]
+        [ActionName("register")]
+        public ActionResult Register(string hostname)
+        {
+            _agentManager.RegisterAgentAndGetStatus(hostname);
+            return new HttpStatusCodeResult((int)HttpStatusCode.Created);
+        }
+
+        [AcceptVerbs("POST")]
+        [ActionName("approve")]
+        public ActionResult Approve(string id)
+        {
+            _agentManager.ApproveAgent(id);
+            return new HttpStatusCodeResult((int)HttpStatusCode.Accepted);
+        }
+
+        [AcceptVerbs("GET")]
+        [ActionName("ping")]
+        public ActionResult Ping(string hostname)
+        {
+            if (_agentManager.GetAgent(hostname) != null)
+            {
+                return new HttpStatusCodeResult((int)HttpStatusCode.OK);
+            }
+            return new HttpNotFoundResult();
         }
     }
 }

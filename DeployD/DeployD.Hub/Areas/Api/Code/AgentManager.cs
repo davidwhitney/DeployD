@@ -84,5 +84,15 @@ namespace DeployD.Hub.Areas.Api.Code
         {
             _agentRepository.Remove(hostname);
         }
+
+        public void ApproveAgent(string id)
+        {
+            _agentRepository.SetApproved(id);
+        }
+
+        public AgentRecord GetAgent(string hostname)
+        {
+            return _agentRepository.Get(a => a.Hostname == hostname);
+        }
     }
 }
