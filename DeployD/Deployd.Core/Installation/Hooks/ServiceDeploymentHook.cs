@@ -1,7 +1,9 @@
 using System;
+using System.Configuration.Install;
 using System.IO;
 using System.IO.Abstractions;
 using System.Linq;
+using System.Management.Automation.Runspaces;
 using System.ServiceProcess;
 using Deployd.Core.AgentConfiguration;
 using log4net;
@@ -36,7 +38,13 @@ namespace Deployd.Core.Installation.Hooks
 
         private void ShutdownRequiredServices(DeploymentContext context, ILog logger)
         {
-            using (var service = ServiceController.GetServices().SingleOrDefault(s => s.ServiceName == context.Package.Title))
+            var pathToExecutable = Path.Combine(context.TargetInstallationFolder, context.Package.Id + ".exe");
+            var serviceName = GetServiceNameForExecutable(context, pathToExecutable);
+            if (string.IsNullOrWhiteSpace(serviceName))
+            {
+                serviceName = context.Package.Id;
+            }
+            using (var service = ServiceController.GetServices().SingleOrDefault(s => s.ServiceName == serviceName))
             {
                 if (service == null)
                 {
@@ -75,19 +83,30 @@ namespace Deployd.Core.Installation.Hooks
                 return;
             }
 
+            var pathToExecutable = Path.Combine(context.TargetInstallationFolder, context.Package.Id + ".exe");
+            var serviceName = GetServiceNameForExecutable(context, pathToExecutable);
             // if no such service then install it
-            using (var service = ServiceController.GetServices().SingleOrDefault(s => s.ServiceName == context.Package.Id))
+            using (var service = ServiceController.GetServices().SingleOrDefault(s => s.ServiceName == serviceName))
             {
                 if (service == null)
                 {
-                    var pathToExecutable = Path.Combine(context.TargetInstallationFolder, context.Package.Id + ".exe");
                     logger.InfoFormat("Installing service {0} from {1}", context.Package.Title, pathToExecutable);
 
-                    System.Configuration.Install.ManagedInstallerClass.InstallHelper(new[] {pathToExecutable});
+                    ManagedInstallerClass.InstallHelper(new[] {pathToExecutable});
                 }
             }
 
-            using (var service = ServiceController.GetServices().SingleOrDefault(s => s.ServiceName == context.Package.Id))
+            // check that installation succeeded
+            using (var service = ServiceController.GetServices().SingleOrDefault(s => s.ServiceName == serviceName))
+            {
+                // it didn't... installutil might be presenting a credentials dialog on the terminal
+                if (service == null)
+                {
+                    throw new InstallException(string.Format("The executable {0} was installed, so a service named '{1}' was expected but it could not be found", Path.GetFileNameWithoutExtension(pathToExecutable), serviceName));
+                }
+            }
+
+            using (var service = ServiceController.GetServices().SingleOrDefault(s => s.ServiceName == serviceName))
             {
                 // todo: recursively shut down dependent services
                 if (!service.Status.Equals(ServiceControllerStatus.Stopped) &&
@@ -100,9 +119,33 @@ namespace Deployd.Core.Installation.Hooks
             }
         }
 
+        private static string GetServiceNameForExecutable(DeploymentContext context, string pathToExecutable)
+        {
+            string serviceName;
+            Runspace runspace = RunspaceFactory.CreateRunspace();
+            runspace.Open();
+            var pipeline = runspace.CreatePipeline();
+            var command =
+                new Command(
+                    @"Get-WmiObject -Class Win32_Service -Filter 'PathName LIKE ""%" +
+                    Path.GetFileNameWithoutExtension(pathToExecutable).Replace(@"\", @"\\") + @"%""'", true);
+            pipeline.Commands.Add(command);
+
+            var results = pipeline.Invoke();
+            runspace.Close();
+
+            if (!results.Any())
+            {
+                return string.Empty;
+            }
+
+            serviceName = (string) results.First().Properties["Name"].Value;
+            return serviceName;
+        }
+
         private void ChangeServiceStateTo(ServiceController service, ServiceControllerStatus verifyMeetsThisStatus, Action switchAction, ILog logger)
         {
-            logger.InfoFormat("Stopping service {0}", service.ServiceName);
+            logger.InfoFormat("Changing service {0} status to {1}", service.ServiceName, verifyMeetsThisStatus);
             switchAction();
 
             var retryCount = 10; // wait 10 retries
