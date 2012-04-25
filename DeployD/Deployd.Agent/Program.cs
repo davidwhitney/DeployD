@@ -43,31 +43,23 @@ namespace Deployd.Agent
 
                 SetLogAppenderPaths(agentSettings);
 
-                new WindowsServiceRunner(args,
-                                         () => new IWindowsService[]
-                                                   {
-                                                       _kernel.Get<AgentConfigurationService>(),
-                                                       _kernel.Get<PackageDownloadingService>(),
-                                                       _kernel.Get<ManagementInterfaceHost>(),
-                                                       _kernel.Get<PackageInstallationService>(),
-                                                       _kernel.Get<HubCommunicationService>()
-                                                   },
-                                         installationSettings: (serviceInstaller, serviceProcessInstaller) =>
-                                                                   {
-                                                                       serviceInstaller.ServiceName = NAME;
-                                                                       serviceInstaller.StartType =
-                                                                           ServiceStartMode.Manual;
-                                                                       serviceProcessInstaller.Account =
-                                                                           ServiceAccount.User;
-                                                                   },
-                                         registerContainer: () => _containerWrapper,
-                                         configureContext: x => { x.Log = s => Logger.Info(s); })
-                    .Host();
-            } catch (Exception ex)
+            new WindowsServiceRunner(args,
+                                        () => _kernel.GetAll<IWindowsService>().ToArray(),
+                                        installationSettings: (serviceInstaller, serviceProcessInstaller) =>
+                                                                {
+                                                                    serviceInstaller.ServiceName = NAME;
+                                                                    serviceInstaller.StartType =
+                                                                        ServiceStartMode.Manual;
+                                                                    serviceProcessInstaller.Account =
+                                                                        ServiceAccount.User;
+                                                                },
+                                        registerContainer: () => _containerWrapper,
+                                        configureContext: x => { x.Log = s => Logger.Info(s); })
+                .Host();
+ } catch (Exception ex)
             {
                 Logger.Error("Unhandled exception", ex);
             }
-
         }
 
         private static void SetLogAppenderPaths(IAgentSettings agentSettings)

@@ -161,14 +161,17 @@
             <Component Id="cmp795D2AC195605554CFD48CA84CC63D1F" Directory="dir94337FEAF6EF05B58D75988A55824316" Guid="{D6127754-FF04-4AA8-A240-3ECAAF4040C3}">
                 <File Id="fil700CFEE08EBA6E51A9A3E65BA161DAB8" KeyPath="yes" Source="$(var.Deployd.Agent.ProjectDir)\bin\$(var.Deployd.Agent.Configuration)\WebUi\Views\layout.cshtml" />
             </Component>
-            <Component Id="cmpDF66CDF5493D324F2740D3B5BBB2139A" Directory="dir94337FEAF6EF05B58D75988A55824316" Guid="{6BC73B8B-C928-4794-952B-7C3AE1D3F240}">
-                <File Id="filAEE92A12C277E09B3FB3E7054196C89A" KeyPath="yes" Source="$(var.Deployd.Agent.ProjectDir)\bin\$(var.Deployd.Agent.Configuration)\WebUi\Views\package-details.cshtml" />
+            <Component Id="cmpDF66CDF5493D324F2740D3B5BBB2139A" Directory="dirViewsPackages" Guid="{6BC73B8B-C928-4794-952B-7C3AE1D3F240}">
+                <File Id="filAEE92A12C277E09B3FB3E7054196C89A" KeyPath="yes" Source="$(var.Deployd.Agent.ProjectDir)\bin\$(var.Deployd.Agent.Configuration)\WebUi\Views\packages\package.cshtml" />
             </Component>
-            <Component Id="cmpDE6D0B8B625197FE082F0327FBA37A42" Directory="dir94337FEAF6EF05B58D75988A55824316" Guid="{F7A61854-986F-499C-A554-93CC1DFFE1FB}">
-                <File Id="fil3A56DCA0DA07A62FD4D87061A95BBD2C" KeyPath="yes" Source="$(var.Deployd.Agent.ProjectDir)\bin\$(var.Deployd.Agent.Configuration)\WebUi\Views\packages.cshtml" />
+            <Component Id="cmpDE6D0B8B625197FE082F0327FBA37A42" Directory="dirViewsPackages" Guid="{F7A61854-986F-499C-A554-93CC1DFFE1FB}">
+                <File Id="fil3A56DCA0DA07A62FD4D87061A95BBD2C" KeyPath="yes" Source="$(var.Deployd.Agent.ProjectDir)\bin\$(var.Deployd.Agent.Configuration)\WebUi\Views\packages\index.cshtml" />
             </Component>
             <Component Id="cmp88A4BA9F7C6C9961CA0520E2AB2836F1" Directory="dir94337FEAF6EF05B58D75988A55824316" Guid="{49A9AB8C-EE48-4B91-9D1B-56A5FAD95576}">
                 <File Id="filD0D4C40EEFA0349124C7E160DDE08EAC" KeyPath="yes" Source="$(var.Deployd.Agent.ProjectDir)\bin\$(var.Deployd.Agent.Configuration)\WebUi\Views\sitrep.cshtml" />
+            </Component>
+            <Component Id="cmpDF66CDF5493D324F2740D3B5BBB2139B" Directory="dirViewsPackages" Guid="{d56d41ab-38b0-4dd5-ac63-870a457d7e6c}">
+                <File Id="filAEE92A12C277E09B3FB3E7054196C89B" KeyPath="yes" Source="$(var.Deployd.Agent.ProjectDir)\bin\$(var.Deployd.Agent.Configuration)\WebUi\Views\packages\actions.cshtml" />
             </Component>
             <Component Id="cmp3EE68AA7BCC0719FF8C86BD1C0DE7404" Directory="dirF92A0AA50EE6D965EFDC0F45769BFA6B" Guid="{7DB8E0F7-94A8-4084-AD15-256889A7B07A}">
                 <File Id="fil23CB98E19A1DEC6C61840765EBFF71FC" KeyPath="yes" Source="$(var.Deployd.Agent.ProjectDir)\bin\$(var.Deployd.Agent.Configuration)\WebUi\Views\installations\completed.cshtml" />
@@ -208,6 +211,11 @@
     <Fragment>
         <DirectoryRef Id="dir94337FEAF6EF05B58D75988A55824316">
             <Directory Id="dir3123ED679E4E2D092C943CF5FAE06A3B" Name="logs" />
+        </DirectoryRef>
+    </Fragment>
+    <Fragment>
+        <DirectoryRef Id="dir94337FEAF6EF05B58D75988A55824316">
+            <Directory Id="dirViewsPackages" Name="packages" />
         </DirectoryRef>
     </Fragment>
     <Fragment>

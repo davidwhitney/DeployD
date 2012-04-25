@@ -4,6 +4,7 @@ using System.Linq;
 using Deployd.Agent.WebUi.Converters;
 using Deployd.Agent.WebUi.Models;
 using Deployd.Core.AgentConfiguration;
+using Deployd.Core.AgentManagement;
 using Deployd.Core.Hosting;
 using Deployd.Core.Installation;
 using Deployd.Core.PackageCaching;
@@ -27,7 +28,7 @@ namespace Deployd.Agent.WebUi.Modules
                 var completedTasks = Container().GetType<CompletedInstallationTaskList>();
                 var agentSettings = Container().GetType<IAgentSettings>();
                 var model = RunningTasksToPackageListViewModelConverter.Convert(cache, runningTasks, installCache, completedTasks, agentSettings);
-                return this.ViewOrJson("packages.cshtml", model);
+                return this.ViewOrJson("packages/index.cshtml", model);
             };
             
             Get["/{packageId}"] = x =>
@@ -36,12 +37,28 @@ namespace Deployd.Agent.WebUi.Modules
                 var packageVersions = cache.AvailablePackageVersions(x.packageId);
                 var runningTasks = Container().GetType<RunningInstallationTaskList>();
                 var installCache = Container().GetType<IInstalledPackageArchive>();
+                var actionsRepository = Container().GetType<IAgentActionsRepository>();
 
                 var currentInstallTask = runningTasks.SingleOrDefault(t => t.PackageId == x.packageId);
                 IPackage currentInstalledPackage = installCache.GetCurrentInstalledVersion(x.packageId);
+                var availableActions = actionsRepository.GetActionsForPackage(x.packageId);
 
-                var latestVersion = currentInstalledPackage != null ? currentInstalledPackage.Version.ToString() : "";
-                return this.ViewOrJson("package-details.cshtml", new PackageVersionsViewModel(x.packageId, packageVersions, latestVersion, currentInstallTask));
+				var latestVersion = currentInstalledPackage != null ? currentInstalledPackage.Version.ToString() : "";
+                return this.ViewOrJson("packages/package.cshtml",
+                    new PackageVersionsViewModel(x.packageId, packageVersions, latestVersion, currentInstallTask, availableActions));
+            };
+
+            Get["/{packageId}/actions"] = x =>
+            {
+                var availableActionsRepository =
+                    Container().GetType<IAgentActionsRepository>();
+                var viewModel = new ActionListViewModel()
+                {
+                    Actions = availableActionsRepository.GetActionsForPackage(x.packageId),
+                    PackageId = x.packageId
+                };
+
+                return this.ViewOrJson("packages/actions.cshtml", viewModel);
             };
 
             Post["/{packageId}/install", y => true] = x =>

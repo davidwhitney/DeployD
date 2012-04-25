@@ -1,0 +1,37 @@
+﻿@{
+	Layout  = "layout.cshtml";
+}
+
+<h2>@Model.PackageId @Model.Action</h2>
+
+<form method="POST" action="/actions/@Model.PackageId/@Model.Action/run">
+    <input type="submit" value="Start"/>
+</form>
+
+
+<h3>Pending</h3>
+<ul>
+    @foreach(var action in Model.Pending)
+    {
+        <li>@action.DateQueued - @action.DateCompleted<br />
+            @action.Log</li>
+    }
+</ul>
+
+<h3>Running</h3>
+<ul>
+    @foreach(var action in Model.Running)
+    {
+        <li>@action.DateQueued - @action.DateCompleted<br />
+            @action.Log</li>
+    }
+</ul>
+
+<h3>Completed</h3>
+<ul>
+    @foreach(var action in Model.Completed)
+    {
+        <li>@action.DateQueued - @action.DateCompleted<br />
+        @action.Log</li>
+    }
+</ul>

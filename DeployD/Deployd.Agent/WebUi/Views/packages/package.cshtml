@@ -1,0 +1,33 @@
+﻿@{
+	Layout  = "layout.cshtml";
+}
+
+<p><a href="/actions/@Model.PackageName">Actions</a></p>
+
+<form action="/packages/@Model.PackageName/install" method="POST">
+	<input type="submit" value="Install Latest"></input>
+</form>
+
+<h2>Install @Model.PackageName</h2>
+<form method="post" action="/packages/@Model.PackageName/install">
+    <input type="submit" value="Update to:"/> <select name="specificVersion">
+                                                  @foreach(string version in Model.CachedVersions)
+                                                  {
+                                                      <option>@version</option>
+                                                  }
+                                              </select>
+</form>
+
+<h2>Actions for @Model.PackageName</h2>
+<ul>
+@foreach(var agentAction in Model.Actions)
+{
+    <li>
+        <a href="/actions/@agentAction.PackageId/@agentAction.ScriptName">@agentAction.ScriptName</a>
+        <form method="POST" action="/actions/@agentAction.PackageId/@agentAction.ScriptName/run" 
+        style="display:inline">
+            <input type="submit" value="Start"/>
+        </form>
+    </li>
+}
+</ul>

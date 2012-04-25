@@ -91,7 +91,17 @@
     <Compile Include="AgentConfiguration\AgentSettings.cs" />
     <Compile Include="AgentConfiguration\IAgentSettings.cs" />
     <Compile Include="AgentConfiguration\IAgentSettingsManager.cs" />
+    <Compile Include="AgentManagement\ActionTask.cs" />
+    <Compile Include="AgentManagement\AgentActionsRepository.cs" />
+    <Compile Include="AgentManagement\PendingActionsQueue.cs" />
+    <Compile Include="AgentManagement\ActionTaskResult.cs" />
+    <Compile Include="AgentManagement\AgentAction.cs" />
+    <Compile Include="AgentManagement\AgentActionsService.cs" />
+    <Compile Include="AgentManagement\IActionTaskManager.cs" />
+    <Compile Include="AgentManagement\IAgentActionsRepository.cs" />
+    <Compile Include="AgentManagement\IAgentActionsService.cs" />
     <Compile Include="DebugTimer.cs" />
+    <Compile Include="Installation\Hooks\CustomActionsExtractionDeploymentHook.cs" />
     <Compile Include="Installation\Hooks\Iis7MsDeployDeploymentHook.cs" />
     <Compile Include="PackageCaching\InstalledPackageArchive.cs" />
     <Compile Include="PackageCaching\IInstalledPackageArchive.cs" />
@@ -129,6 +139,7 @@
     <Compile Include="Installation\InstallationTaskQueue.cs" />
     <Compile Include="Installation\ProgressReport.cs" />
     <Compile Include="Installation\RunningInstallationTaskList.cs" />
+    <Compile Include="PowershellHelper.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="PackageTransport\IRetrievePackageQuery.cs" />
     <Compile Include="PackageTransport\FeedLocation.cs" />

@@ -8018,7 +8018,7 @@ $.extend(Datepicker.prototype, {
 		this._updateDatepicker(inst);
 	},
 
-	/* Action for current link. */
+	/* ScriptName for current link. */
 	_gotoToday: function(id) {
 		var target = $(id);
 		var inst = this._getInst(target[0]);
@@ -8037,7 +8037,7 @@ $.extend(Datepicker.prototype, {
 		this._adjustDate(target);
 	},
 
-	/* Action for selecting a new month/year. */
+	/* ScriptName for selecting a new month/year. */
 	_selectMonthYear: function(id, select, period) {
 		var target = $(id);
 		var inst = this._getInst(target[0]);
@@ -8061,7 +8061,7 @@ $.extend(Datepicker.prototype, {
 		inst._selectingMonthYear = !inst._selectingMonthYear;
 	},
 
-	/* Action for selecting a day. */
+	/* ScriptName for selecting a day. */
 	_selectDay: function(id, month, year, td) {
 		var target = $(id);
 		if ($(td).hasClass(this._unselectableClass) || this._isDisabledDatepicker(target[0])) {
