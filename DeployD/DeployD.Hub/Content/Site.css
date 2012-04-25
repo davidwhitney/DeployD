@@ -71,3 +71,15 @@ textarea
 div.DEBUG { color: green;}
 div.WARN { color: orangered;}
 div.ERROR,div.FATAL { color: red;}
+
+ul.navigation {
+    margin: 0;
+    padding: 0;
+    margin-bottom: 1em;
+}
+ul.navigation li {
+    display: inline;
+    margin: 0;
+    padding: 0;
+    margin-right: 1em;
+}

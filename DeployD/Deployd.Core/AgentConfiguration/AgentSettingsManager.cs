@@ -54,6 +54,7 @@ namespace Deployd.Core.AgentConfiguration
                 {"MsDeployServiceUrl", "localhost"},
                 {"Tags",""},
                 {"LogsDirectory", "~\\logs"},
+                {"Hub.Address", "http://localhost:80"}
             };
         }
 
@@ -161,7 +162,15 @@ namespace Deployd.Core.AgentConfiguration
 
         private string SettingOrDefault(KeyValueConfigurationCollection settings, string key)
         {
-            var value = (settings[key].Value ?? ConfigurationDefaults[key]) ?? string.Empty;
+            var setting = settings[key];
+            string value;
+            if (settings[key] != null)
+            {
+                value = settings[key].Value;
+            } else
+            {
+                value = ConfigurationDefaults[key] ?? string.Empty;
+            }
             return _fileSystem.MapVirtualPath(value);
         }
     }

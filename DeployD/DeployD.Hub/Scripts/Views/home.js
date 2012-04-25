@@ -180,7 +180,8 @@ var _manageAgentDialogOpen = false;
                 availableVersions: this.model.get('availableVersions'),
                 environment: this.model.get('environment'),
                 selected: this.selected,
-                contacted: this.model.get('contacted')
+                contacted: this.model.get('contacted'),
+                approved: this.model.get('Approved')
             };
 
             var template = _.template(_agentTemplate, viewModel);

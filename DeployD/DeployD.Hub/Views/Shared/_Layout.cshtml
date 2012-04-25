@@ -6,7 +6,12 @@
     @RenderSection("scripts", false)
 </head>
 
-<body>
-    @RenderBody()
-</body>
+    <body>
+        <ul class="navigation">
+            <li><a href="/">Dashboard</a></li>
+            <li><a href="/agents">Agents</a></li>
+        </ul>
+
+        @RenderBody()
+    </body>
 </html>

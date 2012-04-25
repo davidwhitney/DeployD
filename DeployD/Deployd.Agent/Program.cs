@@ -5,6 +5,7 @@ using System.Linq;
 using System.ServiceProcess;
 using Deployd.Agent.Conventions;
 using Deployd.Agent.Services.AgentConfiguration;
+using Deployd.Agent.Services.HubCommunication;
 using Deployd.Agent.Services.InstallationService;
 using Deployd.Agent.Services.Management;
 using Deployd.Agent.Services.PackageDownloading;
@@ -48,7 +49,8 @@ namespace Deployd.Agent
                                                        _kernel.Get<AgentConfigurationService>(),
                                                        _kernel.Get<PackageDownloadingService>(),
                                                        _kernel.Get<ManagementInterfaceHost>(),
-                                                       _kernel.Get<PackageInstallationService>()
+                                                       _kernel.Get<PackageInstallationService>(),
+                                                       _kernel.Get<HubCommunicationService>()
                                                    },
                                          installationSettings: (serviceInstaller, serviceProcessInstaller) =>
                                                                    {

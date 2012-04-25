@@ -124,6 +124,10 @@ namespace DeployD.Hub.Areas.Api.Controllers
         [ActionName("register")]
         public ActionResult Register(string hostname)
         {
+            var agent = _agentManager.GetAgent(hostname);
+            if (agent != null)
+                return new HttpStatusCodeResult((int)HttpStatusCode.Conflict);
+
             _agentManager.RegisterAgentAndGetStatus(hostname);
             return new HttpStatusCodeResult((int)HttpStatusCode.Created);
         }
@@ -140,9 +144,16 @@ namespace DeployD.Hub.Areas.Api.Controllers
         [ActionName("ping")]
         public ActionResult Ping(string hostname)
         {
-            if (_agentManager.GetAgent(hostname) != null)
+            var agent = _agentManager.GetAgent(hostname);
+            if (agent != null)
             {
-                return new HttpStatusCodeResult((int)HttpStatusCode.OK);
+                if (agent.Approved)
+                {
+                    return new HttpStatusCodeResult((int) HttpStatusCode.OK);
+                } else
+                {
+                    return new HttpStatusCodeResult((int)HttpStatusCode.Unauthorized);
+                }
             }
             return new HttpNotFoundResult();
         }

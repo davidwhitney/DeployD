@@ -16,5 +16,6 @@ namespace Deployd.Core.AgentConfiguration
         string BaseInstallationPath { get; }
         string MsDeployServiceUrl { get; }
         string LogsDirectory { get; }
+        string HubAddress { get;  }
     }
 }

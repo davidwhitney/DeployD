@@ -1,4 +1,5 @@
 using System;
+using Deployd.Agent.Services.HubCommunication;
 using Deployd.Core.AgentConfiguration;
 using Deployd.Agent.Services.AgentConfiguration;
 using Deployd.Core.Installation;
@@ -29,6 +30,8 @@ namespace Deployd.Agent.Conventions
             Bind<IDeploymentService>().To<DeploymentService>();
 
             Bind<IInstalledPackageArchive>().To<InstalledPackageArchive>();
+
+            Bind<HubCommunicationService>().ToSelf().InSingletonScope();
 
             Bind<IInstallationManager>().To<InstallationManager>().InSingletonScope();
             Bind<RunningInstallationTaskList>().ToSelf().InSingletonScope();

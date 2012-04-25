@@ -36,26 +36,31 @@
         <label for="select-<%=hostname%>" class="agent-hostname">
             <%=hostname%>
             <%if (!contacted) {%> (!) <%}%>
-        </label> (<%=environment%>) <a class="manage-agent" data-id="<%=hostname%>" href="javascript:void(0);">manage</a>&nbsp;
-        <a class="agent-logs" href="#/logs/<%=hostname%>">Logs</a>&nbsp;
-        <a class="unregister-agent" href="javascript:void(0);"><img src="/content/images/delete.png" alt="unregister agent" title="unregister agent" /></a>
-        <%if (packages&&packages.length>0) {
-            var distinctVersions=[];
-            var installedVersions = new jsinq.Enumerable(packages)
-                                                .where(function(p) { return p.installed; })
-                                                .groupBy(function(p) { return p.installedVersion; })
-                                                .select(function(g) { return { version: g.key, count: g.count()}; });
-            installedVersions.each(function(version, index) {%>
-                <%=version.version%> (<%=version.count%>)
-            <%});%>
-        <%}%>
-        
-        <%if (currentTasks&&currentTasks.length != 0) {%>
-            <ul class="tasks">
-                <%_.each(currentTasks, function(task) {%>
-                    <%=_.template(_taskTemplate, task)%>
+        </label> (<%=environment%>) 
+        <%if (approved) {%>
+            <a class="manage-agent" data-id="<%=hostname%>" href="javascript:void(0);">manage</a>&nbsp;
+            <a class="agent-logs" href="#/logs/<%=hostname%>">Logs</a>&nbsp;
+            <a class="unregister-agent" href="javascript:void(0);"><img src="/content/images/delete.png" alt="unregister agent" title="unregister agent" /></a>
+            <%if (packages&&packages.length>0) {
+                var distinctVersions=[];
+                var installedVersions = new jsinq.Enumerable(packages)
+                                                    .where(function(p) { return p.installed; })
+                                                    .groupBy(function(p) { return p.installedVersion; })
+                                                    .select(function(g) { return { version: g.key, count: g.count()}; });
+                installedVersions.each(function(version, index) {%>
+                    <%=version.version%> (<%=version.count%>)
                 <%});%>
-            </ul>
+            <%}%>
+        
+            <%if (currentTasks&&currentTasks.length != 0) {%>
+                <ul class="tasks">
+                    <%_.each(currentTasks, function(task) {%>
+                        <%=_.template(_taskTemplate, task)%>
+                    <%});%>
+                </ul>
+            <%}%>
+        <%} else {%>
+            Not approved (<a href="/agents">Manage Agents</a>)
         <%}%>
     </li>
 </script>

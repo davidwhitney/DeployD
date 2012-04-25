@@ -65,5 +65,10 @@ namespace Deployd.Core.AgentConfiguration
         {
             get { return this["LogsDirectory"]; }
         }
+
+        public string HubAddress
+        {
+            get { return this["Hub.Address"]; }
+        }
     }
 }

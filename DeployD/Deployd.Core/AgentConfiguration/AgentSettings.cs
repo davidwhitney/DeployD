@@ -27,6 +27,8 @@ namespace Deployd.Core.AgentConfiguration
 
         public string LogsDirectory { get; set; }
 
+        public string HubAddress { get; set; }
+
         public AgentSettings()
         {
             PackageSyncIntervalMs = 1000;
