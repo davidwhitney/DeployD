@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Deployd.Core;
 
 namespace DeployD.Hub.Areas.Api.Models
 {

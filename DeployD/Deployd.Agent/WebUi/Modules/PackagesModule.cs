@@ -10,6 +10,8 @@ using Deployd.Core.Installation;
 using Deployd.Core.PackageCaching;
 using Nancy;
 using NuGet;
+using log4net;
+using log4net.Core;
 
 namespace Deployd.Agent.WebUi.Modules
 {
@@ -17,6 +19,7 @@ namespace Deployd.Agent.WebUi.Modules
     {
         public static Func<IIocContainer> Container { get; set; }
         public static readonly List<InstallationTask> InstallationTasks = new List<InstallationTask>();
+        private static ILog Logger = null;
 
         public PackagesModule(): base("/packages")
         {
@@ -63,6 +66,7 @@ namespace Deployd.Agent.WebUi.Modules
 
             Post["/{packageId}/install", y => true] = x =>
             {
+                Logger = Container().GetType<ILog>();
                 var installationManager = Container().GetType<InstallationTaskQueue>();
                 SemanticVersion version;
                 string versionString = null;
@@ -71,6 +75,7 @@ namespace Deployd.Agent.WebUi.Modules
                     versionString = version.ToString();
                 }
 
+                Logger.Info("request install " + x.packageId + " to version " + versionString);
                 installationManager.Add(x.packageId, versionString);
                 return Response.AsRedirect("/packages");
             };
@@ -97,11 +102,28 @@ namespace Deployd.Agent.WebUi.Modules
                 return Response.AsRedirect("/packages");
             };
 
+            Post["/UpdateAllTo/latest", y => true] = x =>
+            {
+                var cache = Container().GetType<ILocalPackageCache>();
+                var queue = Container().GetType<InstallationTaskQueue>();
+                var packagesByVersion =
+                    cache.AllCachedPackages()
+                    .GroupBy(p=>p.Id, g=>g.Version);
+
+                foreach (var packageVersions in packagesByVersion)
+                {
+                    queue.Add(packageVersions.Key, packageVersions.Max(g=>g.Version).ToString());
+                }
+
+                return Response.AsRedirect("/packages");
+            };
+
             Post["/UpdateAllTo/{specificVersion}", y => true] = x =>
             {
                 var cache = Container().GetType<ILocalPackageCache>();
                 var queue = Container().GetType<InstallationTaskQueue>();
-                var packagesByVersion = cache.AllCachedPackages().Where(p=>p.Version.Equals(new SemanticVersion(x.specificVersion)));
+                IEnumerable<IPackage> packagesByVersion = 
+                    cache.AllCachedPackages().Where(p=>p.Version.Equals(new SemanticVersion(x.specificVersion)));
 
                 foreach (var packageVersions in packagesByVersion)
                 {

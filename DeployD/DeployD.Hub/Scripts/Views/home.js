@@ -181,12 +181,12 @@ var _manageAgentDialogOpen = false;
                 environment: this.model.get('environment'),
                 selected: this.selected,
                 contacted: this.model.get('contacted'),
-                approved: this.model.get('Approved')
+                approved: this.model.get('approved')
             };
 
             var template = _.template(_agentTemplate, viewModel);
 
-            this.$el = $(template);
+            this.$el.html(template);
             $(target).append(this.$el);
 
             if (checked) {
@@ -526,7 +526,7 @@ var _manageAgentDialogOpen = false;
             }
         },
         updateAll: function () {
-            this.collection.fetch({add:true, success: this.render });
+            this.collection.fetch({success: this.render });
         },
         show: function () {
             this.$el.show();

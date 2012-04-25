@@ -3,10 +3,15 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Runtime.Serialization;
 using System.Text;
+using System.Threading.Tasks;
 using System.Timers;
+using Deployd.Core;
 using Deployd.Core.AgentConfiguration;
 using Deployd.Core.Hosting;
+using Deployd.Core.Installation;
+using Deployd.Core.PackageCaching;
 using log4net;
 
 namespace Deployd.Agent.Services.HubCommunication
@@ -15,20 +20,135 @@ namespace Deployd.Agent.Services.HubCommunication
     {
         private readonly IAgentSettings _agentSettings;
         private readonly ILog _log;
+        private readonly ILocalPackageCache _cache;
+        private readonly RunningInstallationTaskList _runningTasks;
+        private readonly IInstalledPackageArchive _installCache;
         private Timer _pingTimer = null;
 
-        public HubCommunicationService(IAgentSettings agentSettings, ILog log)
+        public HubCommunicationService(IAgentSettings agentSettings, ILog log, ILocalPackageCache cache, RunningInstallationTaskList runningTasks, IInstalledPackageArchive installCache)
         {
             _agentSettings = agentSettings;
             _log = log;
+            _cache = cache;
+            _runningTasks = runningTasks;
+            _installCache = installCache;
         }
 
         public void Start(string[] args)
         {
-            _pingTimer = new Timer(10000);
-            _pingTimer.Elapsed += PingHub;
+            _pingTimer = new Timer(1000);
+            _pingTimer.Elapsed += SendStatusToHub;
             _pingTimer.Enabled = true;
         }
+
+        private void SendStatusToHub(object sender, ElapsedEventArgs e)
+        {
+            var _pingRequest = HttpWebRequest.Create(string.Format("{0}/api/agent/{1}/status",
+                _agentSettings.HubAddress,
+                Environment.MachineName)) as HttpWebRequest;
+            _pingRequest.Method = "POST";
+            _pingRequest.ContentType = "application/json";
+            AgentStatusReport status = null;
+            try
+            {
+                status = GetAgentStatus();
+
+                var serializer = new System.Runtime.Serialization.Json.DataContractJsonSerializer(status.GetType());
+                using (MemoryStream ms = new MemoryStream())
+                {
+                    serializer.WriteObject(ms, status);
+                    _pingRequest.ContentLength = ms.Length;
+                    using (var requestStream = _pingRequest.GetRequestStream())
+                    {
+                        serializer.WriteObject(requestStream, status);
+                        requestStream.Flush();
+                        requestStream.Close();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                _log.Warn("Could not load agent status", ex);
+                return;
+            }
+
+
+            _pingRequest.ContentType = "application/json";
+
+            try
+            {
+                using (var response = _pingRequest.GetResponse() as HttpWebResponse)
+                {
+                    if (response.StatusCode == HttpStatusCode.Unauthorized)
+                    {
+                        RegisterWithHub();
+                    }
+                    else if (response.StatusCode == HttpStatusCode.Unauthorized)
+                    {
+                        _log.Info("Agent has not been authorised by hub");
+                    }
+                }
+            }
+            catch (WebException exception)
+            {
+                var response = exception.Response as HttpWebResponse;
+                using (StreamReader reader = new StreamReader(response.GetResponseStream()))
+                {
+                    string content = reader.ReadToEnd();
+                    _log.Debug(content);
+                }
+                if (response.StatusCode == HttpStatusCode.Unauthorized)
+                {
+                    _log.Info("Agent has not been authorised by hub");
+                }
+                else if (response.StatusCode == HttpStatusCode.NotFound)
+                {
+                    RegisterWithHub();
+                }
+                else
+                {
+                    _log.Warn("Unknown error pinging hub", exception);
+                }
+            }
+            catch (Exception exception)
+            {
+                _log.Warn("Unknown error pinging hub", exception);
+            }
+        }
+
+        private AgentStatusReport GetAgentStatus()
+        {
+            return new AgentStatusReport
+            {
+                packages = _cache.AvailablePackages.Select(name => new LocalPackageInformation()
+                {
+                    PackageId = name,
+                    InstalledVersion = _installCache.GetCurrentInstalledVersion(name) != null ? _installCache.GetCurrentInstalledVersion(name).Version.ToString() : "",
+                    LatestAvailableVersion = _cache.GetLatestVersion(name) != null ? _cache.GetLatestVersion(name).Version.ToString() : "",
+                    AvailableVersions = _cache.AvailablePackageVersions(name).ToList(),
+                    CurrentTask = _runningTasks.Where(t => t.PackageId == name)
+                        .Select(t => new InstallTaskViewModel()
+                        {
+                            Messages = t.ProgressReports.Select(pr => pr.Message).ToArray(),
+                            Status = Enum.GetName(typeof(TaskStatus), t.Task.Status),
+                            PackageId = t.PackageId,
+                            Version = t.Version,
+                            LastMessage = t.ProgressReports.Count > 0 ? t.ProgressReports.LastOrDefault().Message : ""
+                        }).FirstOrDefault()
+                }).ToList(),
+                currentTasks = _runningTasks.Select(t => new InstallTaskViewModel()
+                {
+                    Messages = t.ProgressReports.Select(pr => pr.Message).ToArray(),
+                    Status = Enum.GetName(typeof(TaskStatus), t.Task.Status),
+                    PackageId = t.PackageId,
+                    Version = t.Version,
+                    LastMessage = t.ProgressReports.Count > 0 ? t.ProgressReports.LastOrDefault().Message : ""
+                }).ToList(),
+                availableVersions = _cache.AllCachedPackages().Select(p => p.Version.ToString()).Distinct().OrderByDescending(s => s).ToList(),
+                environment = _agentSettings.DeploymentEnvironment
+            };
+        }
+
 
         private void PingHub(object sender, ElapsedEventArgs e)
         {

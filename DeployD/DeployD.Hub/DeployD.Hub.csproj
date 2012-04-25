@@ -149,11 +149,7 @@
     <Compile Include="Areas\Api\Controllers\LogController.cs" />
     <Compile Include="Areas\Api\Controllers\PackageController.cs" />
     <Compile Include="Areas\Api\Models\AgentRecord.cs" />
-    <Compile Include="Areas\Api\Models\AgentViewModel.cs" />
-    <Compile Include="Areas\Api\Models\Dto\AgentStatusReport.cs" />
-    <Compile Include="Areas\Api\Models\InstallTaskViewModel.cs" />
     <Compile Include="Areas\Api\Models\PackageRecord.cs" />
-    <Compile Include="Areas\Api\Models\PackageViewModel.cs" />
     <Compile Include="Controllers\AgentsController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Global.asax.cs">
@@ -217,6 +213,7 @@
     <Content Include="Views\Shared\_Layout.cshtml" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="Areas\Api\Models\Dto\" />
     <Folder Include="Areas\Api\Views\Shared\" />
     <Folder Include="Code\" />
     <Folder Include="Models\" />

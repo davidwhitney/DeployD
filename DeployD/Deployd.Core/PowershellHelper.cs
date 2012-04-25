@@ -44,5 +44,37 @@ namespace Deployd.Core
             }
             return stringBuilder;
         }
+
+        public static StringBuilder ExecuteInlinePowerShellScript(string scriptText, IAgentSettings _agentSettings)
+        {
+            var serviceCommands = new Command("Scripts/PS/Services.ps1");
+
+            // create Powershell runspace
+            Runspace runspace = RunspaceFactory.CreateRunspace();
+
+            // open it
+            runspace.Open();
+            var pipeline = runspace.CreatePipeline();
+            pipeline.Commands.Add(serviceCommands);
+
+            // add the custom script
+            pipeline.Commands.AddScript(scriptText);
+
+            // add an extra command to transform the script output objects into nicely formatted strings 
+            // remove this line to get the actual objects that the script returns. For example, the script 
+            // "Get-Process" returns a collection of System.Diagnostics.Process instances. 
+            pipeline.Commands.Add("Out-String");
+
+            var results = pipeline.Invoke();
+            runspace.Close();
+
+            // convert the script result into a single string 
+            var stringBuilder = new StringBuilder();
+            foreach (var obj in results)
+            {
+                stringBuilder.AppendLine(obj.ToString());
+            }
+            return stringBuilder;
+        }
     }
 }

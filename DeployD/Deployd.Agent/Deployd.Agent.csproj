@@ -120,6 +120,7 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\WindowsPowerShell\v1.0\System.Management.Automation.dll</HintPath>
     </Reference>
+    <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.ServiceModel" />
     <Reference Include="System.ServiceModel.Web" />
     <Reference Include="System.ServiceProcess" />
@@ -156,10 +157,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="WebUi\Converters\RunningTasksToPackageListViewModelConverter.cs" />
     <Compile Include="WebUi\Models\ActionListViewModel.cs" />
-    <Compile Include="WebUi\Models\AgentStatusViewModel.cs" />
     <Compile Include="WebUi\Models\InstallationsViewModel.cs" />
-    <Compile Include="WebUi\Models\InstallTaskViewModel.cs" />
-    <Compile Include="WebUi\Models\LocalPackageInformation.cs" />
     <Compile Include="WebUi\Models\LogListViewModel.cs" />
     <Compile Include="WebUi\Models\LogViewModel.cs" />
     <Compile Include="WebUi\Models\PackageListViewModel.cs" />

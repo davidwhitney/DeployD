@@ -32,7 +32,8 @@ namespace DeployD.Hub.Areas.Api.Controllers
         public ActionResult ListForPackage(string hostname, string packageId)
         {
             var logList = _agentRemoteService.ListLogsForPackage(hostname, packageId)
-                .OrderByDescending(l=>l.DateCreated);
+                .OrderByDescending(l=>l.DateCreated)
+                .ToList();
 
             return _apiHttpChannel.RepresentationOf(logList, HttpContext);
         }

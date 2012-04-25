@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Threading.Tasks;
 using Deployd.Agent.WebUi.Models;
+using Deployd.Core;
 using Deployd.Core.AgentConfiguration;
 using Deployd.Core.Installation;
 using Deployd.Core.PackageCaching;

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using DeployD.Hub.Areas.Api.Models;
+using Deployd.Core;
 using Raven.Client;
 
 namespace DeployD.Hub.Areas.Api.Code

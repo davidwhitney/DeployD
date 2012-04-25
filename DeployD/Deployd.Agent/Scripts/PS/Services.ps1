@@ -41,3 +41,8 @@ function InstallIfNotAlready([string]$serviceName,[string]$pathToExecutable)
 		[System.Configuration.Install.ManagedInstallerClass]::InstallHelper($installArgs)
 	}
 }
+
+function FindServiceByExecutablePath([string]$pathToExecutable)
+{
+	Get-WmiObject -Class Win32_Service -Filter 'PathName LIKE "$pathToExecutable"'|select Name
+}

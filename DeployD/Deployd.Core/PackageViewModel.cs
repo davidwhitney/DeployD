@@ -1,4 +1,4 @@
-namespace DeployD.Hub.Areas.Api.Models
+namespace Deployd.Core
 {
     public class PackageViewModel
     {

@@ -30,7 +30,7 @@ namespace DeployD.Hub.Areas.Api
                              new { httpMethod = new HttpMethodConstraint("PUT") });
 
             context.MapRoute("AgentMethod",
-                "Api/agent/{id}/{action}",
+                "Api/agent/{hostname}/{action}",
                 new { controller = "Agent", action = "Index" },
                 new {httpMethod = new HttpMethodConstraint("GET","PUT","DELETE","POST")});
 

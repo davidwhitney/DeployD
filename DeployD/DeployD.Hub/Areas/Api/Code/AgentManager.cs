@@ -5,7 +5,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Web;
 using DeployD.Hub.Areas.Api.Models;
-using DeployD.Hub.Areas.Api.Models.Dto;
 using Deployd.Core;
 using log4net;
 
@@ -32,22 +31,33 @@ namespace DeployD.Hub.Areas.Api.Code
             UpdateTask.Start(null);
         }
 
+        private void UpdateAgentStatus(AgentRecord agent, AgentStatusReport agentStatus)
+        {
+            agent.Packages = agentStatus.packages
+                .Select(p => new PackageViewModel()
+                                 {
+                                     availableVersions = p.AvailableVersions.ToArray(), 
+                                     currentTask = p.CurrentTask, 
+                                     installedVersion = p.InstalledVersion, 
+                                     packageId = p.PackageId,
+                                     installed = p.Installed
+                                 }).ToList();
+            agent.CurrentTasks = agentStatus.currentTasks;
+            agent.AvailableVersions = agentStatus.availableVersions;
+            agent.Environment = agentStatus.environment;
+            agent.Contacted = true;
+            _agentRepository.SaveOrUpdate(agent);
+        }
+
         private void UpdateAgentStatus(AgentRecord agent)
         {
-            AgentStatusReport agentStatus = null;
             try
             {
-                agentStatus = _agentRemoteService.GetAgentStatus(agent.Hostname);
-                agent.Packages = agentStatus.packages;
-                agent.CurrentTasks = agentStatus.currentTasks;
-                agent.AvailableVersions = agentStatus.availableVersions;
-                agent.Environment = agentStatus.environment;
-                agent.Contacted = true;
-                _agentRepository.SaveOrUpdate(agent);
+                UpdateAgentStatus(agent, _agentRemoteService.GetAgentStatus(agent.Hostname));
             }
             catch (Exception ex)
             {
-                _logger.Warn("Failed to get agent status", ex);
+                _logger.InfoFormat("Agent {0} seems to be down", agent.Hostname);
                 agent.Contacted = false;
             }
         }
@@ -77,7 +87,7 @@ namespace DeployD.Hub.Areas.Api.Code
 
         public void StartUpdateOnAllAgents()
         {
-            _agentRepository.List().ForEach(a => new TaskFactory().StartNew(() => UpdateAgentStatus(a)));
+            //_agentRepository.List().ForEach(a => new TaskFactory().StartNew(() => UpdateAgentStatus(a)));
         }
 
         public void UnregisterAgent(string hostname)
@@ -93,6 +103,11 @@ namespace DeployD.Hub.Areas.Api.Code
         public AgentRecord GetAgent(string hostname)
         {
             return _agentRepository.Get(a => a.Hostname == hostname);
+        }
+
+        public void SetStatus(string hostname, AgentStatusReport agentStatus)
+        {
+            UpdateAgentStatus(_agentRepository.Get(a => a.Hostname == hostname), agentStatus);
         }
     }
 }

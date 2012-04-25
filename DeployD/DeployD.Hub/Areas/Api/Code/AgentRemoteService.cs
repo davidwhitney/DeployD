@@ -3,9 +3,10 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Runtime.Serialization;
 using System.Text;
 using DeployD.Hub.Areas.Api.Models;
-using DeployD.Hub.Areas.Api.Models.Dto;
+using Deployd.Core;
 
 namespace DeployD.Hub.Areas.Api.Code
 {
@@ -99,40 +100,60 @@ namespace DeployD.Hub.Areas.Api.Code
             return Get<LogFileDto>(url);
         }
     }
-
+    [DataContract]
     public class PackageLogFolderListDto
     {
+        [DataMember]
         public List<LogListDto> PackageLogFolders { get; set; }
     }
 
+    [DataContract]
     public class LogFileDto
     {
+        [DataMember]
         public string LogFileName { get; set; }
+        [DataMember]
         public DateTime DateCreated { get; set; }
+        [DataMember]
         public DateTime DateModified { get; set; }
+        [DataMember]
         public string PackageId { get; set; }
+        [DataMember]
         public string LogContents { get; set; }
-        public string DateCreatedString { get { return DateCreated.ToString("dd-MM-yyyy HH:mm:ss"); } }
-        public string DateModifiedString { get { return DateModified.ToString("dd-MM-yyyy HH:mm:ss"); } }
+        [DataMember]
+        public string DateCreatedString { get { return DateCreated.ToString("dd-MM-yyyy HH:mm:ss"); } set{} }
+        [DataMember]
+        public string DateModifiedString { get { return DateModified.ToString("dd-MM-yyyy HH:mm:ss"); } set { } }
     }
 
+    [DataContract]
     public class LogListDto
     {
+        [DataMember]
         public List<LogDto> Logs { get; set; }
+        [DataMember]
         public string PackageId { get; set; }
     }
 
+    [DataContract]
     public class LogDto
     {
+        [DataMember]
         public string LogFileName { get; set; }
+        [DataMember]
         public DateTime DateCreated { get; set; }
+        [DataMember]
         public DateTime DateModified { get; set; }
-        public string DateCreatedString { get { return DateCreated.ToString("dd-MM-yyyy HH:mm:ss"); } }
-        public string DateModifiedString { get { return DateModified.ToString("dd-MM-yyyy HH:mm:ss"); } }
+        [DataMember]
+        public string DateCreatedString { get { return DateCreated.ToString("dd-MM-yyyy HH:mm:ss"); } set { } }
+        [DataMember]
+        public string DateModifiedString { get { return DateModified.ToString("dd-MM-yyyy HH:mm:ss"); } set { } }
     }
 
+    [DataContract]
     public class PackageListDto
     {
+        [DataMember]
         public List<PackageViewModel> Packages { get; set; } 
     }
 }

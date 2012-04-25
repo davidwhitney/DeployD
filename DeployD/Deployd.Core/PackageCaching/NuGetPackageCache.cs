@@ -167,7 +167,13 @@ namespace Deployd.Core.PackageCaching
                 throw new ArgumentOutOfRangeException("version");
             }
 
-            return new ZipPackage(packagePath);
+            try
+            {
+                return new ZipPackage(packagePath);
+            } catch (Exception ex)
+            {
+                return null;
+            }
         }
 
         private static string CachedPackageVersionFilename(string packageId, string version)

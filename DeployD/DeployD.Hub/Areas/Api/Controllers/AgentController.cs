@@ -1,11 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Web;
 using System.Web.Mvc;
 using DeployD.Hub.Areas.Api.Code;
 using DeployD.Hub.Areas.Api.Models;
+using Deployd.Core;
+using log4net;
 
 namespace DeployD.Hub.Areas.Api.Controllers
 {
@@ -14,12 +17,14 @@ namespace DeployD.Hub.Areas.Api.Controllers
         private readonly IApiHttpChannel _httpChannel;
         private readonly IAgentManager _agentManager;
         private readonly IAgentRemoteService _agentRemoteService;
+        private readonly ILog _log;
 
-        public AgentController(IApiHttpChannel httpChannel, IAgentManager agentManager, IAgentRemoteService agentRemoteService)
+        public AgentController(IApiHttpChannel httpChannel, IAgentManager agentManager, IAgentRemoteService agentRemoteService, ILog log)
         {
             _httpChannel = httpChannel;
             _agentManager = agentManager;
             _agentRemoteService = agentRemoteService;
+            _log = log;
 
             AutoMapper.Mapper.CreateMap<AgentRecord, AgentViewModel>().ForMember(viewModel=>viewModel.id, mo=>mo.MapFrom(record=>record.Hostname));
             AutoMapper.Mapper.CreateMap<PackageRecord, PackageViewModel>().ForMember(viewModel => viewModel.packageId, mo => mo.MapFrom(record => record.PackageId));
@@ -45,14 +50,14 @@ namespace DeployD.Hub.Areas.Api.Controllers
 
         [ActionName("Index")]
         [HttpGet]
-        public ActionResult Index(string id) // list
+        public ActionResult Index(string hostname) // list
         {
-            if (string.IsNullOrWhiteSpace(id))
+            if (string.IsNullOrWhiteSpace(hostname))
             {
-                throw new HttpException((int)HttpStatusCode.BadRequest, "Invalid parameter", new ArgumentException("Invalid hostname", "id"));
+                throw new HttpException((int)HttpStatusCode.BadRequest, "Invalid parameter", new ArgumentException("Invalid hostname", "hostname"));
             }
 
-            AgentRecord agentRecord = _agentManager.ListAgents().SingleOrDefault(a => a.Hostname == id);
+            AgentRecord agentRecord = _agentManager.ListAgents().SingleOrDefault(a => a.Hostname == hostname);
             var viewModel = AutoMapper.Mapper.Map<AgentRecord, AgentViewModel>(agentRecord);
 
             return _httpChannel.RepresentationOf(viewModel, HttpContext);
@@ -60,18 +65,18 @@ namespace DeployD.Hub.Areas.Api.Controllers
 
         [AcceptVerbs("PUT")]
         [ActionName("Index")]
-        public ActionResult IndexPost(string id)
+        public ActionResult IndexPost(string hostname)
         {
-            _agentManager.RegisterAgentAndGetStatus(id);
+            _agentManager.RegisterAgentAndGetStatus(hostname);
 
             return new HttpStatusCodeResult((int) HttpStatusCode.Created);
         }
 
         [AcceptVerbs("DELETE")]
         [ActionName("Index")]
-        public ActionResult IndexDelete(string id)
+        public ActionResult IndexDelete(string hostname)
         {
-            _agentManager.UnregisterAgent(id);
+            _agentManager.UnregisterAgent(hostname);
             return new HttpStatusCodeResult((int)HttpStatusCode.OK);
         }
 
@@ -92,10 +97,10 @@ namespace DeployD.Hub.Areas.Api.Controllers
 
         [AcceptVerbs("POST")]
         [ActionName("applyVersions")]
-        public ActionResult ApplyVersions(string id)
+        public ActionResult ApplyVersions(string hostname)
         {
-            Response.Write("apply versions to " + id + "\n");
-            var agentPackages = _agentRemoteService.ListPackages(id);
+            Response.Write("apply versions to " + hostname + "\n");
+            var agentPackages = _agentRemoteService.ListPackages(hostname);
             foreach(var package in agentPackages)
             {
                 string requestedVersion = Request.Form[package.packageId];
@@ -108,10 +113,11 @@ namespace DeployD.Hub.Areas.Api.Controllers
                     }
                     else if (package.installed && package.installedVersion == requestedVersion)
                     {
-                        Response.Write("version is already installed\n");
+                        Response.Write("version is already installed... installing anyway\n");
+                        _agentRemoteService.StartUpdate(hostname, package.packageId, requestedVersion);
                     } else
                     {
-                        _agentRemoteService.StartUpdate(id, package.packageId, requestedVersion);
+                        _agentRemoteService.StartUpdate(hostname, package.packageId, requestedVersion);
                     }
                 }
             }
@@ -134,9 +140,9 @@ namespace DeployD.Hub.Areas.Api.Controllers
 
         [AcceptVerbs("POST")]
         [ActionName("approve")]
-        public ActionResult Approve(string id)
+        public ActionResult Approve(string hostname)
         {
-            _agentManager.ApproveAgent(id);
+            _agentManager.ApproveAgent(hostname);
             return new HttpStatusCodeResult((int)HttpStatusCode.Accepted);
         }
 
@@ -151,6 +157,37 @@ namespace DeployD.Hub.Areas.Api.Controllers
                 {
                     return new HttpStatusCodeResult((int) HttpStatusCode.OK);
                 } else
+                {
+                    return new HttpStatusCodeResult((int)HttpStatusCode.Unauthorized);
+                }
+            }
+            return new HttpNotFoundResult();
+        }
+
+        [AcceptVerbs("POST")]
+        [ActionName("status")]
+        public ActionResult Status(string hostname, AgentStatusReport agentStatus)
+        {
+            _log.DebugFormat("agent {0} status", hostname);
+            var tasks = agentStatus.packages.Where(p => p.CurrentTask != null).Select(p => p.CurrentTask);
+            foreach(var task in tasks)
+            {
+                _log.DebugFormat("{0}:{1}", task.PackageId, task.LastMessage);
+            }
+            /*foreach(var package in agentStatus.packages)
+            {
+                _log.DebugFormat("{0}:{1}", package.PackageId, package.CurrentTask!= null ? package.CurrentTask.LastMessage : package.InstalledVersion);
+            }*/
+            var agent = _agentManager.GetAgent(hostname);
+            
+            if (agent != null)
+            {
+                if (agent.Approved)
+                {
+                    _agentManager.SetStatus(hostname, agentStatus);
+                    return new HttpStatusCodeResult((int)HttpStatusCode.OK);
+                }
+                else
                 {
                     return new HttpStatusCodeResult((int)HttpStatusCode.Unauthorized);
                 }

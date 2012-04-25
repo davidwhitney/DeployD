@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace Deployd.Agent.WebUi.Models
+namespace Deployd.Core
 {
     public class AgentStatusViewModel
     {

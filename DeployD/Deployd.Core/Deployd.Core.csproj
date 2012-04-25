@@ -75,6 +75,7 @@
       <HintPath>..\packages\System.IO.Abstractions.1.4.0.12\lib\net35\System.IO.Abstractions.dll</HintPath>
     </Reference>
     <Reference Include="System.Management.Automation, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
+    <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.ServiceModel" />
     <Reference Include="System.ServiceProcess" />
     <Reference Include="System.Xml.Linq" />
@@ -100,9 +101,14 @@
     <Compile Include="AgentManagement\IActionTaskManager.cs" />
     <Compile Include="AgentManagement\IAgentActionsRepository.cs" />
     <Compile Include="AgentManagement\IAgentActionsService.cs" />
+    <Compile Include="AgentStatusReport.cs" />
+    <Compile Include="AgentStatusViewModel.cs" />
+    <Compile Include="AgentViewModel.cs" />
     <Compile Include="DebugTimer.cs" />
     <Compile Include="Installation\Hooks\CustomActionsExtractionDeploymentHook.cs" />
     <Compile Include="Installation\Hooks\Iis7MsDeployDeploymentHook.cs" />
+    <Compile Include="InstallTaskViewModel.cs" />
+    <Compile Include="LocalPackageInformation.cs" />
     <Compile Include="PackageCaching\InstalledPackageArchive.cs" />
     <Compile Include="PackageCaching\IInstalledPackageArchive.cs" />
     <Compile Include="Installation\DeploymentContext.cs" />
@@ -139,6 +145,7 @@
     <Compile Include="Installation\InstallationTaskQueue.cs" />
     <Compile Include="Installation\ProgressReport.cs" />
     <Compile Include="Installation\RunningInstallationTaskList.cs" />
+    <Compile Include="PackageViewModel.cs" />
     <Compile Include="PowershellHelper.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="PackageTransport\IRetrievePackageQuery.cs" />
