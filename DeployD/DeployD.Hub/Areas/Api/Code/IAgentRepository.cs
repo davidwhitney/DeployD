@@ -12,6 +12,7 @@ namespace DeployD.Hub.Areas.Api.Code
         void Remove(string hostname);
         List<AgentRecord> List();
         AgentRecord Get(Func<AgentRecord, bool> predicate );
+        IEnumerable<AgentRecord> Where(Func<AgentRecord, bool> predicate);
         void SetApproved(string hostname);
     }
 }

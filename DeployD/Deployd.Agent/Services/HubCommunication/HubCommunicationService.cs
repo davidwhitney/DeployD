@@ -24,7 +24,7 @@ namespace Deployd.Agent.Services.HubCommunication
         private readonly RunningInstallationTaskList _runningTasks;
         private readonly IInstalledPackageArchive _installCache;
         private Timer _pingTimer = null;
-        private int _pingIntervalInMilliseconds = 1000;
+        private int _pingIntervalInMilliseconds = 5000;
 
         public HubCommunicationService(IAgentSettings agentSettings, ILog log, ILocalPackageCache cache, RunningInstallationTaskList runningTasks, IInstalledPackageArchive installCache)
         {
@@ -110,13 +110,18 @@ namespace Deployd.Agent.Services.HubCommunication
                 }
                 else
                 {
-                    _log.Warn("Unknown error pinging hub", exception);
+                    _log.Warn("Unknown web error sending status to hub", exception);
+                    using (var responseStream = response.GetResponseStream())
+                    using (var streamReader = new StreamReader(responseStream))
+                    {
+                        _log.Warn(streamReader.ReadToEnd());
+                    }
                 }
                 SlowPingIntervalUpToFiveMinutes();
             }
             catch (Exception exception)
             {
-                _log.Warn("Unknown error pinging hub", exception);
+                _log.Warn("Unknown error sending status to hub", exception);
                 SlowPingIntervalUpToFiveMinutes();
             }
         }
@@ -204,6 +209,11 @@ namespace Deployd.Agent.Services.HubCommunication
                 else
                 {
                     _log.Warn("Unknown error pinging hub", exception);
+                    using (var responseStream = response.GetResponseStream())
+                    using (var streamReader = new StreamReader(responseStream))
+                    {
+                        _log.Warn(streamReader.ReadToEnd());
+                    }
                 }
             } catch (Exception exception)
             {
@@ -239,7 +249,12 @@ namespace Deployd.Agent.Services.HubCommunication
                 }
                 else
                 {
-                    _log.Warn("Unknown error registering with hub", webException);
+                    _log.Warn("Unknown web error registering with hub", webException);
+                    using (var responseStream = response.GetResponseStream())
+                    using (var streamReader = new StreamReader(responseStream))
+                    {
+                        _log.Warn(streamReader.ReadToEnd());
+                    }
 
                 }
             }catch (Exception exception)

@@ -48,6 +48,11 @@ namespace DeployD.Hub.Areas.Api.Code
             return _agentList.SingleOrDefault(predicate);
         }
 
+        public IEnumerable<AgentRecord> Where(Func<AgentRecord, bool> predicate)
+        {
+            throw new NotImplementedException();
+        }
+
         public void SetApproved(string hostname)
         {
             var agent = _agentList.SingleOrDefault(a => a.Hostname == hostname);

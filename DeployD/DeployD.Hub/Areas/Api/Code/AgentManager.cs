@@ -102,7 +102,7 @@ namespace DeployD.Hub.Areas.Api.Code
 
         public AgentRecord GetAgent(string hostname)
         {
-            return _agentRepository.Get(a => a.Hostname == hostname);
+            return _agentRepository.Where(a => a.Hostname == hostname).FirstOrDefault();
         }
 
         public void SetStatus(string hostname, AgentStatusReport agentStatus)

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Transactions;
 using DeployD.Hub.Areas.Api.Models;
 using Deployd.Core;
 using Raven.Client;
@@ -9,6 +10,7 @@ namespace DeployD.Hub.Areas.Api.Code
 {
     public class RavenDbAgentRepository : IAgentRepository
     {
+        private static object _lock=new object();
         private readonly IDocumentStore _documentStore;
 
         public RavenDbAgentRepository(IDocumentStore documentStore)
@@ -28,9 +30,11 @@ namespace DeployD.Hub.Areas.Api.Code
         public void Remove(AgentRecord agent)
         {
             using (var session = _documentStore.OpenSession())
+            using (var transaction = new TransactionScope())
             {
                 session.Delete(agent);
                 session.SaveChanges();
+                transaction.Complete();
             }
         }
 
@@ -55,6 +59,14 @@ namespace DeployD.Hub.Areas.Api.Code
             using (var session = _documentStore.OpenSession())
             {
                 return session.Query<AgentRecord>().ToList();
+            }
+        }
+
+        public IEnumerable<AgentRecord> Where(Func<AgentRecord, bool> predicate )
+        {
+            using (var session = _documentStore.OpenSession())
+            {
+                return session.Query<AgentRecord>().Where(predicate);
             }
         }
 
