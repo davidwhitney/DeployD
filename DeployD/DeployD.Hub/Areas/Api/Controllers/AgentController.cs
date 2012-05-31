@@ -57,7 +57,7 @@ namespace DeployD.Hub.Areas.Api.Controllers
                 throw new HttpException((int)HttpStatusCode.BadRequest, "Invalid parameter", new ArgumentException("Invalid hostname", "hostname"));
             }
 
-            AgentRecord agentRecord = _agentManager.ListAgents().SingleOrDefault(a => a.Hostname == hostname);
+            AgentRecord agentRecord = _agentManager.GetAgent(hostname);
             var viewModel = AutoMapper.Mapper.Map<AgentRecord, AgentViewModel>(agentRecord);
 
             return _httpChannel.RepresentationOf(viewModel, HttpContext);

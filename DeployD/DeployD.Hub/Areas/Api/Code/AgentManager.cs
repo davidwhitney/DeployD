@@ -47,7 +47,7 @@ namespace DeployD.Hub.Areas.Api.Code
 
         public AgentRecord GetAgent(string hostname)
         {
-            var agent = _ravenSession.Load<AgentRecord>("agent/"+hostname);
+            var agent = _ravenSession.Load<AgentRecord>(hostname);
             return agent;
         }
 

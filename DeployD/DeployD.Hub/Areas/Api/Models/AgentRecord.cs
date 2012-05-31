@@ -21,7 +21,7 @@ namespace DeployD.Hub.Areas.Api.Models
             Packages = new List<PackageViewModel>();
             CurrentTasks = new List<InstallTaskViewModel>();
             AvailableVersions = new List<string>();
-            Id = "agent/" + hostname;
+            Id = hostname;
         }
 
     }
