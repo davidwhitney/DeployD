@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Deployd.Core;
 
@@ -13,12 +14,14 @@ namespace DeployD.Hub.Areas.Api.Models
         public string Environment { get; set; }
         public bool Contacted { get; set; }
         public bool Approved { get; set; }
+        public DateTime LastContact { get; set; }
 
-        public AgentRecord()
+        public AgentRecord(string hostname)
         {
             Packages = new List<PackageViewModel>();
             CurrentTasks = new List<InstallTaskViewModel>();
             AvailableVersions = new List<string>();
+            Id = "agent/" + hostname;
         }
 
     }

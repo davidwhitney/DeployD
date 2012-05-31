@@ -65,6 +65,13 @@ namespace Deployd.Agent.Services.HubCommunication
                         requestStream.Flush();
                         requestStream.Close();
                     }
+
+                    ms.Position = 0;
+                    using (var streamReader = new StreamReader(ms))
+                    {
+                        //_log.DebugFormat("{0}", streamReader.ReadToEnd());
+                        System.Diagnostics.Debug.WriteLine(streamReader.ReadToEnd());
+                    }
                 }
             }
             catch (Exception ex)

@@ -7,11 +7,11 @@ namespace DeployD.Hub.Areas.Api.Code
     public interface IAgentManager
     {
         List<AgentRecord> ListAgents();
-        void StartUpdateOnAllAgents();
-        void RegisterAgentAndGetStatus(string hostname);
+        AgentRecord RegisterAgent(string hostname);
         void UnregisterAgent(string hostname);
-        void ApproveAgent(string id);
+        void ApproveAgent(string hostname);
         AgentRecord GetAgent(string hostname);
         void SetStatus(string hostname, AgentStatusReport agentStatus);
+        void ReceiveStatus(string hostname, AgentStatusReport agentStatus);
     }
 }

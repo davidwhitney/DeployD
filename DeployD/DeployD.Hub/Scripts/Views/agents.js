@@ -36,7 +36,7 @@ $(function () {
         },
         approveAgent: function (event) {
             var agentHostname = $(event.target).attr('data-id');
-            $.post('/api/agent/' + agentHostname + '/approve')
+            $.post('/api/' + agentHostname + '/approve')
                 .success(function () {
                     agentsList.refresh();
                 });

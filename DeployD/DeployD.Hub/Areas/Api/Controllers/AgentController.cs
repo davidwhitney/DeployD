@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Net;
 using System.Web;
@@ -19,14 +18,16 @@ namespace DeployD.Hub.Areas.Api.Controllers
         private readonly IAgentRemoteService _agentRemoteService;
         private readonly ILog _log;
 
-        public AgentController(IApiHttpChannel httpChannel, IAgentManager agentManager, IAgentRemoteService agentRemoteService, ILog log)
+        public AgentController(IApiHttpChannel httpChannel, IAgentManager agentManager, 
+            IAgentRemoteService agentRemoteService, ILog log)
         {
             _httpChannel = httpChannel;
             _agentManager = agentManager;
             _agentRemoteService = agentRemoteService;
             _log = log;
 
-            AutoMapper.Mapper.CreateMap<AgentRecord, AgentViewModel>().ForMember(viewModel=>viewModel.id, mo=>mo.MapFrom(record=>record.Hostname));
+            AutoMapper.Mapper.CreateMap<AgentRecord, AgentViewModel>().ForMember(viewModel=>viewModel.id, mo=>mo.MapFrom(record=>record.Id));
+
             AutoMapper.Mapper.CreateMap<PackageRecord, PackageViewModel>().ForMember(viewModel => viewModel.packageId, mo => mo.MapFrom(record => record.PackageId));
         }
 
@@ -39,9 +40,8 @@ namespace DeployD.Hub.Areas.Api.Controllers
             if (!includeUnapproved.HasValue)
                 includeUnapproved = false;
 
-            _agentManager.StartUpdateOnAllAgents();
-            List<AgentRecord> agents = _agentManager.ListAgents()
-                .Where(a => a.Approved || includeUnapproved.Value) 
+            List<AgentRecord> agents = _agentManager.ListAgents();
+                agents = agents.Where(a => a.Approved || includeUnapproved.Value) 
                     .ToList(); 
             var viewModel = agents.Select(AutoMapper.Mapper.Map<AgentRecord, AgentViewModel>).ToList();
 
@@ -67,7 +67,7 @@ namespace DeployD.Hub.Areas.Api.Controllers
         [ActionName("Index")]
         public ActionResult IndexPost(string hostname)
         {
-            _agentManager.RegisterAgentAndGetStatus(hostname);
+            _agentManager.RegisterAgent(hostname);
 
             return new HttpStatusCodeResult((int) HttpStatusCode.Created);
         }
@@ -134,7 +134,7 @@ namespace DeployD.Hub.Areas.Api.Controllers
             if (agent != null)
                 return new HttpStatusCodeResult((int)HttpStatusCode.Conflict);
 
-            _agentManager.RegisterAgentAndGetStatus(hostname);
+            _agentManager.RegisterAgent(hostname);
             return new HttpStatusCodeResult((int)HttpStatusCode.Created);
         }
 
@@ -168,31 +168,9 @@ namespace DeployD.Hub.Areas.Api.Controllers
         [ActionName("status")]
         public ActionResult Status(string hostname, AgentStatusReport agentStatus)
         {
-            _log.DebugFormat("agent {0} status", hostname);
-            var tasks = agentStatus.packages.Where(p => p.CurrentTask != null).Select(p => p.CurrentTask);
-            foreach(var task in tasks)
-            {
-                _log.DebugFormat("{0}:{1}", task.PackageId, task.LastMessage);
-            }
-            /*foreach(var package in agentStatus.packages)
-            {
-                _log.DebugFormat("{0}:{1}", package.PackageId, package.CurrentTask!= null ? package.CurrentTask.LastMessage : package.InstalledVersion);
-            }*/
-            var agent = _agentManager.GetAgent(hostname);
-            
-            if (agent != null)
-            {
-                if (agent.Approved)
-                {
-                    _agentManager.SetStatus(hostname, agentStatus);
-                    return new HttpStatusCodeResult((int)HttpStatusCode.OK);
-                }
-                else
-                {
-                    return new HttpStatusCodeResult((int)HttpStatusCode.Unauthorized);
-                }
-            }
-            return new HttpNotFoundResult();
+            _agentManager.ReceiveStatus(hostname, agentStatus);
+
+            return new HttpStatusCodeResult((int)HttpStatusCode.Accepted);
         }
     }
 }

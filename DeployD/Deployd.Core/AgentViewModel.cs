@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
 
@@ -20,5 +21,11 @@ namespace Deployd.Core
         public bool contacted { get; set; }
         [DataMember(Name = "approved")]
         public bool Approved { get; set; }
+
+        [DataMember(Name = "lastContact")]
+        public DateTime LastContact { get; set; }
+
+        [DataMember(Name="stale")]
+        public bool Stale { get { return DateTime.Now.Subtract(LastContact).TotalMinutes > 1; } set {} }
     }
 }

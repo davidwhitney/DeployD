@@ -22,6 +22,7 @@ namespace DeployD.Hub.Areas.Api.Code
         {
             using (var session = _documentStore.OpenSession())
             {
+                session.Advanced.UseOptimisticConcurrency = true;
                 session.Store(agent);
                 session.SaveChanges();
             }

@@ -18,7 +18,7 @@
         <%_.each(agents.models, function(agent) {%>
         <li>
             <%=agent.attributes.id%>
-            <%if (!agent.attributes.Approved) {%> <a href='#' class='approve-agent' data-id='<%=agent.attributes.id%>'>Approve</a> <%}%>
+            <%if (!agent.attributes.approved) {%> <a href='#' class='approve-agent' data-id='<%=agent.attributes.id%>'>Approve</a> <%}%>
         </li>
         <%});%>
     </ul>

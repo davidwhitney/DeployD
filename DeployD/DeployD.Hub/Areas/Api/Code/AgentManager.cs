@@ -1,44 +1,79 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Configuration;
 using System.Linq;
-using System.Threading.Tasks;
-using System.Web;
 using DeployD.Hub.Areas.Api.Models;
 using Deployd.Core;
-using log4net;
+using Raven.Client;
 
 namespace DeployD.Hub.Areas.Api.Code
 {
     public class AgentManager : IAgentManager
     {
-        private readonly IAgentRepository _agentRepository;
-        private readonly IAgentRemoteService _agentRemoteService;
-        private readonly ILog _logger;
-        public TimedSingleExecutionTask UpdateTask { get; private set; }
+        private readonly IDocumentSession _ravenSession;
 
-        public AgentManager(IAgentRepository agentRepository, IAgentRemoteService agentRemoteService, ILog logger)
+        public AgentManager(IDocumentSession ravenSession)
         {
-            int updateInterval;
-            if (!int.TryParse(ConfigurationManager.AppSettings["UpdateInterval"], out updateInterval))
-            {
-                updateInterval = 5000;
-            }
-            _agentRepository = agentRepository;
-            _agentRemoteService = agentRemoteService;
-            _logger = logger;
-            UpdateTask = new TimedSingleExecutionTask(updateInterval, StartUpdateOnAllAgents, true);
-            UpdateTask.Start(null);
+            _ravenSession = ravenSession;
         }
 
-        private void UpdateAgentStatus(AgentRecord agent, AgentStatusReport agentStatus)
+        public List<AgentRecord> ListAgents()
         {
+            return _ravenSession.Query<AgentRecord>().ToList();
+        }
+
+        public AgentRecord RegisterAgent(string hostname)
+        {
+            if (_ravenSession.Load<AgentRecord>(hostname) != null)
+                throw new InvalidOperationException("Agent already registered");
+
+            var agent = new AgentRecord(hostname);
+            _ravenSession.Store(agent);
+
+            return agent;
+        }
+
+        public void UnregisterAgent(string hostname)
+        {
+            var agent = GetAgent(hostname);
+            _ravenSession.Delete(agent);
+        }
+
+        public void ApproveAgent(string hostname)
+        {
+            var agent = GetAgent(hostname);
+            agent.Approved = true;
+            _ravenSession.SaveChanges();
+        }
+
+        public AgentRecord GetAgent(string hostname)
+        {
+            var agent = _ravenSession.Load<AgentRecord>("agent/"+hostname);
+            return agent;
+        }
+
+        public void SetStatus(string hostname, AgentStatusReport agentStatus)
+        {
+            SetAgentStatus(agentStatus, GetAgent(hostname));
+        }
+
+        public void ReceiveStatus(string hostname, AgentStatusReport agentStatus)
+        {
+            var agent = GetAgent(hostname) ?? RegisterAgent(hostname);
+            _ravenSession.Advanced.Refresh(agent);
+
+            // set agent status and update
+            SetAgentStatus(agentStatus, agent);
+        }
+
+        private void SetAgentStatus(AgentStatusReport agentStatus, AgentRecord agent)
+        {
+            _ravenSession.Advanced.GetEtagFor(agent);
             agent.Packages = agentStatus.packages
-                .Select(p => new PackageViewModel()
+                .Select(p => new PackageViewModel
                                  {
-                                     availableVersions = p.AvailableVersions.ToArray(), 
-                                     currentTask = p.CurrentTask, 
-                                     installedVersion = p.InstalledVersion, 
+                                     availableVersions = p.AvailableVersions.ToArray(),
+                                     currentTask = p.CurrentTask,
+                                     installedVersion = p.InstalledVersion,
                                      packageId = p.PackageId,
                                      installed = p.Installed
                                  }).ToList();
@@ -46,68 +81,10 @@ namespace DeployD.Hub.Areas.Api.Code
             agent.AvailableVersions = agentStatus.availableVersions;
             agent.Environment = agentStatus.environment;
             agent.Contacted = true;
-            _agentRepository.SaveOrUpdate(agent);
-        }
-
-        private void UpdateAgentStatus(AgentRecord agent)
-        {
-            try
-            {
-                UpdateAgentStatus(agent, _agentRemoteService.GetAgentStatus(agent.Hostname));
-            }
-            catch (Exception ex)
-            {
-                _logger.InfoFormat("Agent {0} seems to be down", agent.Hostname);
-                agent.Contacted = false;
-            }
-        }
-
-
-        ~AgentManager()
-        {
-            UpdateTask.Stop();
-        }
-
-        public List<AgentRecord> ListAgents()
-        {
-            return _agentRepository.List();
-        }
-
-        public void RegisterAgentAndGetStatus(string hostname)
-        {
-            if (_agentRepository.List().Any(a=>a.Hostname == hostname))
-            {
-                throw new InvalidOperationException("Agent already registered");
-            }
-
-            AgentRecord agent = new AgentRecord() { Hostname = hostname };
-            new TaskFactory().StartNew(() => UpdateAgentStatus(agent));
-            _agentRepository.SaveOrUpdate(agent);
-        }
-
-        public void StartUpdateOnAllAgents()
-        {
-            //_agentRepository.List().ForEach(a => new TaskFactory().StartNew(() => UpdateAgentStatus(a)));
-        }
-
-        public void UnregisterAgent(string hostname)
-        {
-            _agentRepository.Remove(hostname);
-        }
-
-        public void ApproveAgent(string id)
-        {
-            _agentRepository.SetApproved(id);
-        }
-
-        public AgentRecord GetAgent(string hostname)
-        {
-            return _agentRepository.Where(a => a.Hostname == hostname).FirstOrDefault();
-        }
-
-        public void SetStatus(string hostname, AgentStatusReport agentStatus)
-        {
-            UpdateAgentStatus(_agentRepository.Get(a => a.Hostname == hostname), agentStatus);
+            agent.LastContact = DateTime.Now;
+            _ravenSession.Store(agent);
+            System.Diagnostics.Debug.WriteLine("Update agent");
+            _ravenSession.SaveChanges();
         }
     }
 }

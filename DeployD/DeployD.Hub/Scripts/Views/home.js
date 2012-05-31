@@ -38,7 +38,7 @@ var _manageAgentDialogOpen = false;
 
     var AgentList = Backbone.Collection.extend({
         model: Agent,
-        url: _apiBaseUrl + '/agent?includeUnapproved=true'
+        url: _apiBaseUrl + '/agent?includeUnapproved=false'
     });
 
     var VersionList = Backbone.Collection.extend({
@@ -181,7 +181,9 @@ var _manageAgentDialogOpen = false;
                 environment: this.model.get('environment'),
                 selected: this.selected,
                 contacted: this.model.get('contacted'),
-                approved: this.model.get('approved')
+                approved: this.model.get('approved'),
+                stale: this.model.get('stale'),
+                lastContact: this.model.get('lastContact')
             };
 
             var template = _.template(_agentTemplate, viewModel);

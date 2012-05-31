@@ -35,7 +35,7 @@
     <input type="checkbox" id="select-<%=hostname%>" data-value="<%=hostname%>" name="select-agent"  />
         <label for="select-<%=hostname%>" class="agent-hostname">
             <%=hostname%>
-            <%if (!contacted) {%> (!) <%}%>
+            <%if (stale) {%> (!) <%}%>
         </label> (<%=environment%>) 
         <%if (approved) {%>
             <a class="manage-agent" data-id="<%=hostname%>" href="javascript:void(0);">manage</a>&nbsp;
