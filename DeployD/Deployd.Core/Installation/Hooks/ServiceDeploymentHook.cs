@@ -42,6 +42,7 @@ namespace Deployd.Core.Installation.Hooks
         {
             var pathToExecutable = Path.Combine(Path.Combine(_serviceInstallationPath, context.Package.Id), context.Package.Id + ".exe");
             var serviceName = GetServiceNameForExecutable(context, pathToExecutable);
+            logger.InfoFormat("Service name is {0}", serviceName);
             if (string.IsNullOrWhiteSpace(serviceName))
             {
                 serviceName = context.Package.Id;
@@ -87,6 +88,7 @@ namespace Deployd.Core.Installation.Hooks
 
             var pathToExecutable = Path.Combine(Path.Combine(_serviceInstallationPath, context.Package.Id), context.Package.Id + ".exe");
             var serviceName = GetServiceNameForExecutable(context, pathToExecutable);
+            logger.InfoFormat("Service name is {0}", serviceName);
             
             // if no such service then install it
             using (var service = ServiceController.GetServices().SingleOrDefault(s => s.ServiceName == serviceName))
