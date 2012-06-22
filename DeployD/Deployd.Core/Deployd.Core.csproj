@@ -106,6 +106,7 @@
     <Compile Include="AgentStatusViewModel.cs" />
     <Compile Include="AgentViewModel.cs" />
     <Compile Include="DebugTimer.cs" />
+    <Compile Include="Installation\DeploydMetaData.cs" />
     <Compile Include="Installation\Hooks\CustomActionsExtractionDeploymentHook.cs" />
     <Compile Include="Installation\Hooks\Iis7MsDeployDeploymentHook.cs" />
     <Compile Include="InstallTaskViewModel.cs" />

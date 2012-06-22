@@ -41,12 +41,9 @@ namespace Deployd.Core.Installation.Hooks
         private void ShutdownRequiredServices(DeploymentContext context, ILog logger)
         {
             var pathToExecutable = Path.Combine(Path.Combine(_serviceInstallationPath, context.Package.Id), context.Package.Id + ".exe");
-            var serviceName = GetServiceNameForExecutable(context, pathToExecutable);
-            if (string.IsNullOrWhiteSpace(serviceName))
-            {
-                serviceName = context.Package.Id;
-            }
-            using (var service = ServiceController.GetServices().SingleOrDefault(s => s.ServiceName == serviceName))
+            
+            var serviceName = DetermineServiceName(context, pathToExecutable, logger);
+            using (var service = GetServiceByNameOrDisplayName(serviceName))
             {
                 if (service == null)
                 {
@@ -62,6 +59,20 @@ namespace Deployd.Core.Installation.Hooks
 
                 ChangeServiceStateTo(service, ServiceControllerStatus.Stopped, service.Stop, logger);
             }
+        }
+
+        private static string DetermineServiceName(DeploymentContext context, string pathToExecutable, ILog logger)
+        {
+            var serviceName = context.MetaData != null
+                                  ? context.MetaData.ServiceName
+                                  : GetServiceNameForExecutable(context, pathToExecutable);
+
+            if (string.IsNullOrWhiteSpace(serviceName))
+            {
+                serviceName = context.Package.Id;
+            }
+            logger.DebugFormat("Service name is '{0}'", serviceName);
+            return serviceName;
         }
 
         public override void Deploy(DeploymentContext context)
@@ -86,31 +97,32 @@ namespace Deployd.Core.Installation.Hooks
             }
 
             var pathToExecutable = Path.Combine(Path.Combine(_serviceInstallationPath, context.Package.Id), context.Package.Id + ".exe");
-            var serviceName = GetServiceNameForExecutable(context, pathToExecutable);
-            
+            var serviceName = DetermineServiceName(context, pathToExecutable, logger);
+
             // if no such service then install it
-            using (var service = ServiceController.GetServices().SingleOrDefault(s => s.ServiceName == serviceName))
+            using (var service = GetServiceByNameOrDisplayName(serviceName))
             {
                 if (service == null)
                 {
                     logger.InfoFormat("Installing service {0} from {1}", serviceName, pathToExecutable);
 
                     ManagedInstallerClass.InstallHelper(new[] {pathToExecutable});
-                    serviceName = GetServiceNameForExecutable(context, pathToExecutable);
+                    serviceName = DetermineServiceName(context, pathToExecutable, logger);
                 }
             }
 
             // check that installation succeeded
-            using (var service = ServiceController.GetServices().SingleOrDefault(s => s.ServiceName == serviceName))
+            using (var service = GetServiceByNameOrDisplayName(serviceName))
             {
                 // it didn't... installutil might be presenting a credentials dialog on the terminal
                 if (service == null)
                 {
-                    throw new InstallException(string.Format("The executable {0} was installed, so a service named '{1}' was expected but it could not be found", Path.GetFileNameWithoutExtension(pathToExecutable), serviceName));
+                    throw new InstallException(string.Format("The executable {0} was installed, so a service named '{1}' was expected but it could not be found", 
+                        Path.GetFileNameWithoutExtension(pathToExecutable), serviceName));
                 }
             }
 
-            using (var service = ServiceController.GetServices().SingleOrDefault(s => s.ServiceName == serviceName))
+            using (var service = GetServiceByNameOrDisplayName(serviceName))
             {
                 if (!service.Status.Equals(ServiceControllerStatus.Stopped) &&
                     !service.Status.Equals(ServiceControllerStatus.StopPending))
@@ -120,6 +132,11 @@ namespace Deployd.Core.Installation.Hooks
                 
                 ChangeServiceStateTo(service, ServiceControllerStatus.Running, service.Start, logger);
             }
+        }
+
+        private static ServiceController GetServiceByNameOrDisplayName(string serviceName)
+        {
+            return ServiceController.GetServices().SingleOrDefault(s => s.ServiceName == serviceName || s.DisplayName==serviceName);
         }
 
         private class ServiceInfo

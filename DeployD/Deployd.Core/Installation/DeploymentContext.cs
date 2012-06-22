@@ -16,9 +16,10 @@ namespace Deployd.Core.Installation
         private readonly string _installationTaskId;
         private readonly DateTime _contextCreateTime = DateTime.Now;
         private log4net.Appender.IAppender _appender;
-        private readonly string _logAppenderName;
-        private readonly string _logFileName;
-        private readonly string _logDirectory;
+        private string _logAppenderName;
+        private string _logFileName;
+        private string _logDirectory;
+        private DeployDMetaData _metaData=null;
 
         public DeploymentContext(IPackage package, IAgentSettings agentSettings, string workingFolder, string targetInstallationFolder, string installationTaskId)
         {
@@ -26,8 +27,30 @@ namespace Deployd.Core.Installation
             _agentSettings = agentSettings;
             _workingFolder = workingFolder;
             _installationTaskId = installationTaskId;
-            TargetInstallationFolder = targetInstallationFolder;
 
+            ConfigureInstallationLogging();
+            var logger = GetLoggerFor(this);
+
+            TargetInstallationFolder = targetInstallationFolder;
+        }
+
+        private DeployDMetaData LoadMetaDataFromDisk(ILog logger)
+        {
+            DeployDMetaData metaData = null;
+            var settingsFilePath = Path.Combine(_workingFolder, @"content\deployd.xml");
+            var settingsFileExists = File.Exists(settingsFilePath);
+            logger.DebugFormat("MetaData file ({1})? {0}", settingsFileExists, settingsFilePath);
+            if (settingsFileExists)
+            {
+                metaData = new DeployDMetaData(settingsFilePath);
+                logger.DebugFormat("metadata serviceName:{0}", metaData.ServiceName);
+                logger.DebugFormat("metadata iisPath:{0}", metaData.IISPath);
+            }
+            return metaData;
+        }
+
+        private void ConfigureInstallationLogging()
+        {
             _logDirectory = _agentSettings.LogsDirectory.MapVirtualPath();
             _logFileName = string.Format("{0:dd-MM-yyyy-HH-mm-ss}.log", _contextCreateTime);
             _logAppenderName = string.Format("Install.{0}.{1:dd.MM.yyyy.HH.mm.ss}", _package.Id, _contextCreateTime);
@@ -39,7 +62,9 @@ namespace Deployd.Core.Installation
             var plainTextAppender = new log4net.Appender.FileAppender
                                         {
                                             Name = _logAppenderName,
-                                            File = Path.Combine(AgentSettings.AgentProgramDataPath, Path.Combine(_logDirectory, Path.Combine(_package.Id, _logFileName))),
+                                            File =
+                                                Path.Combine(AgentSettings.AgentProgramDataPath,
+                                                             Path.Combine(_logDirectory, Path.Combine(_package.Id, _logFileName))),
                                             AppendToFile = true,
                                             ImmediateFlush = true,
                                             Layout = layout,
@@ -56,6 +81,17 @@ namespace Deployd.Core.Installation
         public IPackage Package { get { return _package; } }
         public string InstallationTaskId { get { return _installationTaskId; } }
         public string LogFileName { get { return _logFileName; } }
+        public DeployDMetaData MetaData
+        {
+            get
+            {
+                if (_metaData == null)
+                {
+                    _metaData=LoadMetaDataFromDisk(GetLoggerFor(this));
+                }
+                return _metaData;
+            }
+        }
 
         public ILog GetLoggerFor<T>(T process)
         {

@@ -56,10 +56,15 @@ namespace Deployd.Core.Installation.Hooks
         {
             var installationLogger = context.GetLoggerFor(this);
             LocateMsDeploy(installationLogger);
+
+            var applicationName = context.MetaData != null
+                                      ? context.MetaData.IISPath
+                                      : context.Package.Title;
+
             DeployWebsite(
                 "localhost",
                 Path.Combine(context.WorkingFolder, "Content\\" + context.Package.Id + ".zip"),
-                context.Package.Title,
+                applicationName,
                 installationLogger,
                 Ignore.AppOffline().And().LogFiles().And().MaintenanceFile());
         }
@@ -74,7 +79,11 @@ namespace Deployd.Core.Installation.Hooks
         private void RestartApplication(DeploymentContext context, ILog logger)
         {
             string virtualDirectoryPath = null;
-            string[] websitePath = context.Package.Title.Split(new[] {'/'}, StringSplitOptions.RemoveEmptyEntries);
+            var applicationName = context.MetaData != null
+                                      ? context.MetaData.IISPath
+                                      : context.Package.Title;
+
+            string[] websitePath = applicationName.Split(new[] { '/' }, StringSplitOptions.RemoveEmptyEntries);
             if (websitePath.Length > 1)
             {
                 virtualDirectoryPath = string.Join("/", websitePath.Skip(1).ToArray());
@@ -83,7 +92,7 @@ namespace Deployd.Core.Installation.Hooks
             {
                 if (website == null)
                 {
-                    logger.WarnFormat("No such IIS website found: '{0}'", context.Package.Id);
+                    logger.WarnFormat("No such IIS website found: '{0}'", applicationName);
                 }
                 var appPoolId = website.Properties["AppPoolId"].Value;
 
