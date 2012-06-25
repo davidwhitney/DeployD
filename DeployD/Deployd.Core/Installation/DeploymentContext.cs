@@ -39,6 +39,12 @@ namespace Deployd.Core.Installation
             DeployDMetaData metaData = null;
             var settingsFilePath = Path.Combine(_workingFolder, @"content\deployd.xml");
             var settingsFileExists = File.Exists(settingsFilePath);
+            if (!settingsFileExists)
+            {
+                settingsFilePath = Path.Combine(_workingFolder, @"deployd.xml");
+                settingsFileExists = File.Exists(settingsFilePath);
+            }
+
             logger.DebugFormat("MetaData file ({1})? {0}", settingsFileExists, settingsFilePath);
             if (settingsFileExists)
             {
