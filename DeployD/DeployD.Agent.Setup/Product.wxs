@@ -122,6 +122,12 @@
             <Component Id="cmp5C51B63316FC79F8CB959D7C4711AACD" Directory="INSTALLDIR" Guid="{C3593DB0-342D-4374-917C-6E4F5ACE88FC}">
                 <File Id="fil306122A20210E68AE18CCA2D0E6EDE51" KeyPath="yes" Source="$(var.Deployd.Agent.ProjectDir)\bin\$(var.Deployd.Agent.Configuration)\Ninject.xml" />
             </Component>
+            <Component Id="cmp6C6E3A4782B29A777EAFACCECDE25A76" Directory="INSTALLDIR" Guid="{8F5EDDFC-524B-4AAA-ABDF-AC966062C839}">
+                <File Id="fil61E2178807DDF4CB67E717F57A0B45E2" KeyPath="yes" Source="$(var.Deployd.Agent.ProjectDir)\bin\$(var.Deployd.Agent.Configuration)\Ninject.Extensions.Logging.dll" />
+            </Component>
+            <Component Id="cmp6C6E3A4782B29A777EAFACCECDE25A77" Directory="INSTALLDIR" Guid="{E268F726-BC04-4501-830B-4726D8F5B6B4}">
+                <File Id="fil61E2178807DDF4CB67E717F57A0B45E3" KeyPath="yes" Source="$(var.Deployd.Agent.ProjectDir)\bin\$(var.Deployd.Agent.Configuration)\Ninject.Extensions.Logging.Log4Net.dll" />
+            </Component>
             <Component Id="cmpE64455536329F5AAD499724114DC0AFA" Directory="INSTALLDIR" Guid="{CEAFBEFD-40F5-47F5-8AF3-0922AE80DA9B}">
                 <File Id="filB2CB86B1A666C5D3D8B32E0D297E30D0" KeyPath="yes" Source="$(var.Deployd.Agent.ProjectDir)\bin\$(var.Deployd.Agent.Configuration)\Spark.dll" />
             </Component>
