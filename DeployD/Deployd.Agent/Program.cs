@@ -4,11 +4,6 @@ using System.IO;
 using System.Linq;
 using System.ServiceProcess;
 using Deployd.Agent.Conventions;
-using Deployd.Agent.Services.AgentConfiguration;
-using Deployd.Agent.Services.HubCommunication;
-using Deployd.Agent.Services.InstallationService;
-using Deployd.Agent.Services.Management;
-using Deployd.Agent.Services.PackageDownloading;
 using Deployd.Core;
 using Deployd.Core.AgentConfiguration;
 using Deployd.Core.Hosting;
@@ -32,18 +27,19 @@ namespace Deployd.Agent
         static void Main(string[] args)
         {
             XmlConfigurator.Configure();
-            Logger = LogManager.GetLogger(NAME);
 
             try
             {
+                Logger = LogManager.GetLogger(typeof (Program));
                 _kernel = new StandardKernel(new INinjectModule[] {new ContainerConfiguration()});
+                
                 _containerWrapper = new ContainerWrapper(_kernel);
 
                 var agentSettings = _containerWrapper.GetType<IAgentSettings>();
 
-                SetLogAppenderPaths(agentSettings);
+                SetLogAppenderPaths(agentSettings, LogManager.GetLogger("Agent.Main"));
 
-            new WindowsServiceRunner(args,
+                new WindowsServiceRunner(args,
                                         () => _kernel.GetAll<IWindowsService>().ToArray(),
                                         installationSettings: (serviceInstaller, serviceProcessInstaller) =>
                                                                 {
@@ -62,9 +58,9 @@ namespace Deployd.Agent
             }
         }
 
-        private static void SetLogAppenderPaths(IAgentSettings agentSettings)
+        private static void SetLogAppenderPaths(IAgentSettings agentSettings, ILog log)
         {
-            var appenders = Logger.Logger.Repository.GetAppenders().Where(a=>a is FileAppender);
+            var appenders = log.Logger.Repository.GetAppenders().Where(a => a is FileAppender);
             foreach (FileAppender appender in appenders)
             {
                 string fileName = Path.GetFileName(appender.File);

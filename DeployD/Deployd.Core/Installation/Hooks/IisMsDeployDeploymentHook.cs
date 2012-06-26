@@ -94,6 +94,13 @@ namespace Deployd.Core.Installation.Hooks
                 {
                     logger.WarnFormat("No such IIS website found: '{0}'", applicationName);
                 }
+
+                if (website.Properties["AppPoolId"] == null)
+                {
+                    logger.WarnFormat("Website has no AppPoolId: '{0}'", applicationName);
+                    DumpWebsiteProperties(website, logger);
+                }
+
                 var appPoolId = website.Properties["AppPoolId"].Value;
 
                 using (var applicationPool = new DirectoryEntry("IIS://localhost/W3SVC/AppPools/" + appPoolId))
@@ -102,6 +109,27 @@ namespace Deployd.Core.Installation.Hooks
                     applicationPool.Invoke("Stop");
                     logger.InfoFormat("Starting AppPool {0}...", appPoolId);
                     applicationPool.Invoke("Start");
+                }
+            }
+        }
+
+        private static void DumpWebsiteProperties(DirectoryEntry website, ILog logger)
+        {
+            foreach(string propertyName in website.Properties.PropertyNames)
+            {
+                var propertyValueCollection = website.Properties[propertyName];
+                if (propertyValueCollection != null)
+                {
+                    if (propertyValueCollection.Count == 1)
+                    {
+                        logger.DebugFormat("{0}={1}", propertyName, propertyValueCollection.Value);
+                    } else if (propertyValueCollection.Count > 0)
+                    {
+                        foreach(var value in propertyValueCollection)
+                        {
+                            logger.DebugFormat("{0}={1}", propertyName, value);
+                        }
+                    }
                 }
             }
         }

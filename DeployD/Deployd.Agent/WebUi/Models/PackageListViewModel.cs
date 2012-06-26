@@ -8,6 +8,7 @@ namespace Deployd.Agent.WebUi.Models
         public IList<LocalPackageInformation> Packages { get; set; }
         public IList<InstallTaskViewModel> CurrentTasks { get; set; }
         public IEnumerable<string> AvailableVersions { get; set; }
+        public List<string> Tags { get; set; }
 
         public string NugetRepository { get; set; }
 
@@ -15,7 +16,9 @@ namespace Deployd.Agent.WebUi.Models
         {
             Packages = new List<LocalPackageInformation>();
             CurrentTasks = new List<InstallTaskViewModel>();
+            Tags = new List<string>();
             AvailableVersions = new List<string>();
         }
+
     }
 }

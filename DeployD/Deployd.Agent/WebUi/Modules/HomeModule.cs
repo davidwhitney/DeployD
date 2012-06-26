@@ -10,26 +10,28 @@ using Deployd.Core.Hosting;
 using Deployd.Core.Installation;
 using Deployd.Core.PackageCaching;
 using Nancy;
-using log4net;
+using ILogger = Ninject.Extensions.Logging.ILogger;
 
 namespace Deployd.Agent.WebUi.Modules
 {
     public class HomeModule : NancyModule
     {
         private readonly IAgentSettings _agentSettings;
-        private readonly ILog _log = LogManager.GetLogger("HomeModule");
+        private readonly ILogger _log;
         public static Func<IIocContainer> Container { get; set; }
         public static readonly List<InstallationTask> InstallationTasks = new List<InstallationTask>();
 
         public HomeModule()
         {
             _agentSettings = Container().GetType<IAgentSettings>();
+            _log = Container().GetType<ILogger>();
             
             Get["/"] = x => View["index.cshtml"];
 
             Get["/sitrep"] = x =>
             {
-                _log.DebugFormat("{0} asked for status", Request.UserHostAddress);
+
+                _log.Debug(string.Format("{0} asked for status", Request.UserHostAddress));
                 var cache = Container().GetType<ILocalPackageCache>();
                 var runningTasks = Container().GetType<RunningInstallationTaskList>();
                 var installCache = Container().GetType<IInstalledPackageArchive>();

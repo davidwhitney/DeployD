@@ -15,6 +15,7 @@ namespace Deployd.Agent.WebUi.Converters
         {
             var model = new PackageListViewModel();
 
+
             foreach(var packageId in cache.AvailablePackages)
             {
                 var package = new LocalPackageInformation
@@ -48,7 +49,19 @@ namespace Deployd.Agent.WebUi.Converters
                            : null;
 
                 package.AvailableVersions = cache.AvailablePackageVersions(packageId).ToList();
+
+                var tags = cache.GetLatestVersion(packageId).Tags.Split(new[] { ' ' },
+                                                        StringSplitOptions.RemoveEmptyEntries);
+                package.Tags = tags;
                 model.Packages.Add(package);
+
+                foreach(var tag in tags)
+                {
+                    if (!model.Tags.Any(t => t.Equals(tag.ToLower())))
+                    {
+                        model.Tags.Add(tag.ToLower());
+                    }
+                }
             }
 
             model.CurrentTasks = runningTasks

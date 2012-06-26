@@ -1,11 +1,13 @@
 ﻿using System.Collections.Generic;
 using System.IO;
+using System.Runtime.Versioning;
 using Deployd.Agent.Services.AgentConfiguration;
 using Deployd.Core.AgentConfiguration;
 using Deployd.Core.PackageTransport;
 using Moq;
 using NUnit.Framework;
 using NuGet;
+using ILogger = Ninject.Extensions.Logging.ILogger;
 
 namespace Deployd.Agent.Test.Unit.Services.AgentConfiguration
 {
@@ -18,6 +20,7 @@ namespace Deployd.Agent.Test.Unit.Services.AgentConfiguration
         private Mock<IPackage> _nugetPackageMock;
         private PackageFileStub _nugetPackageFile;
         private Mock<IAgentSettingsManager> _agentSettingsManagerMock;
+        private Mock<ILogger> _logger=new Mock<ILogger>();
 
         [SetUp]
         public void SetUp()
@@ -27,7 +30,7 @@ namespace Deployd.Agent.Test.Unit.Services.AgentConfiguration
             _nugetPackageFile = new PackageFileStub { Path = ConfigurationFiles.AgentConfigurationFile };
             _agentConfigManagerMock = new Mock<IAgentConfigurationManager>();
             _retrieveQueryMock = new Mock<IRetrievePackageQuery>();
-            _downloader = new AgentConfigurationDownloader(_agentConfigManagerMock.Object, _retrieveQueryMock.Object, _agentSettingsManagerMock.Object);
+            _downloader = new AgentConfigurationDownloader(_agentConfigManagerMock.Object, _retrieveQueryMock.Object, _agentSettingsManagerMock.Object, _logger.Object);
         }
 
         [Test]
@@ -94,5 +97,20 @@ namespace Deployd.Agent.Test.Unit.Services.AgentConfiguration
         }
 
         public string Path { get; set; }
+
+        public string EffectivePath
+        {
+            get { throw new System.NotImplementedException(); }
+        }
+
+        public FrameworkName TargetFramework
+        {
+            get { throw new System.NotImplementedException(); }
+        }
+
+        public IEnumerable<FrameworkName> SupportedFrameworks
+        {
+            get { throw new System.NotImplementedException(); }
+        }
     }
 }

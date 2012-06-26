@@ -4,8 +4,8 @@ using System.IO;
 using System.Linq;
 using Deployd.Core.AgentConfiguration;
 using NuGet;
-using log4net;
 using IFileSystem = System.IO.Abstractions.IFileSystem;
+using ILogger = Ninject.Extensions.Logging.ILogger;
 
 namespace Deployd.Core.PackageCaching
 {
@@ -15,7 +15,7 @@ namespace Deployd.Core.PackageCaching
     public class NuGetPackageCache : ILocalPackageCache
     {
         private readonly IFileSystem _fileSystem;
-        protected static readonly ILog Logger = LogManager.GetLogger("NuGetPackageCache"); 
+        protected static readonly ILogger Logger; 
 
         private readonly string _cacheDirectory;
 
@@ -97,9 +97,9 @@ namespace Deployd.Core.PackageCaching
                 return;
             }
 
-            Logger.InfoFormat("Downloading {0} to {1}.", package.Id, package);
+            Logger.Info("Downloading {0} to {1}.", package.Id, package);
             File.WriteAllBytes(cachedPackagePath, package.GetStream().ReadAllBytes());
-            Logger.InfoFormat("Cached {0} to {1}.", package.Id, package);
+            Logger.Info("Cached {0} to {1}.", package.Id, package);
         }
 
         private static bool CachedVersionExistsAndIsUpToDate(IPackage package, string packagePath)
@@ -109,14 +109,14 @@ namespace Deployd.Core.PackageCaching
                              || package.Published.Value.LocalDateTime < File.GetLastWriteTime(packagePath);
             if (exists)
             {
-                Logger.DebugFormat("Evaluating packageId: '{0}' - ver '{1}', cached item already exists.", package.Id, package.Version);
+                Logger.Debug("Evaluating packageId: '{0}' - ver '{1}', cached item already exists.", package.Id, package.Version);
             }
             if (upToDate)
             {
-                Logger.DebugFormat("Cached package is up to date");
+                Logger.Debug("Cached package is up to date");
             } else
             {
-                Logger.DebugFormat("Cached package needs updating");
+                Logger.Debug("Cached package needs updating");
             }
             return exists && upToDate;
         }

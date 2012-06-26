@@ -21,5 +21,7 @@ namespace Deployd.Core
         public InstallTaskViewModel CurrentTask { get; set; }
         [DataMember(Name = "lastInstallationTask")]
         public InstallationTask LastInstallationTask { get; set; }
+        [DataMember(Name="tags")]
+        public string[] Tags { get; set; }
     }
 }

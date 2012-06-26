@@ -4,6 +4,7 @@ using Deployd.Agent.Services.AgentConfiguration;
 using Deployd.Core.AgentConfiguration;
 using Moq;
 using NUnit.Framework;
+using Ninject.Extensions.Logging;
 
 namespace Deployd.Agent.Test.Unit.Services.AgentConfiguration
 {
@@ -13,19 +14,20 @@ namespace Deployd.Agent.Test.Unit.Services.AgentConfiguration
         private AgentConfigurationService _acs;
         private AgentSettings _agentSettings;
         private Mock<IAgentConfigurationDownloader> _configurationDownloader;
+        private Mock<ILogger> _logger = new Mock<ILogger>();
 
         [SetUp]
         public void SetUp()
         {
             _agentSettings = new AgentSettings();
             _configurationDownloader = new Mock<IAgentConfigurationDownloader>();
-            _acs = new AgentConfigurationService(_agentSettings, _configurationDownloader.Object);
+            _acs = new AgentConfigurationService(_agentSettings, _configurationDownloader.Object, _logger.Object);
         }
 
         [Test]
         public void Ctor_NullSettings_ThrowsArgumentNullException()
         {
-            var ex = Assert.Throws<ArgumentNullException>(() => new AgentConfigurationService(null, _configurationDownloader.Object));
+            var ex = Assert.Throws<ArgumentNullException>(() => new AgentConfigurationService(null, _configurationDownloader.Object, _logger.Object));
             
             Assert.That(ex.ParamName, Is.EqualTo("agentSettings"));
         }
@@ -33,7 +35,7 @@ namespace Deployd.Agent.Test.Unit.Services.AgentConfiguration
         [Test]
         public void Ctor_NullDownloader_ThrowsArgumentNullException()
         {
-            var ex = Assert.Throws<ArgumentNullException>(() => new AgentConfigurationService(_agentSettings, null));
+            var ex = Assert.Throws<ArgumentNullException>(() => new AgentConfigurationService(_agentSettings, null, _logger.Object));
 
             Assert.That(ex.ParamName, Is.EqualTo("configurationDownloader"));
         }

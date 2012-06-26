@@ -7,14 +7,14 @@ using Deployd.Core.Hosting;
 using Deployd.Core.PackageCaching;
 using Deployd.Core.PackageTransport;
 using NuGet;
-using log4net;
+using ILogger = Ninject.Extensions.Logging.ILogger;
 
 namespace Deployd.Agent.Services.PackageDownloading
 {
     public class PackageDownloadingService : IWindowsService
     {
         private readonly IAgentConfigurationManager _agentConfigurationManager; 
-        protected static readonly ILog Logger = LogManager.GetLogger("PackageDownloadingService");
+        protected readonly ILogger _logger;
 
         public ApplicationContext AppContext { get; set; }
 
@@ -24,13 +24,18 @@ namespace Deployd.Agent.Services.PackageDownloading
 
         public TimedSingleExecutionTask TimedTask { get; private set; }
 
-        public PackageDownloadingService(IAgentSettings agentSettings, IRetrievePackageQuery allPackagesQuery, ILocalPackageCache agentCache, IAgentConfigurationManager agentConfigurationManager)
+        public PackageDownloadingService(IAgentSettings agentSettings, 
+            IRetrievePackageQuery allPackagesQuery, 
+            ILocalPackageCache agentCache, 
+            IAgentConfigurationManager agentConfigurationManager,
+            ILogger logger)
         {
             _settings = agentSettings;
             AllPackagesQuery = allPackagesQuery;
             AgentCache = agentCache;
             _agentConfigurationManager = agentConfigurationManager;
-            TimedTask = new TimedSingleExecutionTask(agentSettings.PackageSyncIntervalMs, FetchPackages);
+            _logger = logger;
+            TimedTask = new TimedSingleExecutionTask(agentSettings.PackageSyncIntervalMs, FetchPackages, _logger);
         }
 
         public void Start(string[] args)
@@ -56,7 +61,7 @@ namespace Deployd.Agent.Services.PackageDownloading
                 }
                 catch (Exception ex)
                 {
-                    Logger.Error("Failed to download latest version of " + packageId, ex);
+                    _logger.Error("Failed to download latest version of " + packageId, ex);
                     continue;
                 }
 

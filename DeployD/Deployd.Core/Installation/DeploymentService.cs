@@ -9,6 +9,7 @@ using Deployd.Core.PackageCaching;
 using Deployd.Core.PackageFormats.NuGet;
 using NuGet;
 using log4net;
+using ILogger = Ninject.Extensions.Logging.ILogger;
 
 namespace Deployd.Core.Installation
 {
@@ -18,18 +19,19 @@ namespace Deployd.Core.Installation
         private readonly ILocalPackageCache _packageCache;
         private readonly IInstalledPackageArchive _installedPackageArchive;
         private readonly IAgentSettings _agentSettings;
-        protected static readonly ILog Logger = LogManager.GetLogger("DeploymentService"); 
+        protected readonly ILogger Logger; 
         public ApplicationContext AppContext { get; set; }
 
         public DeploymentService(IEnumerable<IDeploymentHook> hooks, 
                                  ILocalPackageCache packageCache,
                                  IInstalledPackageArchive installedPackageArchive,
-            IAgentSettings agentSettings)
+            IAgentSettings agentSettings, ILogger logger)
         {
             _hooks = hooks;
             _packageCache = packageCache;
             _installedPackageArchive = installedPackageArchive;
             _agentSettings = agentSettings;
+            Logger = logger;
         }
 
         public void InstallPackage(string packageId, string taskId, CancellationTokenSource cancellationToken, Action<ProgressReport> reportProgress)
@@ -64,7 +66,7 @@ namespace Deployd.Core.Installation
             try
             {
                 reportProgress(ProgressReport.Info(deploymentContext, this, package.Id, package.Version.Version.ToString(), taskId, "Extracting package to temp folder..."));
-                new NuGetPackageExtractor().Extract(package, workingFolder);
+                new NuGetPackageExtractor(Logger).Extract(package, workingFolder);
             } 
             catch (Exception ex)
             {

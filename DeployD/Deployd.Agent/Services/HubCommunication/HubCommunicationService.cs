@@ -12,6 +12,7 @@ using Deployd.Core.AgentConfiguration;
 using Deployd.Core.Hosting;
 using Deployd.Core.Installation;
 using Deployd.Core.PackageCaching;
+using Ninject.Extensions.Logging;
 using log4net;
 
 namespace Deployd.Agent.Services.HubCommunication
@@ -19,14 +20,14 @@ namespace Deployd.Agent.Services.HubCommunication
     public class HubCommunicationService : IWindowsService
     {
         private readonly IAgentSettings _agentSettings;
-        private readonly ILog _log;
+        private readonly ILogger _log;
         private readonly ILocalPackageCache _cache;
         private readonly RunningInstallationTaskList _runningTasks;
         private readonly IInstalledPackageArchive _installCache;
         private Timer _pingTimer = null;
         private int _pingIntervalInMilliseconds = 5000;
 
-        public HubCommunicationService(IAgentSettings agentSettings, ILog log, ILocalPackageCache cache, RunningInstallationTaskList runningTasks, IInstalledPackageArchive installCache)
+        public HubCommunicationService(IAgentSettings agentSettings, ILogger log, ILocalPackageCache cache, RunningInstallationTaskList runningTasks, IInstalledPackageArchive installCache)
         {
             _agentSettings = agentSettings;
             _log = log;

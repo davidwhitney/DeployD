@@ -6,15 +6,15 @@ using System.Threading.Tasks;
 using Deployd.Core;
 using Deployd.Core.Hosting;
 using Deployd.Core.Installation;
-using log4net;
 using log4net.Core;
+using ILogger = Ninject.Extensions.Logging.ILogger;
 
 namespace Deployd.Agent.Services.InstallationService
 {
     public class PackageInstallationService : IWindowsService
     {
         private readonly IDeploymentService _deploymentService;
-        protected static readonly ILog Logger = LogManager.GetLogger("PackageInstallationService");
+        private readonly ILogger _logger;
 
         public ApplicationContext AppContext { get; set; }
         public TimedSingleExecutionTask TimedTask { get; private set; }
@@ -26,13 +26,15 @@ namespace Deployd.Agent.Services.InstallationService
         public PackageInstallationService(InstallationTaskQueue pendingInstalls, 
             RunningInstallationTaskList runningInstalls, 
             CompletedInstallationTaskList completedInstalls,
-            IDeploymentService deploymentService)
+            IDeploymentService deploymentService,
+            ILogger logger)
         {
             CompletedInstalls = completedInstalls;
             _deploymentService = deploymentService;
+            _logger = logger;
             PendingInstalls = pendingInstalls;
             RunningInstalls = runningInstalls;
-            TimedTask = new TimedSingleExecutionTask(5000, CheckForNewInstallations);
+            TimedTask = new TimedSingleExecutionTask(5000, CheckForNewInstallations, _logger);
         }
 
         public void Start(string[] args)
@@ -90,7 +92,7 @@ namespace Deployd.Agent.Services.InstallationService
 
             nextPendingInstall.Task
                 .ContinueWith(RemoveFromRunningInstallationList)
-                .ContinueWith(task => Logger.Error("Installation task failed.", task.Exception), TaskContinuationOptions.OnlyOnFaulted);
+                .ContinueWith(task => _logger.Error("Installation task failed.", task.Exception), TaskContinuationOptions.OnlyOnFaulted);
 
             nextPendingInstall.Task.Start();
         }

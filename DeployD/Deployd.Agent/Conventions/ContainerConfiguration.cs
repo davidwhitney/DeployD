@@ -12,6 +12,7 @@ using Deployd.Core.Installation;
 using Deployd.Core.Installation.Hooks;
 using Deployd.Core.PackageCaching;
 using Deployd.Core.PackageTransport;
+using Ninject;
 using Ninject.Modules;
 using NuGet;
 using log4net;
@@ -30,7 +31,7 @@ namespace Deployd.Agent.Conventions
             Bind<IWindowsService>().To<ActionExecutionService>().InSingletonScope();
             Bind<IWindowsService>().To<HubCommunicationService>().InSingletonScope();
 
-            Bind<IAgentConfigurationManager>().ToMethod(context => new AgentConfigurationManager() );
+            Bind<IAgentConfigurationManager>().To<AgentConfigurationManager>();
             Bind<IAgentSettingsManager>().To<AgentSettingsManager>().InSingletonScope();
             Bind<IAgentSettings>().ToMethod(context => GetService<IAgentSettingsManager>().Settings);
             Bind<FeedLocation>().ToMethod(context => new FeedLocation { Source = GetService<IAgentSettings>().NuGetRepository });
@@ -65,8 +66,6 @@ namespace Deployd.Agent.Conventions
             Bind<IDeploymentHook>().To<AppOfflineDeploymentHook>();
             Bind<IDeploymentHook>().To<CustomActionsExtractionDeploymentHook>();
             Bind<System.IO.Abstractions.IFileSystem>().To<System.IO.Abstractions.FileSystem>();
-
-            Bind<ILog>().ToMethod(context => LogManager.GetLogger(context.Request.Target.Name));
         }
 
         public T GetService<T>()

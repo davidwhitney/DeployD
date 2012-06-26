@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Threading;
 using System.Timers;
-using log4net;
+using Ninject.Extensions.Logging;
 using Timer = System.Timers.Timer;
+using ILogger = Ninject.Extensions.Logging.ILogger;
 
 namespace Deployd.Core
 {
@@ -10,16 +11,17 @@ namespace Deployd.Core
     {
         private readonly Action _action;
         private readonly bool _runWhenCreated;
-        protected static readonly ILog Logger = LogManager.GetLogger("TimedSingleExecutionTask");
+        private readonly ILogger _logger;
 
         private readonly Timer _cacheUpdateTimer;
         protected readonly object OneSyncAtATimeLock;
 
         public bool IsRunning { get; private set; }
         
-        public TimedSingleExecutionTask(int timerIntervalInMs, Action action, bool runWhenCreated = false)
+        public TimedSingleExecutionTask(int timerIntervalInMs, Action action, ILogger logger, bool runWhenCreated = false)
         {
             _action = action;
+            _logger = logger;
             _runWhenCreated = runWhenCreated;
             _cacheUpdateTimer = new Timer(timerIntervalInMs) { Enabled = true };
             OneSyncAtATimeLock = new object();
@@ -53,7 +55,7 @@ namespace Deployd.Core
         {
             if (!Monitor.TryEnter(OneSyncAtATimeLock))
             {
-                Logger.Info("Skipping sync operation because a previous sync is still running.");
+                _logger.Info("Skipping sync operation because a previous sync is still running.");
                 return;
             }
 
@@ -63,7 +65,7 @@ namespace Deployd.Core
             }
             catch (Exception ex)
             {
-                Logger.Error(ex);
+                _logger.Error(ex,"Sync Failed");
             }
             finally
             {

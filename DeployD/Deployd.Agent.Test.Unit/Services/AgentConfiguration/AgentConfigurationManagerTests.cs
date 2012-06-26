@@ -2,7 +2,9 @@
 using System.IO;
 using Deployd.Agent.Services.AgentConfiguration;
 using Deployd.Core.AgentConfiguration;
+using Moq;
 using NUnit.Framework;
+using Ninject.Extensions.Logging;
 
 namespace Deployd.Agent.Test.Unit.Services.AgentConfiguration
 {
@@ -10,6 +12,7 @@ namespace Deployd.Agent.Test.Unit.Services.AgentConfiguration
     public class AgentConfigurationManagerTests
     {
         private AgentConfigurationManager _mgr;
+        private Mock<ILogger> _logger=new Mock<ILogger>();
 
         private const string CONFIG_FILE = @"<?xml version=""1.0"" encoding=""utf-8""?>
 <GlobalAgentConfiguration xmlns:xsd=""http://www.w3.org/2001/XMLSchema"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"">
@@ -31,7 +34,7 @@ namespace Deployd.Agent.Test.Unit.Services.AgentConfiguration
         {
             _fileName = Guid.NewGuid().ToString();
             File.WriteAllText(_fileName, CONFIG_FILE);
-            _mgr = new AgentConfigurationManager();
+            _mgr = new AgentConfigurationManager(_logger.Object);
         }
 
         [Test]

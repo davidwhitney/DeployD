@@ -6,13 +6,14 @@ using System.IO;
 using System.IO.Abstractions;
 using System.Linq;
 using log4net;
+using ILogger = Ninject.Extensions.Logging.ILogger;
 
 namespace Deployd.Core.AgentConfiguration
 {
     public class AgentSettingsManager : IAgentSettingsManager
     {
         private readonly IFileSystem _fileSystem;
-        private readonly ILog _log;
+        private readonly ILogger _log;
         public static Dictionary<string, string> ConfigurationDefaults { get; private set; }
         private IAgentSettings _settings = null;
         private static object _fileLock=new object();
@@ -32,7 +33,7 @@ namespace Deployd.Core.AgentConfiguration
             _settings = null;
         }
 
-        public AgentSettingsManager(IFileSystem fileSystem, ILog log)
+        public AgentSettingsManager(IFileSystem fileSystem, ILogger log)
         {
             _fileSystem = fileSystem;
             _log = log;
@@ -140,7 +141,7 @@ namespace Deployd.Core.AgentConfiguration
 
             foreach(var setting in agentSettings)
             {
-                _log.DebugFormat("{0} = {1}", setting.Key, setting.Value);
+                _log.Debug(string.Format("{0} = {1}", setting.Key, setting.Value));
             }
 
             return agentSettings;

@@ -1,12 +1,17 @@
 using System.IO;
 using NuGet;
-using log4net;
+using ILogger = Ninject.Extensions.Logging.ILogger;
 
 namespace Deployd.Core.PackageFormats.NuGet
 {
     public class NuGetPackageExtractor
     {
-        private readonly ILog _logger = LogManager.GetLogger("NuGetPackageExtractor");
+        private readonly ILogger _logger;
+
+        public NuGetPackageExtractor(ILogger logger)
+        {
+            _logger = logger;
+        }
 
         public void Extract(string packagePath, string destinationPath)
         {
@@ -24,7 +29,7 @@ namespace Deployd.Core.PackageFormats.NuGet
             foreach(var file in files)
             {
                 string fileOutputPath = Path.Combine(destinationPath, file.Path);
-                _logger.DebugFormat("Writing file {0} to {1}...", file.Path, fileOutputPath);
+                _logger.Debug(string.Format("Writing file {0} to {1}...", file.Path, fileOutputPath));
                 string directoryPath = Path.GetDirectoryName(fileOutputPath);
                 if (!Directory.Exists(directoryPath))
                 {

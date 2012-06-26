@@ -10,8 +10,7 @@ using Deployd.Core.Installation;
 using Deployd.Core.PackageCaching;
 using Nancy;
 using NuGet;
-using log4net;
-using log4net.Core;
+using ILogger = Ninject.Extensions.Logging.ILogger;
 
 namespace Deployd.Agent.WebUi.Modules
 {
@@ -19,10 +18,11 @@ namespace Deployd.Agent.WebUi.Modules
     {
         public static Func<IIocContainer> Container { get; set; }
         public static readonly List<InstallationTask> InstallationTasks = new List<InstallationTask>();
-        private static ILog Logger = null;
+        private static ILogger Logger = null;
 
         public PackagesModule(): base("/packages")
         {
+            Logger = Container().GetType<ILogger>();
             Get["/"] = x =>
             {
                 var cache = Container().GetType<ILocalPackageCache>();
@@ -66,7 +66,6 @@ namespace Deployd.Agent.WebUi.Modules
 
             Post["/{packageId}/install", y => true] = x =>
             {
-                Logger = LogManager.GetLogger(typeof(PackagesModule));
                 var installationManager = Container().GetType<InstallationTaskQueue>();
                 SemanticVersion version;
                 string versionString = null;
@@ -89,12 +88,14 @@ namespace Deployd.Agent.WebUi.Modules
 
             Post["/UpdateAllTo", y => true] = x =>
             {
-                string specificVersion = Response.Context.Request.Form["specificVersion"];
                 var cache = Container().GetType<ILocalPackageCache>();
                 var queue = Container().GetType<InstallationTaskQueue>();
-                var packagesByVersion = cache.AllCachedPackages().Where(p => p.Version.Equals(new SemanticVersion(specificVersion)));
 
-                foreach (var packageVersions in packagesByVersion)
+                string specificVersion = Response.Context.Request.Form["specificVersion"];
+                IEnumerable<IPackage> packagesToInstall = cache.AllCachedPackages().Where(p => p.Version.Equals(new SemanticVersion(specificVersion)));
+                packagesToInstall = FilterPackagesByTags(packagesToInstall);
+
+                foreach (var packageVersions in packagesToInstall)
                 {
                     queue.Add(packageVersions.Id, packageVersions.Version.ToString());
                 }
@@ -106,9 +107,9 @@ namespace Deployd.Agent.WebUi.Modules
             {
                 var cache = Container().GetType<ILocalPackageCache>();
                 var queue = Container().GetType<InstallationTaskQueue>();
-                var packagesByVersion =
-                    cache.AllCachedPackages()
-                    .GroupBy(p=>p.Id, g=>g.Version);
+
+
+                var packagesByVersion = cache.AllCachedPackages().GroupBy(p=>p.Id, g=>g.Version);
 
                 foreach (var packageVersions in packagesByVersion)
                 {
@@ -122,16 +123,34 @@ namespace Deployd.Agent.WebUi.Modules
             {
                 var cache = Container().GetType<ILocalPackageCache>();
                 var queue = Container().GetType<InstallationTaskQueue>();
-                IEnumerable<IPackage> packagesByVersion = 
+                IEnumerable<IPackage> packagesToInstall = 
                     cache.AllCachedPackages().Where(p=>p.Version.Equals(new SemanticVersion(x.specificVersion)));
+                packagesToInstall = FilterPackagesByTags(packagesToInstall);
 
-                foreach (var packageVersions in packagesByVersion)
+                foreach (var packageVersions in packagesToInstall)
                 {
                     queue.Add(packageVersions.Id, packageVersions.Version.ToString());
                 }
 
                 return Response.AsRedirect("/packages");
             };
+        }
+
+        private IEnumerable<IPackage> FilterPackagesByTags(IEnumerable<IPackage> packagesToInstall)
+        {
+            if (Response.Context.Request.Form["all-tags"] != null
+                && Response.Context.Request.Form["all-tags"] == "true"
+                && Response.Context.Request.Form["tags"] != null)
+            {
+                throw new ArgumentException("Either select 'All' or a specific set of tags, not both");
+            }
+
+            if (Response.Context.Request.Form["tags"] != null)
+            {
+                string[] tags = ((string) Response.Context.Request.Form["tags"]).Split(',');
+                packagesToInstall = packagesToInstall.Where(p => tags.All(t => p.Tags.Contains(t)));
+            }
+            return packagesToInstall;
         }
     }
 }

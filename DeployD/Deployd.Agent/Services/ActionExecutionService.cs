@@ -7,13 +7,14 @@ using Deployd.Core;
 using Deployd.Core.AgentManagement;
 using Deployd.Core.Hosting;
 using Deployd.Core.Installation;
-using log4net;
+
+using ILogger = Ninject.Extensions.Logging.ILogger;
 
 namespace Deployd.Agent.Services
 {
     public class ActionExecutionService : IWindowsService
     {
-        private ILog Logger = LogManager.GetLogger(typeof (ActionExecutionService));
+        private readonly ILogger _logger;
         public PendingActionsQueue PendingActionsQueue { get; set; }
         public RunningActionsList RunningActionsList { get; set; }
         public CompletedActionsList CompletedActionsList { get; set; }
@@ -24,14 +25,16 @@ namespace Deployd.Agent.Services
         public ActionExecutionService(PendingActionsQueue pendingActionsQueue, 
             CompletedActionsList completedActionsList,
             RunningActionsList runningActionsList,
-            IAgentActionsService actionsService, IAgentActionsRepository actionsRepository)
+            IAgentActionsService actionsService, IAgentActionsRepository actionsRepository,
+            ILogger logger)
         {
+            _logger = logger;
             PendingActionsQueue = pendingActionsQueue;
             CompletedActionsList = completedActionsList;
             RunningActionsList = runningActionsList;
             ActionsService = actionsService;
             _actionsRepository = actionsRepository;
-            TimedTask = new TimedSingleExecutionTask(2000, CheckForPendingActions);
+            TimedTask = new TimedSingleExecutionTask(2000, CheckForPendingActions, _logger);
         }
 
         public ActionTask GetAction(string id)
@@ -66,7 +69,7 @@ namespace Deployd.Agent.Services
             });
             action.Task
                 .ContinueWith(RemoveFromRunningActions)
-                .ContinueWith(task => Logger.Error("Action failed", action.Exception),
+                .ContinueWith(task => _logger.Error("Action failed", action.Exception),
                               TaskContinuationOptions.OnlyOnFaulted);
             action.Task.Start();
         }

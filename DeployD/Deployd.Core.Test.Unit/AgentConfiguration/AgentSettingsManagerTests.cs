@@ -1,10 +1,9 @@
-﻿using System.Collections.Specialized;
-using System.Configuration;
+﻿using System.Configuration;
 using System.IO.Abstractions;
 using Deployd.Core.AgentConfiguration;
 using Moq;
 using NUnit.Framework;
-using log4net;
+using Ninject.Extensions.Logging;
 
 namespace Deployd.Core.Test.Unit.AgentConfiguration
 {
@@ -13,12 +12,12 @@ namespace Deployd.Core.Test.Unit.AgentConfiguration
     {
         private AgentSettingsManager _mgr;
         private Mock<IFileSystem> _fileSystemMock;
-        private Mock<ILog> _loggerMock;
+        private Mock<ILogger> _loggerMock;
 
         [SetUp]
         public void SetUp()
         {
-            _loggerMock = new Mock<ILog>();
+            _loggerMock = new Mock<ILogger>();
 
             _fileSystemMock = new Mock<IFileSystem>();
             _fileSystemMock.Setup(x => x.Directory.GetCurrentDirectory()).Returns("c:\\fakedirectory");

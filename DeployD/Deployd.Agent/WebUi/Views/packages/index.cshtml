@@ -9,13 +9,23 @@
 
 <p>Feed Url: @Model.NugetRepository</p>
 
+Tags:
+
 <form method="post" action="/packages/UpdateAllTo">
-	<input type="submit" value="Update all to:"/> <select name="specificVersion">
-					   @foreach(string version in Model.AvailableVersions)
-					   {
-						   <option>@version</option>
-					   }
-				   </select>
+    Update:
+    <input type="checkbox" name="all-tags" value="true" id="all-tags" checked="checked"/><label for="all-tags">All</label>
+    @foreach (string tag in Model.Tags)
+    {
+        <input type="checkbox" name="tags" value="@tag" id="tag-@tag"/><label for="tag-@tag">@tag</label>
+    }
+
+    to: <select name="specificVersion">
+            @foreach(string version in Model.AvailableVersions)
+            {
+                <option>@version</option>
+            }
+        </select>
+        <input type="submit" value="Install"/>
 </form>
 
 @foreach(LocalPackageInformation package in Model.Packages)

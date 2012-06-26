@@ -5,6 +5,7 @@ using System.Linq;
 using System.Xml.Serialization;
 using Deployd.Core;
 using Deployd.Core.AgentConfiguration;
+using Ninject.Extensions.Logging;
 using log4net;
 
 namespace Deployd.Agent.Services.AgentConfiguration
@@ -12,10 +13,11 @@ namespace Deployd.Agent.Services.AgentConfiguration
     public class AgentConfigurationManager : IAgentConfigurationManager
     {
         private readonly object _fileLock;
-        private readonly ILog _logger = LogManager.GetLogger(typeof (AgentConfigurationManager));
+        private readonly ILogger _logger;
 
-        public AgentConfigurationManager()
+        public AgentConfigurationManager(ILogger logger)
         {
+            _logger = logger;
             _fileLock = new object();
         }
 
@@ -51,7 +53,7 @@ namespace Deployd.Agent.Services.AgentConfiguration
         public void SaveToDisk(GlobalAgentConfiguration configuration, string fileName = ConfigurationFiles.AgentConfigurationFile)
         {
             var configurationPath = ApplicationFilePath(fileName);
-            _logger.DebugFormat("saving configuration file to {0}", configurationPath);
+            _logger.Debug(string.Format("saving configuration file to {0}", configurationPath));
             
             lock (_fileLock)
             {
@@ -67,7 +69,7 @@ namespace Deployd.Agent.Services.AgentConfiguration
         public void SaveToDisk(byte[] configuration, string fileName = ConfigurationFiles.AgentConfigurationFile)
         {
             var configurationPath = ApplicationFilePath(fileName);
-            _logger.DebugFormat("saving configuration file to {0}", configurationPath);
+            _logger.Debug(string.Format("saving configuration file to {0}", configurationPath));
            
             try
             {

@@ -7,7 +7,7 @@ using System.Web.Mvc;
 using DeployD.Hub.Areas.Api.Code;
 using DeployD.Hub.Areas.Api.Models;
 using Deployd.Core;
-using log4net;
+using Ninject.Extensions.Logging;
 
 namespace DeployD.Hub.Areas.Api.Controllers
 {
@@ -16,10 +16,13 @@ namespace DeployD.Hub.Areas.Api.Controllers
         private readonly IApiHttpChannel _httpChannel;
         private readonly IAgentManager _agentManager;
         private readonly IAgentRemoteService _agentRemoteService;
-        private readonly ILog _log;
+        private readonly ILogger _log;
 
-        public AgentController(IApiHttpChannel httpChannel, IAgentManager agentManager, 
-            IAgentRemoteService agentRemoteService, ILog log)
+        public AgentController(
+            IApiHttpChannel httpChannel, 
+            IAgentManager agentManager, 
+            IAgentRemoteService agentRemoteService, 
+            ILogger log)
         {
             _httpChannel = httpChannel;
             _agentManager = agentManager;

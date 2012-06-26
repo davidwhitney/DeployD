@@ -1,4 +1,5 @@
 using DeployD.Hub.Areas.Api.Code;
+using Ninject.Extensions.Logging;
 using Raven.Client;
 using Raven.Client.Document;
 using Raven.Client.Embedded;
@@ -29,6 +30,7 @@ namespace DeployD.Hub.App_Start
             DynamicModuleUtility.RegisterModule(typeof(OnePerRequestHttpModule));
             DynamicModuleUtility.RegisterModule(typeof(NinjectHttpModule));
             bootstrapper.Initialize(CreateKernel);
+            ServiceLocator.Initialize(bootstrapper.Kernel);
         }
         
         /// <summary>
@@ -57,7 +59,7 @@ namespace DeployD.Hub.App_Start
         /// Load your modules or register your services here!
         /// </summary>
         /// <param name="kernel">The kernel.</param>
-        private static void RegisterServices(IKernel kernel)
+        public static void RegisterServices(IKernel kernel)
         {
             kernel.Bind<IApiHttpChannel>().To<ApiHttpChannel>();
             kernel.Bind<IRepresentationBuilder>().To<XmlRepresentationBuilder>();
@@ -65,42 +67,34 @@ namespace DeployD.Hub.App_Start
             kernel.Bind<IAgentManager>().To<AgentManager>().InRequestScope();
             kernel.Bind<IPackageStore>().To<LocalPackageStore>();
             kernel.Bind<IAgentRemoteService>().To<AgentRemoteService>();
-            kernel.Bind<ILog>().ToMethod(context =>
-            {
-                if (context.Request.Target != null)
-                    return LogManager.GetLogger(context.Request.Target.Name);
-                return LogManager.GetLogger("log");
-            });
+
 
             kernel.Bind<IDocumentStore>()
                 .ToMethod(ctx =>
-                {
-                    //var documentStore = new DocumentStore() { Url = "http://localhost:8080" };
-                    var documentStore = new EmbeddableDocumentStore(){DataDirectory = "App_Data/Database"};
-                    documentStore.Initialize();
-                    return documentStore;
-                }).InSingletonScope();
+                                {
+                                    //var documentStore = new DocumentStore() { Url = "http://localhost:8080" };
+                                    var documentStore = new EmbeddableDocumentStore() {DataDirectory = "App_Data/Database"};
+                                    documentStore.Initialize();
+                                    return documentStore;
+                                }).InSingletonScope();
 
 
             kernel.Bind<IDocumentSession, DocumentSession>()
                 .ToMethod(ctx =>
-                {
-                    ctx.Kernel.Get<ILog>().Debug("raven session opened");
-                    var session = ctx.Kernel.Get<IDocumentStore>().OpenSession();
-                    session.Advanced.UseOptimisticConcurrency = true;
-                    return session as DocumentSession;
+                                {
+                                    var session = ctx.Kernel.Get<IDocumentStore>().OpenSession();
+                                    session.Advanced.UseOptimisticConcurrency = true;
+                                    return session as DocumentSession;
 
-                })
+                                })
                 .InRequestScope()
                 .OnDeactivation((ctx, session) =>
-                {
-                    if (session.Advanced.HasChanges)
-                    {
-                        session.SaveChanges();
-                        ctx.Kernel.Get<ILog>().Debug("raven session changes saved");
-                    }
-                    ctx.Kernel.Get<ILog>().Debug("raven session closed");
-                });
+                                    {
+                                        if (session.Advanced.HasChanges)
+                                        {
+                                            session.SaveChanges();
+                                        }
+                                    });
         }        
     }
 }

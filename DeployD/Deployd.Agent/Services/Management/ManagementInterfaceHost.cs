@@ -5,13 +5,14 @@ using System.ServiceModel.Web;
 using Deployd.Agent.WebUi.Modules;
 using Deployd.Core.Hosting;
 using Nancy.Hosting.Wcf;
+using Ninject.Extensions.Logging;
 using log4net;
 
 namespace Deployd.Agent.Services.Management
 {
     public class ManagementInterfaceHost : IWindowsService
     {
-        protected static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType); 
+        protected static readonly ILogger Logger; 
         
         private WebServiceHost _host;
 

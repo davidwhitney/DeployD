@@ -3,17 +3,22 @@ using System.Collections.Generic;
 using System.Linq;
 using DeployD.Hub.Areas.Api.Models;
 using Deployd.Core;
+using Ninject.Extensions.Logging;
+using Raven.Abstractions.Exceptions;
 using Raven.Client;
+using log4net;
 
 namespace DeployD.Hub.Areas.Api.Code
 {
     public class AgentManager : IAgentManager
     {
         private readonly IDocumentSession _ravenSession;
+        private readonly ILogger _logger;
 
-        public AgentManager(IDocumentSession ravenSession)
+        public AgentManager(IDocumentSession ravenSession, ILogger logger)
         {
             _ravenSession = ravenSession;
+            _logger = logger;
         }
 
         public List<AgentRecord> ListAgents()
@@ -47,7 +52,10 @@ namespace DeployD.Hub.Areas.Api.Code
 
         public AgentRecord GetAgent(string hostname)
         {
-            var agent = _ravenSession.Load<AgentRecord>(hostname);
+            var agent = _ravenSession
+                .Query<AgentRecord>()
+                .Customize(q=>q.WaitForNonStaleResults(TimeSpan.FromSeconds(5)))
+                .SingleOrDefault(a=>a.Id==hostname);
             return agent;
         }
 
@@ -84,7 +92,14 @@ namespace DeployD.Hub.Areas.Api.Code
             agent.LastContact = DateTime.Now;
             _ravenSession.Store(agent);
             System.Diagnostics.Debug.WriteLine("Update agent");
-            _ravenSession.SaveChanges();
+
+            try
+            {
+                _ravenSession.SaveChanges();
+            } catch (ConcurrencyException)
+            {
+                _logger.Debug("agent status update was rejected because etag was old");
+            }
         }
     }
 }

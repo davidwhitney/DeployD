@@ -7,24 +7,27 @@ using Deployd.Core.AgentConfiguration;
 using Deployd.Core.PackageTransport;
 using NuGet;
 using log4net;
+using ILogger = Ninject.Extensions.Logging.ILogger;
 
 namespace Deployd.Agent.Services.AgentConfiguration
 {
     public class AgentConfigurationDownloader : IAgentConfigurationDownloader
     {
         public const string DeploydConfigurationPackageName = "Deployd.Configuration";
-        private static readonly ILog Logger = LogManager.GetLogger(typeof (AgentConfigurationDownloader));
         private readonly IAgentConfigurationManager _agentConfigurationManager;
         private readonly IRetrievePackageQuery _packageQuery;
         private readonly IAgentSettingsManager _agentSettingsManager;
+        private readonly ILogger _logger;
 
         public AgentConfigurationDownloader(IAgentConfigurationManager agentConfigurationManager,
                                             IRetrievePackageQuery packageQuery,
-                                            IAgentSettingsManager agentSettingsManager)
+                                            IAgentSettingsManager agentSettingsManager,
+            ILogger logger)
         {
             _agentConfigurationManager = agentConfigurationManager;
             _packageQuery = packageQuery;
             _agentSettingsManager = agentSettingsManager;
+            _logger = logger;
         }
 
         public void DownloadAgentConfiguration()
@@ -35,7 +38,7 @@ namespace Deployd.Agent.Services.AgentConfiguration
                 configPackage = DownloadConfigurationPackage();
             } catch(Exception ex)
             {
-                Logger.Error("Could not download configuration package", ex);
+                _logger.Error("Could not download configuration package", ex);
                 return;
             }
 
@@ -46,7 +49,7 @@ namespace Deployd.Agent.Services.AgentConfiguration
             }
             catch (Exception ex)
             {
-                Logger.Error("failed", ex);
+                _logger.Error("failed", ex);
             }
         }
 
