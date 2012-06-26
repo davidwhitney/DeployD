@@ -15,13 +15,14 @@ namespace Deployd.Core.PackageCaching
     public class NuGetPackageCache : ILocalPackageCache
     {
         private readonly IFileSystem _fileSystem;
-        protected static readonly ILogger Logger; 
+        protected readonly ILogger Logger; 
 
         private readonly string _cacheDirectory;
 
-        public NuGetPackageCache(IFileSystem fileSystem, IAgentSettings agentSettings)
+        public NuGetPackageCache(IFileSystem fileSystem, IAgentSettings agentSettings, ILogger logger)
             : this(fileSystem, agentSettings.CacheDirectory)
         {
+            Logger = logger;
         }
 
         public NuGetPackageCache(IFileSystem fileSystem, string cacheDirectory)
@@ -102,7 +103,7 @@ namespace Deployd.Core.PackageCaching
             Logger.Info("Cached {0} to {1}.", package.Id, package);
         }
 
-        private static bool CachedVersionExistsAndIsUpToDate(IPackage package, string packagePath)
+        private bool CachedVersionExistsAndIsUpToDate(IPackage package, string packagePath)
         {
             bool exists = File.Exists(packagePath);
             bool upToDate = !package.Published.HasValue
