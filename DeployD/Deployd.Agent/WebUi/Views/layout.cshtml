@@ -1,10 +1,12 @@
-﻿<!DOCTYPE html>
+﻿@using System.Diagnostics
+@using System.Reflection
+<!DOCTYPE html>
 <html>
     <head>
         <title>@Environment.MachineName - Deployd.Agent</title>
     </head>
     <body>
-        <h1>Deployd.Agent - @Environment.MachineName</h1>
+        <h1>Deployd.Agent - @Environment.MachineName v@(FileVersionInfo.GetVersionInfo(Assembly.GetAssembly(typeof (Deployd.Agent.Program)).Location).FileVersion)</h1>
         
         <ul>
             <li><a href="/packages">Packages</a></li>
