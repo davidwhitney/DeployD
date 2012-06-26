@@ -1,3 +1,4 @@
+using System;
 using System.IO;
 using System.Management.Automation.Runspaces;
 using System.Text;
@@ -9,7 +10,7 @@ namespace Deployd.Core
     {
         public static StringBuilder ExecutePowerShellScript(string pathToScript, IAgentSettings _agentSettings)
         {
-            var serviceCommands = new Command("Scripts/PS/Services.ps1");
+            var serviceCommands = new Command(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Scripts/PS/Services.ps1"));
 
             string scriptText = File.ReadAllText(pathToScript);
 
@@ -47,7 +48,7 @@ namespace Deployd.Core
 
         public static StringBuilder ExecuteInlinePowerShellScript(string scriptText, IAgentSettings _agentSettings)
         {
-            var serviceCommands = new Command("Scripts/PS/Services.ps1");
+            var serviceCommands = new Command(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Scripts/PS/Services.ps1"));
 
             // create Powershell runspace
             Runspace runspace = RunspaceFactory.CreateRunspace();
