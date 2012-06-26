@@ -4,6 +4,8 @@ using System.IO;
 using System.Reflection;
 using System.ServiceProcess;
 using System.Threading.Tasks;
+using Ninject.Extensions.Logging;
+using log4net;
 
 namespace Deployd.Core.Hosting
 {
@@ -12,6 +14,7 @@ namespace Deployd.Core.Hosting
     	private readonly string[] _args;
 		private readonly ApplicationContext _context;
         private readonly Func<IWindowsService[]> _createServices;
+        private readonly ILog _logger;
         private readonly Action<ApplicationContext> _configureContext;
 
         /// <summary>
@@ -27,14 +30,25 @@ namespace Deployd.Core.Hosting
                                     Action<ApplicationContext> configureContext = null,
                                     Action<System.ServiceProcess.ServiceInstaller, ServiceProcessInstaller> installationSettings = null,
                                     Func<IIocContainer> registerContainer = null)
-		{
+        {
+            var log = LogManager.GetLogger(typeof (WindowsServiceRunner));
             _args = args;
 			_context = new ApplicationContext();
             _createServices = createServices;
-    	    _configureContext = configureContext ?? (ctx => {  });
+            _logger = log;
+            _configureContext = configureContext ?? (ctx => {  });
     	    _context.ConfigureInstall = installationSettings ?? ((serviceInstaller, serviceProcessInstaller) => { });
             _context.Container = registerContainer;
-		}
+
+            if (registerContainer==null)
+            {
+                throw new ArgumentException("Binding container is null");
+            }
+            if (registerContainer != null)
+            {
+                _logger.DebugFormat("container is " + registerContainer.ToString());
+            }
+        }
 
 		public void Host()
         {

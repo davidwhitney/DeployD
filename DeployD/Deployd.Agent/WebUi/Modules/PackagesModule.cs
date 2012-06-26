@@ -18,11 +18,10 @@ namespace Deployd.Agent.WebUi.Modules
     {
         public static Func<IIocContainer> Container { get; set; }
         public static readonly List<InstallationTask> InstallationTasks = new List<InstallationTask>();
-        private static ILogger Logger = null;
 
         public PackagesModule(): base("/packages")
         {
-            Logger = Container().GetType<ILogger>();
+            
             Get["/"] = x =>
             {
                 var cache = Container().GetType<ILocalPackageCache>();
@@ -65,7 +64,8 @@ namespace Deployd.Agent.WebUi.Modules
             };
 
             Post["/{packageId}/install", y => true] = x =>
-            {
+                                                          {
+
                 var installationManager = Container().GetType<InstallationTaskQueue>();
                 SemanticVersion version;
                 string versionString = null;
@@ -74,7 +74,6 @@ namespace Deployd.Agent.WebUi.Modules
                     versionString = version.ToString();
                 }
 
-                Logger.Info("request install " + x.packageId + " to version " + versionString);
                 installationManager.Add(x.packageId, versionString);
                 return Response.AsRedirect("/packages");
             };

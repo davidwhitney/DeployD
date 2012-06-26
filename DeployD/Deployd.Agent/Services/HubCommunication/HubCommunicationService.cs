@@ -19,6 +19,7 @@ namespace Deployd.Agent.Services.HubCommunication
 {
     public class HubCommunicationService : IWindowsService
     {
+        private static bool _communicating=false;
         private readonly IAgentSettings _agentSettings;
         private readonly ILogger _log;
         private readonly ILocalPackageCache _cache;
@@ -45,6 +46,10 @@ namespace Deployd.Agent.Services.HubCommunication
 
         private void SendStatusToHub(object sender, ElapsedEventArgs e)
         {
+            if (_communicating)
+                return;
+
+            _communicating = true;
             var _pingRequest = HttpWebRequest.Create(string.Format("{0}/api/agent/{1}/status",
                 _agentSettings.HubAddress,
                 Environment.MachineName)) as HttpWebRequest;
@@ -70,8 +75,8 @@ namespace Deployd.Agent.Services.HubCommunication
                     ms.Position = 0;
                     using (var streamReader = new StreamReader(ms))
                     {
-                        //_log.DebugFormat("{0}", streamReader.ReadToEnd());
-                        System.Diagnostics.Debug.WriteLine(streamReader.ReadToEnd());
+                        _log.Debug("{0}", streamReader.ReadToEnd());
+                        //System.Diagnostics.Debug.WriteLine(streamReader.ReadToEnd());
                     }
                 }
             }
@@ -79,6 +84,7 @@ namespace Deployd.Agent.Services.HubCommunication
             {
                 _log.Warn("Could not load agent status", ex);
                 SlowPingIntervalUpToFiveMinutes();
+                _communicating = false;
                 return;
             }
 
@@ -132,6 +138,7 @@ namespace Deployd.Agent.Services.HubCommunication
                 _log.Warn("Unknown error sending status to hub", exception);
                 SlowPingIntervalUpToFiveMinutes();
             }
+            _communicating = false;
         }
 
         private void SetPingIntervalToDefault()

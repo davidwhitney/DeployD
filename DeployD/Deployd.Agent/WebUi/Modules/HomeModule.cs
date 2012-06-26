@@ -17,20 +17,18 @@ namespace Deployd.Agent.WebUi.Modules
     public class HomeModule : NancyModule
     {
         private readonly IAgentSettings _agentSettings;
-        private readonly ILogger _log;
         public static Func<IIocContainer> Container { get; set; }
         public static readonly List<InstallationTask> InstallationTasks = new List<InstallationTask>();
 
         public HomeModule()
         {
             _agentSettings = Container().GetType<IAgentSettings>();
-            _log = Container().GetType<ILogger>();
             
             Get["/"] = x => View["index.cshtml"];
 
             Get["/sitrep"] = x =>
-            {
-
+                                 {
+                var _log = Container().GetType<ILogger>();
                 _log.Debug(string.Format("{0} asked for status", Request.UserHostAddress));
                 var cache = Container().GetType<ILocalPackageCache>();
                 var runningTasks = Container().GetType<RunningInstallationTaskList>();

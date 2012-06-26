@@ -6,13 +6,17 @@ using Deployd.Agent.WebUi.Modules;
 using Deployd.Core.Hosting;
 using Nancy.Hosting.Wcf;
 using Ninject.Extensions.Logging;
-using log4net;
 
 namespace Deployd.Agent.Services.Management
 {
     public class ManagementInterfaceHost : IWindowsService
     {
-        protected static readonly ILogger Logger; 
+        private readonly ILogger _logger;
+
+        public ManagementInterfaceHost(ILogger logger)
+        {
+            _logger = logger;
+        }
         
         private WebServiceHost _host;
 
@@ -38,10 +42,10 @@ namespace Deployd.Agent.Services.Management
             } 
             catch (Exception ex)
             {
-                Logger.Fatal("could not start listening", ex);
+                _logger.Fatal(ex, "could not start listening");
             }
 
-            Logger.Info("Hosting Web interface on: " + WebUiAddress);
+            _logger.Info("Hosting Web interface on: " + WebUiAddress);
         }
 
         public void Stop()
