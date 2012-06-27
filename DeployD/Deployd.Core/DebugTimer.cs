@@ -1,6 +1,7 @@
 using System;
 using System.Diagnostics;
 using System.Reflection;
+using log4net;
 using ILogger = Ninject.Extensions.Logging.ILogger;
 
 namespace Deployd.Core
@@ -8,7 +9,7 @@ namespace Deployd.Core
     public class DebugTimer : Stopwatch, IDisposable
     {
         private readonly string _name;
-        protected static ILogger Log;
+        protected static ILog Log = LogManager.GetLogger(typeof(DebugTimer));
 
         public DebugTimer(string name = null)
         {
