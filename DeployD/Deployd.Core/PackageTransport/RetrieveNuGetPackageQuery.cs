@@ -16,17 +16,15 @@ namespace Deployd.Core.PackageTransport
             _packageRepositoryFactory = packageRepositoryFactory;
             _logger = logger;
             _packageRepository = _packageRepositoryFactory.CreateRepository(feedLocation.Source);
-            
-            _logger.Info(string.Format("Nuget feed: {0}", feedLocation.Source));
         }
 
         public IPackage GetLatestPackage(string packageId)
         {
             try
             {
-                var all = _packageRepository.GetPackages().Where(x => x.Id == packageId && x.IsLatestVersion).ToList();
-                all.Reverse();
-                return all.FirstOrDefault();
+                var all = _packageRepository.GetPackages().Where(x => x.Id == packageId && x.IsAbsoluteLatestVersion).ToList();
+
+                return all.OrderByDescending(v=>v.Version).FirstOrDefault();
             } 
             catch (Exception ex)
             {

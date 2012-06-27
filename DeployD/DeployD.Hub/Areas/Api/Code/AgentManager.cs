@@ -75,8 +75,12 @@ namespace DeployD.Hub.Areas.Api.Code
 
         private void SetAgentStatus(AgentStatusReport agentStatus, AgentRecord agent)
         {
+            if (agentStatus.packages == null)
+                return;
+
             _ravenSession.Advanced.GetEtagFor(agent);
             agent.Packages = agentStatus.packages
+                .Where(p=>p.AvailableVersions != null)
                 .Select(p => new PackageViewModel
                                  {
                                      availableVersions = p.AvailableVersions.ToArray(),

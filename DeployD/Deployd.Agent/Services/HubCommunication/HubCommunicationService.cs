@@ -26,7 +26,7 @@ namespace Deployd.Agent.Services.HubCommunication
         private readonly RunningInstallationTaskList _runningTasks;
         private readonly IInstalledPackageArchive _installCache;
         private Timer _pingTimer = null;
-        private int _pingIntervalInMilliseconds = 5000;
+        private int _pingIntervalInMilliseconds = 15000;
 
         public HubCommunicationService(IAgentSettings agentSettings, ILogger log, ILocalPackageCache cache, RunningInstallationTaskList runningTasks, IInstalledPackageArchive installCache)
         {

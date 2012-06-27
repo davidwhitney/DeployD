@@ -41,7 +41,7 @@ namespace Deployd.Agent
 
                 new WindowsServiceRunner(args,
                                         () => _kernel.GetAll<IWindowsService>().ToArray(),
-                                        installationSettings: (serviceInstaller, serviceProcessInstaller) =>
+                                            installationSettings: (serviceInstaller, serviceProcessInstaller) =>
                                                                 {
                                                                     serviceInstaller.ServiceName = NAME;
                                                                     serviceInstaller.StartType =
@@ -50,7 +50,8 @@ namespace Deployd.Agent
                                                                         ServiceAccount.User;
                                                                 },
                                         registerContainer: () => _containerWrapper,
-                                        configureContext: x => { x.Log = s => Logger.Info(s); })
+                                        configureContext: x => { x.Log = s => Logger.Info(s); },
+                                        agentSettings:agentSettings)
                 .Host();
  } catch (Exception ex)
             {

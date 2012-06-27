@@ -87,11 +87,11 @@ namespace Deployd.Core.PackageCaching
 
         public void Add(IPackage package)
         {
-            var packageCache = PackageCacheLocation(package);
+            var packageCacheLocation = PackageCacheLocation(package);
 
-            _fileSystem.EnsureDirectoryExists(packageCache);
+            _fileSystem.EnsureDirectoryExists(packageCacheLocation);
 
-            var cachedPackagePath = Path.Combine(packageCache, CachedPackageVersionFilename(package.Id, package.Version.ToString()));
+            var cachedPackagePath = Path.Combine(packageCacheLocation, CachedPackageVersionFilename(package.Id, package.Version.ToString()));
             
             if (CachedVersionExistsAndIsUpToDate(package, cachedPackagePath))
             {
