@@ -2,7 +2,7 @@
 <GlobalAgentConfiguration xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <Environments>
     <DeploymentEnvironment>
-      <Name>Staging FrontOffice</Name>
+      <Name>Staging</Name>
       <Packages>
           <string>GG.PaymentProcessing.Agent</string>
           <string>GG.Integration.EmailVision.MsmqService</string>
@@ -14,12 +14,7 @@
           <string>GG.Api.Services.Sms</string>
           <string>GG.Web.Website.Charity</string>
           <string>GG.Web.Website.Companies</string>
-      </Packages>
-    </DeploymentEnvironment>
-	<DeploymentEnvironment>
-      <Name>Staging BackOffice</Name>
-      <Packages>
-		<string>GG.Search.Indexing.Service</string>
+          <string>GG.Search.Indexing.Service</string>
           <string>GG.GlobalGiving.FeedConsumer.Service</string>
           <string>GG.GlobalGiving.FeedConsumer.Service</string>
       </Packages>

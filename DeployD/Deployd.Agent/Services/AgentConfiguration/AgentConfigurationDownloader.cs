@@ -38,7 +38,7 @@ namespace Deployd.Agent.Services.AgentConfiguration
                 configPackage = DownloadConfigurationPackage();
             } catch(Exception ex)
             {
-                _logger.Error("Could not download configuration package", ex);
+                _logger.Error(ex, "Could not download configuration package");
                 return;
             }
 
@@ -49,7 +49,7 @@ namespace Deployd.Agent.Services.AgentConfiguration
             }
             catch (Exception ex)
             {
-                _logger.Error("failed", ex);
+                _logger.Error(ex, "failed");
             }
         }
 

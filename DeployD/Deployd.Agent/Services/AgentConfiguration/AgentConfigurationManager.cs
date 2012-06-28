@@ -80,7 +80,7 @@ namespace Deployd.Agent.Services.AgentConfiguration
             }
             catch (Exception ex)
             {
-                _logger.Error("Could not save configuration file " + fileName.MapVirtualPath(), ex);
+                _logger.Error(ex, "Could not save configuration file " + fileName.MapVirtualPath());
             }
         }
     }

@@ -6,7 +6,7 @@ namespace Deployd.Core.AgentConfiguration
     public class AgentSettings : IAgentSettings
     {
         public static readonly string AgentProgramDataPath =
-            Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData), "DeployD.Agent");
+            Path.Combine(Environment.CurrentDirectory, "DeployD.Agent");
 
         public int PackageSyncIntervalMs { get; set; }
         public int ConfigurationSyncIntervalMs { get; set; }

@@ -69,7 +69,7 @@ namespace Deployd.Agent.Services
             });
             action.Task
                 .ContinueWith(RemoveFromRunningActions)
-                .ContinueWith(task => _logger.Error("Action failed", action.Exception),
+                .ContinueWith(task => _logger.Error(action.Exception, "Action failed"),
                               TaskContinuationOptions.OnlyOnFaulted);
             action.Task.Start();
         }

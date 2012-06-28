@@ -75,22 +75,23 @@ namespace DeployD.Hub.Areas.Api.Code
 
         private void SetAgentStatus(AgentStatusReport agentStatus, AgentRecord agent)
         {
-            if (agentStatus.packages == null)
-                return;
+            if (agentStatus.packages != null)
+            {
 
-            _ravenSession.Advanced.GetEtagFor(agent);
-            agent.Packages = agentStatus.packages
-                .Where(p=>p.AvailableVersions != null)
-                .Select(p => new PackageViewModel
-                                 {
-                                     availableVersions = p.AvailableVersions.ToArray(),
-                                     currentTask = p.CurrentTask,
-                                     installedVersion = p.InstalledVersion,
-                                     packageId = p.PackageId,
-                                     installed = p.Installed
-                                 }).ToList();
+                _ravenSession.Advanced.GetEtagFor(agent);
+                agent.Packages = agentStatus.packages
+                    .Where(p => p.AvailableVersions != null)
+                    .Select(p => new PackageViewModel
+                                     {
+                                         availableVersions = p.AvailableVersions.ToArray(),
+                                         currentTask = p.CurrentTask,
+                                         installedVersion = p.InstalledVersion,
+                                         packageId = p.PackageId,
+                                         installed = p.Installed
+                                     }).ToList();
+            }
             agent.CurrentTasks = agentStatus.currentTasks;
-            agent.AvailableVersions = agentStatus.availableVersions;
+                agent.AvailableVersions = agentStatus.availableVersions;
             agent.Environment = agentStatus.environment;
             agent.Contacted = true;
             agent.LastContact = DateTime.Now;

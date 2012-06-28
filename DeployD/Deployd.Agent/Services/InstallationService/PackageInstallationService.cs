@@ -92,7 +92,7 @@ namespace Deployd.Agent.Services.InstallationService
 
             nextPendingInstall.Task
                 .ContinueWith(RemoveFromRunningInstallationList)
-                .ContinueWith(task => _logger.Error("Installation task failed.", task.Exception), TaskContinuationOptions.OnlyOnFaulted);
+                .ContinueWith(task => _logger.Error(task.Exception, "Installation task failed."), TaskContinuationOptions.OnlyOnFaulted);
 
             nextPendingInstall.Task.Start();
         }

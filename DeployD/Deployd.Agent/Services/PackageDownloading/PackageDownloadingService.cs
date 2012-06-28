@@ -61,7 +61,7 @@ namespace Deployd.Agent.Services.PackageDownloading
                 }
                 catch (Exception ex)
                 {
-                    _logger.Error("Failed to download latest version of " + packageId, ex);
+                    _logger.Error(ex, "Failed to download latest version of " + packageId);
                     continue;
                 }
 

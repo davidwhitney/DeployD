@@ -28,7 +28,7 @@ namespace Deployd.Core.PackageTransport
             } 
             catch (Exception ex)
             {
-                _logger.Error("Could not get packages", ex);
+                _logger.Error(ex, "Could not get packages");
                 throw;
             }
         }
