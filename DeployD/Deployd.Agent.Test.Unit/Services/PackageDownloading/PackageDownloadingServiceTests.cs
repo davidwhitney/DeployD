@@ -19,19 +19,20 @@ namespace Deployd.Agent.Test.Unit.Services.PackageDownloading
         private Mock<ILocalPackageCache> _packageCacheMock;
         private PackageDownloadingService _pds;
         private Mock<IAgentConfigurationManager> _agentConfigManagerMock;
-        private AgentSettings _agentSettings;
+        private Mock<IAgentSettingsManager> _agentSettings;
         private Mock<ILogger> _logger = new Mock<ILogger>();
         private const string PACKAGE_ID = "packageId";
 
         [SetUp]
         public void SetUp()
         {
-            _agentSettings = new AgentSettings {DeploymentEnvironment = "Staging", PackageSyncIntervalMs = 1};
+            _agentSettings = new Mock<IAgentSettingsManager>();
+            _agentSettings.SetupGet(s=>s.Settings).Returns(new AgentSettings { DeploymentEnvironment = "Staging", PackageSyncIntervalMs = 1 });
             _agentConfigManagerMock = new Mock<IAgentConfigurationManager>();
-            _agentConfigManagerMock.Setup(x => x.GetWatchedPackages(_agentSettings.DeploymentEnvironment)).Returns(new List<string> { PACKAGE_ID });
+            _agentConfigManagerMock.Setup(x => x.GetWatchedPackages(_agentSettings.Object.Settings.DeploymentEnvironment)).Returns(new List<string> { PACKAGE_ID });
             _packageRepoMock = new Mock<IRetrievePackageQuery>();
             _packageCacheMock = new Mock<ILocalPackageCache>();
-            _pds = new PackageDownloadingService(_agentSettings, _packageRepoMock.Object, _packageCacheMock.Object, _agentConfigManagerMock.Object, _logger.Object);
+            _pds = new PackageDownloadingService(_agentSettings.Object, _packageRepoMock.Object, _packageCacheMock.Object, _agentConfigManagerMock.Object, _logger.Object);
         }
 
         [Test]
@@ -60,7 +61,7 @@ namespace Deployd.Agent.Test.Unit.Services.PackageDownloading
         [Test]
         public void Stop_WhenInvoked_StopsTask()
         {
-            _agentSettings.ConfigurationSyncIntervalMs = 10000;
+            _agentSettings.SetupGet(s => s.Settings.ConfigurationSyncIntervalMs).Returns(10000);
 
             _pds.Start(new string[0]);
             Assert.That(_pds.TimedTask.IsRunning, Is.True);

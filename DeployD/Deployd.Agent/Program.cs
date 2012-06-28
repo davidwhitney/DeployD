@@ -35,9 +35,9 @@ namespace Deployd.Agent
                 
                 _containerWrapper = new ContainerWrapper(_kernel);
 
-                var agentSettings = _containerWrapper.GetType<IAgentSettings>();
+                var agentSettingsManager = _containerWrapper.GetType<IAgentSettingsManager>();
 
-                SetLogAppenderPaths(agentSettings, LogManager.GetLogger("Agent.Main"));
+                SetLogAppenderPaths(agentSettingsManager.Settings, LogManager.GetLogger("Agent.Main"));
 
                 new WindowsServiceRunner(args,
                                         () => _kernel.GetAll<IWindowsService>().ToArray(),
@@ -51,7 +51,7 @@ namespace Deployd.Agent
                                                                 },
                                         registerContainer: () => _containerWrapper,
                                         configureContext: x => { x.Log = s => Logger.Info(s); },
-                                        agentSettings:agentSettings)
+                                        agentSettingsManager:agentSettingsManager)
                 .Host();
  } catch (Exception ex)
             {

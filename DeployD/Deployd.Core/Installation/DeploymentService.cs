@@ -18,19 +18,19 @@ namespace Deployd.Core.Installation
         private readonly IEnumerable<IDeploymentHook> _hooks;
         private readonly ILocalPackageCache _packageCache;
         private readonly IInstalledPackageArchive _installedPackageArchive;
-        private readonly IAgentSettings _agentSettings;
+        private readonly IAgentSettingsManager _agentSettingsManager;
         protected readonly ILogger Logger; 
         public ApplicationContext AppContext { get; set; }
 
         public DeploymentService(IEnumerable<IDeploymentHook> hooks, 
                                  ILocalPackageCache packageCache,
                                  IInstalledPackageArchive installedPackageArchive,
-            IAgentSettings agentSettings, ILogger logger)
+            IAgentSettingsManager agentSettingsManager, ILogger logger)
         {
             _hooks = hooks;
             _packageCache = packageCache;
             _installedPackageArchive = installedPackageArchive;
-            _agentSettings = agentSettings;
+            _agentSettingsManager = agentSettingsManager;
             Logger = logger;
         }
 
@@ -50,10 +50,10 @@ namespace Deployd.Core.Installation
 
         public bool Deploy(string taskId, IPackage package, CancellationTokenSource cancellationToken, Action<ProgressReport> reportProgress)
         {
-            var unpackFolder = Path.Combine(AgentSettings.AgentProgramDataPath, _agentSettings.UnpackingLocation);
+            var unpackFolder = Path.Combine(AgentSettings.AgentProgramDataPath, _agentSettingsManager.Settings.UnpackingLocation);
             var workingFolder = Path.Combine(unpackFolder, package.GetFullName());
-            var targetInstallationFolder = Path.Combine(_agentSettings.BaseInstallationPath, package.Id);
-            var deploymentContext = new DeploymentContext(package, _agentSettings, workingFolder, targetInstallationFolder, taskId);
+            var targetInstallationFolder = Path.Combine(_agentSettingsManager.Settings.BaseInstallationPath, package.Id);
+            var deploymentContext = new DeploymentContext(package, _agentSettingsManager, workingFolder, targetInstallationFolder, taskId);
 
             var logger = deploymentContext.GetLoggerFor(this);
             var frameworks = package.GetSupportedFrameworks();

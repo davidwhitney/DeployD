@@ -11,8 +11,8 @@ namespace Deployd.Core.Installation.Hooks
 {
     public class Iis7MsDeployDeploymentHook : IisMsDeployDeploymentHook
     {
-        public Iis7MsDeployDeploymentHook(IAgentSettings agentSettings, IFileSystem fileSystem)
-            : base(agentSettings, fileSystem)
+        public Iis7MsDeployDeploymentHook(IAgentSettingsManager agentSettingsManager, IFileSystem fileSystem)
+            : base(agentSettingsManager, fileSystem)
         {
         }
 

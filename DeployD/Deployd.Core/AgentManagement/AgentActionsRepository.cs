@@ -9,12 +9,10 @@ namespace Deployd.Core.AgentManagement
     public class AgentActionsRepository : IAgentActionsRepository
     {
         private readonly IFileSystem _fileSystem;
-        private readonly IAgentSettings _agentSettings;
 
-        public AgentActionsRepository(IFileSystem fileSystem, IAgentSettings agentSettings)
+        public AgentActionsRepository(IFileSystem fileSystem)
         {
             _fileSystem = fileSystem;
-            _agentSettings = agentSettings;
         }
 
         public List<AgentAction> GetActionsForPackage(string packageId)

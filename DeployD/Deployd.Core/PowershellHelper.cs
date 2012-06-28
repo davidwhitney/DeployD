@@ -8,7 +8,7 @@ namespace Deployd.Core
 {
     public static class PowershellHelper
     {
-        public static StringBuilder ExecutePowerShellScript(string pathToScript, IAgentSettings _agentSettings)
+        public static StringBuilder ExecutePowerShellScript(string pathToScript, IAgentSettings agentSettings)
         {
             var serviceCommands = new Command(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Scripts/PS/Services.ps1"));
 
@@ -19,7 +19,7 @@ namespace Deployd.Core
 
             // open it
             var command = new Command(pathToScript);
-            command.Parameters.Add("agentEnvironment", _agentSettings.DeploymentEnvironment);
+            command.Parameters.Add("agentEnvironment", agentSettings.DeploymentEnvironment);
 
             // open it
             runspace.Open();
@@ -46,7 +46,7 @@ namespace Deployd.Core
             return stringBuilder;
         }
 
-        public static StringBuilder ExecuteInlinePowerShellScript(string scriptText, IAgentSettings _agentSettings)
+        public static StringBuilder ExecuteInlinePowerShellScript(string scriptText, IAgentSettings agentSettings)
         {
             var serviceCommands = new Command(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Scripts/PS/Services.ps1"));
 

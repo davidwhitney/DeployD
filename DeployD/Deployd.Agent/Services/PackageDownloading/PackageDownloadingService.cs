@@ -18,24 +18,24 @@ namespace Deployd.Agent.Services.PackageDownloading
 
         public ApplicationContext AppContext { get; set; }
 
-        private readonly IAgentSettings _settings;
+        private readonly IAgentSettingsManager _settingsManager;
         protected readonly IRetrievePackageQuery AllPackagesQuery;
         protected readonly ILocalPackageCache AgentCache;
 
         public TimedSingleExecutionTask TimedTask { get; private set; }
 
-        public PackageDownloadingService(IAgentSettings agentSettings, 
+        public PackageDownloadingService(IAgentSettingsManager agentSettingsManager, 
             IRetrievePackageQuery allPackagesQuery, 
             ILocalPackageCache agentCache, 
             IAgentConfigurationManager agentConfigurationManager,
             ILogger logger)
         {
-            _settings = agentSettings;
+            _settingsManager = agentSettingsManager;
             AllPackagesQuery = allPackagesQuery;
             AgentCache = agentCache;
             _agentConfigurationManager = agentConfigurationManager;
             _logger = logger;
-            TimedTask = new TimedSingleExecutionTask(agentSettings.PackageSyncIntervalMs, FetchPackages, _logger);
+            TimedTask = new TimedSingleExecutionTask(agentSettingsManager.Settings.PackageSyncIntervalMs, FetchPackages, _logger);
         }
 
         public void Start(string[] args)
@@ -50,7 +50,7 @@ namespace Deployd.Agent.Services.PackageDownloading
 
         public void FetchPackages()
         {
-            var packages = _agentConfigurationManager.GetWatchedPackages(_settings.DeploymentEnvironment);
+            var packages = _agentConfigurationManager.GetWatchedPackages(_settingsManager.Settings.DeploymentEnvironment);
 
             foreach(var packageId in packages)
             {

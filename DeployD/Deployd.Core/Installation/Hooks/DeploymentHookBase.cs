@@ -13,12 +13,12 @@ namespace Deployd.Core.Installation.Hooks
     /// </summary>
     public abstract class DeploymentHookBase : IDeploymentHook
     {
-        protected readonly IAgentSettings AgentSettings;
+        protected readonly IAgentSettingsManager AgentSettingsManager;
         protected readonly IFileSystem FileSystem;
 
-        protected DeploymentHookBase(IAgentSettings agentSettings, IFileSystem fileSystem)
+        protected DeploymentHookBase(IAgentSettingsManager agentSettingsManager, IFileSystem fileSystem)
         {
-            AgentSettings = agentSettings;
+            AgentSettingsManager = agentSettingsManager;
             FileSystem = fileSystem;
         }
 
@@ -90,7 +90,7 @@ namespace Deployd.Core.Installation.Hooks
         protected bool EnvironmentIsValidForPackage(DeploymentContext context)
         {
             var tags = context.Package.Tags.ToLower().Split(' ', ',', ';');
-            return tags.Intersect(AgentSettings.Tags).Any();
+            return tags.Intersect(AgentSettingsManager.Settings.Tags).Any();
         }
 
         protected void RunProcess(string executablePath, string executableArgs, ILog logger)

@@ -19,8 +19,8 @@ namespace Deployd.Core.PackageCaching
 
         private readonly string _cacheDirectory;
 
-        public NuGetPackageCache(IFileSystem fileSystem, IAgentSettings agentSettings, ILogger logger)
-            : this(fileSystem, agentSettings.CacheDirectory)
+        public NuGetPackageCache(IFileSystem fileSystem, IAgentSettingsManager agentSettings, ILogger logger)
+            : this(fileSystem, agentSettings.Settings.CacheDirectory)
         {
             Logger = logger;
         }

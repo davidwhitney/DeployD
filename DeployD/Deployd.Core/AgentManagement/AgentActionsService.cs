@@ -8,19 +8,19 @@ namespace Deployd.Core.AgentManagement
 {
     public class AgentActionsService : IAgentActionsService
     {
-        private readonly IAgentSettings _agentSettings;
+        private readonly IAgentSettingsManager _agentSettingsManager;
 
-        public AgentActionsService(IAgentSettings agentSettings)
+        public AgentActionsService(IAgentSettingsManager agentSettingsManager)
         {
-            _agentSettings = agentSettings;
+            _agentSettingsManager = agentSettingsManager;
         }
 
         public void RunAction(ActionTask action, Action<ProgressReport> reportProgress)
         {
             string scriptPath = 
-                System.IO.Path.Combine(_agentSettings.UnpackingLocation, action.ScriptPath);
+                System.IO.Path.Combine(_agentSettingsManager.Settings.UnpackingLocation, action.ScriptPath);
             action.Log = 
-                PowershellHelper.ExecutePowerShellScript(scriptPath, _agentSettings)
+                PowershellHelper.ExecutePowerShellScript(scriptPath, _agentSettingsManager.Settings)
                 .ToString();
             
         }

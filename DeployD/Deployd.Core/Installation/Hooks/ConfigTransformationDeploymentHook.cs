@@ -8,7 +8,7 @@ namespace Deployd.Core.Installation.Hooks
 {
     public class ConfigTransformationDeploymentHook : DeploymentHookBase
     {
-        public ConfigTransformationDeploymentHook(IFileSystem fileSystem, IAgentSettings agentSettings) : base(agentSettings, fileSystem)
+        public ConfigTransformationDeploymentHook(IFileSystem fileSystem, IAgentSettingsManager agentSettingsManager) : base(agentSettingsManager, fileSystem)
         {
         }
 
@@ -31,7 +31,7 @@ namespace Deployd.Core.Installation.Hooks
             {
                 var expectedTransformFileName = string.Format("{0}.{1}{2}",
                     Path.GetFileNameWithoutExtension(configFile.Path),
-                    AgentSettings.DeploymentEnvironment,
+                    AgentSettingsManager.Settings.DeploymentEnvironment,
                     Path.GetExtension(configFile.Path));
 
 

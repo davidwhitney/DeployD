@@ -15,7 +15,7 @@ namespace Deployd.Core.Hosting
     	private readonly string[] _args;
 		private readonly ApplicationContext _context;
         private readonly Func<IWindowsService[]> _createServices;
-        private readonly IAgentSettings _agentSettings=null;
+        private readonly IAgentSettingsManager _agentSettingsManager=null;
         private readonly ILog _logger;
         private readonly Action<ApplicationContext> _configureContext;
 
@@ -27,20 +27,20 @@ namespace Deployd.Core.Hosting
         /// <param name="configureContext">Optional application context configuration</param>
         /// <param name="installationSettings">Optional installer configuration with semi-sensible defaults</param>
         /// <param name="registerContainer">Optionally register an IoC container</param>
-        /// <param name="agentSettings">Optionally provide agent settings </param>
+        /// <param name="agentSettingsManager">Optionally provide agent settings </param>
         public WindowsServiceRunner(string[] args,
                                     Func<IWindowsService[]> createServices, 
                                     Action<ApplicationContext> configureContext = null,
                                     Action<System.ServiceProcess.ServiceInstaller, 
                                     ServiceProcessInstaller> installationSettings = null,
                                     Func<IIocContainer> registerContainer = null,
-                                    IAgentSettings agentSettings=null)
+                                    IAgentSettingsManager agentSettingsManager = null)
         {
             var log = LogManager.GetLogger(typeof (WindowsServiceRunner));
             _args = args;
 			_context = new ApplicationContext();
             _createServices = createServices;
-            _agentSettings = agentSettings;
+            _agentSettingsManager = agentSettingsManager;
             _logger = log;
             _configureContext = configureContext ?? (ctx => {  });
     	    _context.ConfigureInstall = installationSettings ?? ((serviceInstaller, serviceProcessInstaller) => { });
@@ -110,10 +110,10 @@ namespace Deployd.Core.Hosting
             _context.Log("Codebase: " + currentApplication.EscapedCodeBase);
             _context.Log("CLR Version: " + currentApplication.ImageRuntimeVersion);
             _context.Log("Location: " + currentApplication.Location);
-            if (_agentSettings != null)
+            if (_agentSettingsManager != null)
             {
-                _context.Log("Environment: " + _agentSettings.DeploymentEnvironment);
-                _context.Log("Hub Address: " + _agentSettings.HubAddress);
+                _context.Log("Environment: " + _agentSettingsManager.Settings.DeploymentEnvironment);
+                _context.Log("Hub Address: " + _agentSettingsManager.Settings.HubAddress);
             }
             _context.Log("================================================");
         }

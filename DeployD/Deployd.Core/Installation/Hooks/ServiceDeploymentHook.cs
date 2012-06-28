@@ -21,10 +21,10 @@ namespace Deployd.Core.Installation.Hooks
             return context.Package.Tags.ToLower().Contains("service");
         }
 
-        public ServiceDeploymentHook(IFileSystem fileSystem, IAgentSettings agentSettings)
-            : base(agentSettings, fileSystem)
+        public ServiceDeploymentHook(IFileSystem fileSystem, IAgentSettingsManager agentSettingsManager)
+            : base(agentSettingsManager, fileSystem)
         {
-            _serviceInstallationPath = Path.Combine(agentSettings.BaseInstallationPath, "services");
+            _serviceInstallationPath = Path.Combine(agentSettingsManager.Settings.BaseInstallationPath, "services");
         }
 
         public override void BeforeDeploy(DeploymentContext context)

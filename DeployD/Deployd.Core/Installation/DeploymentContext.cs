@@ -11,7 +11,7 @@ namespace Deployd.Core.Installation
     public class DeploymentContext
     {
         private readonly IPackage _package;
-        private readonly IAgentSettings _agentSettings;
+        private readonly IAgentSettingsManager _agentSettingsManager;
         private readonly string _workingFolder;
         private readonly string _installationTaskId;
         private readonly DateTime _contextCreateTime = DateTime.Now;
@@ -21,10 +21,10 @@ namespace Deployd.Core.Installation
         private string _logDirectory;
         private DeployDMetaData _metaData=null;
 
-        public DeploymentContext(IPackage package, IAgentSettings agentSettings, string workingFolder, string targetInstallationFolder, string installationTaskId)
+        public DeploymentContext(IPackage package, IAgentSettingsManager agentSettingsManager, string workingFolder, string targetInstallationFolder, string installationTaskId)
         {
             _package = package;
-            _agentSettings = agentSettings;
+            _agentSettingsManager = agentSettingsManager;
             _workingFolder = workingFolder;
             _installationTaskId = installationTaskId;
 
@@ -57,7 +57,7 @@ namespace Deployd.Core.Installation
 
         private void ConfigureInstallationLogging()
         {
-            _logDirectory = _agentSettings.LogsDirectory.MapVirtualPath();
+            _logDirectory = _agentSettingsManager.Settings.LogsDirectory.MapVirtualPath();
             _logFileName = string.Format("{0:dd-MM-yyyy-HH-mm-ss}.log", _contextCreateTime);
             _logAppenderName = string.Format("Install.{0}.{1:dd.MM.yyyy.HH.mm.ss}", _package.Id, _contextCreateTime);
 

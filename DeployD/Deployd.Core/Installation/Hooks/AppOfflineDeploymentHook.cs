@@ -11,7 +11,7 @@ namespace Deployd.Core.Installation.Hooks
         private const string APP_ONLINE_FILE = "app_online.htm";
         private const string APP_OFFLINE_FILE = "app_offline.htm";
 
-        public AppOfflineDeploymentHook(IFileSystem fileSystem, IAgentSettings agentSettings) : base(agentSettings, fileSystem)
+        public AppOfflineDeploymentHook(IFileSystem fileSystem, IAgentSettingsManager agentSettingsManager) : base(agentSettingsManager, fileSystem)
         {
             _fileSystem = fileSystem;
         }

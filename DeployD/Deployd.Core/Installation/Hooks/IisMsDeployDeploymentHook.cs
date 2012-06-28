@@ -22,7 +22,7 @@ namespace Deployd.Core.Installation.Hooks
             Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86), @"IIS\Microsoft Web Deploy V3\msdeploy.exe"),
         };
 
-        public IisMsDeployDeploymentHook(IAgentSettings agentSettings, IFileSystem fileSystem) : base(agentSettings, fileSystem)
+        public IisMsDeployDeploymentHook(IAgentSettingsManager agentSettingsManager, IFileSystem fileSystem) : base(agentSettingsManager, fileSystem)
         {
         }
 
@@ -144,7 +144,7 @@ namespace Deployd.Core.Installation.Hooks
             }
 
             const string msDeployArgsFormat = @"-verb:sync -source:package=""{0}"" -dest:auto,computername=""{1}"" {3} -allowUntrusted -setParam:""IIS Web Application Name""=""{2}"" -verbose";
-            var executableArgs = string.Format(msDeployArgsFormat, sourcePackagePath, AgentSettings.MsDeployServiceUrl,
+            var executableArgs = string.Format(msDeployArgsFormat, sourcePackagePath, AgentSettingsManager.Settings.MsDeployServiceUrl,
                                                iisApplicationName, ignore);
 
             RunProcess(MsWebDeployPath, executableArgs, logger);

@@ -11,7 +11,7 @@ namespace Deployd.Core.Installation.Hooks
     {
         private readonly IFileSystem _fileSystem;
 
-        public PowershellDeploymentHook(IAgentSettings agentSettings, IFileSystem fileSystem) : base(agentSettings, fileSystem)
+        public PowershellDeploymentHook(IAgentSettingsManager agentSettingsManager, IFileSystem fileSystem) : base(agentSettingsManager, fileSystem)
         {
             _fileSystem = fileSystem;
         }
@@ -59,7 +59,7 @@ namespace Deployd.Core.Installation.Hooks
 
         private void LoadAndExecuteScript(DeploymentContext context, string pathToScript, ILog logger)
         {
-            var stringBuilder = PowershellHelper.ExecutePowerShellScript(pathToScript, AgentSettings);
+            var stringBuilder = PowershellHelper.ExecutePowerShellScript(pathToScript, AgentSettingsManager.Settings);
 
             logger.Info(stringBuilder.ToString());
         }
