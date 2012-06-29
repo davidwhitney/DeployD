@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.Serialization;
 
 namespace Deployd.Core
@@ -30,5 +31,17 @@ namespace Deployd.Core
 
         [DataMember(Name = "updating")]
         public List<string> Updating { get; set; }
+
+        [DataMember(Name="outOfDate")]
+        public bool OutOfDate
+        {
+            get
+            {
+                return
+                    packages.Any(
+                        p => System.String.CompareOrdinal(p.installedVersion, p.availableVersions.Max(s => s)) > 0);
+            }
+            set { }
+        }
     }
 }
