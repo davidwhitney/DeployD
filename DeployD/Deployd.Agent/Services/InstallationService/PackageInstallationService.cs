@@ -4,8 +4,11 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Deployd.Core;
+using Deployd.Core.AgentConfiguration;
 using Deployd.Core.Hosting;
 using Deployd.Core.Installation;
+using Deployd.Core.PackageCaching;
+using Deployd.Core.Remoting;
 using log4net.Core;
 using ILogger = Ninject.Extensions.Logging.ILogger;
 
@@ -15,6 +18,11 @@ namespace Deployd.Agent.Services.InstallationService
     {
         private readonly IDeploymentService _deploymentService;
         private readonly ILogger _logger;
+        private readonly IHubCommunicator _hubCommunicator;
+        private ILocalPackageCache _agentCache;
+        private IInstalledPackageArchive _installCache;
+        private RunningInstallationTaskList _runningTasks;
+        private IAgentSettingsManager _settingsManager;
 
         public ApplicationContext AppContext { get; set; }
         public TimedSingleExecutionTask TimedTask { get; private set; }
@@ -27,11 +35,17 @@ namespace Deployd.Agent.Services.InstallationService
             RunningInstallationTaskList runningInstalls, 
             CompletedInstallationTaskList completedInstalls,
             IDeploymentService deploymentService,
-            ILogger logger)
+            ILogger logger,
+            IHubCommunicator hubCommunicator, ILocalPackageCache agentCache, IInstalledPackageArchive installCache, RunningInstallationTaskList runningTasks, IAgentSettingsManager settingsManager)
         {
             CompletedInstalls = completedInstalls;
             _deploymentService = deploymentService;
             _logger = logger;
+            _hubCommunicator = hubCommunicator;
+            _agentCache = agentCache;
+            _installCache = installCache;
+            _runningTasks = runningTasks;
+            _settingsManager = settingsManager;
             PendingInstalls = pendingInstalls;
             RunningInstalls = runningInstalls;
             TimedTask = new TimedSingleExecutionTask(5000, CheckForNewInstallations, _logger);
@@ -133,13 +147,14 @@ namespace Deployd.Agent.Services.InstallationService
 
             if (progressReport.Exception == null)
             {
+                _hubCommunicator.SendStatusToHubAsync(AgentStatusFactory.BuildStatus(_agentCache, _installCache, _runningTasks, _settingsManager));
                 return;
             }
 
             installationTask.HasErrors = true;
             installationTask.Errors.Add(progressReport.Exception);
 
-            
+            _hubCommunicator.SendStatusToHubAsync(AgentStatusFactory.BuildStatus(_agentCache, _installCache, _runningTasks, _settingsManager));
         }
 
         private void RemoveFromRunningInstallationList(Task<InstallationResult> completedInstallationTask)

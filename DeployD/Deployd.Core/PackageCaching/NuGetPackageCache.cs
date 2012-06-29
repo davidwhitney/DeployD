@@ -114,13 +114,13 @@ namespace Deployd.Core.PackageCaching
             // save the package
             File.WriteAllBytes(cachedPackagePath, package.GetStream().ReadAllBytes());
 
+            Logger.Info("Cached {0} to {1}.", package.Id, package);
+            _currentlyUpdating.Remove(package);
+
             if (OnUpdateFinished != null)
             {
                 OnUpdateFinished(this, new PackageEventArgs(package));
             }
-
-            Logger.Info("Cached {0} to {1}.", package.Id, package);
-            _currentlyUpdating.Remove(package);
         }
 
         private bool CachedVersionExistsAndIsUpToDate(IPackage package, string packagePath)

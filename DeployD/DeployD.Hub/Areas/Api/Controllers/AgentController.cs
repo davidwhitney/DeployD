@@ -171,7 +171,13 @@ namespace DeployD.Hub.Areas.Api.Controllers
         [ActionName("status")]
         public ActionResult Status(string hostname, AgentStatusReport agentStatus)
         {
-            _agentManager.ReceiveStatus(hostname, agentStatus);
+            try
+            {
+                _agentManager.ReceiveStatus(hostname, agentStatus);
+            } catch (Exception ex)
+            {
+                _log.Info(ex, "agent status update failed");
+            }
 
             return new HttpStatusCodeResult((int)HttpStatusCode.Accepted);
         }

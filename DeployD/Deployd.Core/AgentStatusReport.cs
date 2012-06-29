@@ -21,5 +21,8 @@ namespace Deployd.Core
 
         [DataMember(Name="updating")]
         public List<string> updating { get; set; }
+
+        [DataMember(Name="outOfDate")]
+        public bool OutOfDate { get; set; }
     }
 }

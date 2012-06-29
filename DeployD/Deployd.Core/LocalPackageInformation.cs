@@ -23,5 +23,7 @@ namespace Deployd.Core
         public InstallationTask LastInstallationTask { get; set; }
         [DataMember(Name="tags")]
         public string[] Tags { get; set; }
+        [DataMember(Name="outOfDate")]
+        public bool OutOfDate { get; set; }
     }
 }

@@ -102,7 +102,7 @@
                 <%});%>
             </select> <button style="display:none" class="update-agent" data-packageid="<%=package.packageId%>">Update</button>
             </div>
-            
+            <%if (package.outOfDate) {%>Out of date<%}%>
         <div class="manage-agent-current-task"><%if (package.currentTask!= null) {%>-> <%=package.currentTask.version%>: <%=package.currentTask.status%>, <%=package.currentTask.lastMessage%><%}%></div>
         </li>
     <%});%>

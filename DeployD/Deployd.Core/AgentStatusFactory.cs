@@ -13,7 +13,7 @@ namespace Deployd.Core
         public static AgentStatusReport BuildStatus(ILocalPackageCache agentCache, IInstalledPackageArchive installCache, RunningInstallationTaskList runningTasks, IAgentSettingsManager settingsManager)
         {
 
-            return new AgentStatusReport
+            var status= new AgentStatusReport
                        {
                            packages = BuildPackageInformation(agentCache, installCache, runningTasks),
                            currentTasks = runningTasks != null ?
@@ -32,6 +32,11 @@ namespace Deployd.Core
                            environment = settingsManager.Settings.DeploymentEnvironment,
                            updating = agentCache.Updating.Select(p=>string.Format("{0} {1}", p.Id, p.Version)).ToList()
                        };
+
+            status.OutOfDate =
+                status.packages.Any(p => p.OutOfDate);
+
+            return status;
         }
 
         private static List<LocalPackageInformation> BuildPackageInformation(ILocalPackageCache agentCache, IInstalledPackageArchive installCache, RunningInstallationTaskList runningTasks)
@@ -71,6 +76,21 @@ namespace Deployd.Core
                         Version = t.Version,
                         LastMessage = t.ProgressReports.Count > 0 ? t.ProgressReports.LastOrDefault ().Message : ""
                     }).FirstOrDefault();
+
+                packageInfo.OutOfDate = false;
+                if (installedPackage != null)
+                {
+                    if (latestAvailablePackage != null)
+                    {
+                        packageInfo.OutOfDate = installedPackage.Version < latestAvailablePackage.Version;
+                    } 
+                } else
+                {
+                    if (latestAvailablePackage != null)
+                    {
+                        packageInfo.OutOfDate = true;
+                    }
+                }
 
                 packageInformations.Add(packageInfo);
             }

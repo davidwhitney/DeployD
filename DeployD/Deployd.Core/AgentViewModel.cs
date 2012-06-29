@@ -37,9 +37,7 @@ namespace Deployd.Core
         {
             get
             {
-                return
-                    packages.Any(
-                        p => System.String.CompareOrdinal(p.installedVersion, p.availableVersions.Max(s => s)) > 0);
+                return packages.Any(p => p.outOfDate);
             }
             set { }
         }
