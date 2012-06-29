@@ -55,6 +55,9 @@ namespace Deployd.Agent.Services.PackageDownloading
         public void Start(string[] args)
         {
             TimedTask.Start(args);
+
+            // do an initial check/fetch
+            FetchPackages();
         }
 
         public void Stop()
