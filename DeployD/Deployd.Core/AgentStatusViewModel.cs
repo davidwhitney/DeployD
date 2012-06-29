@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using NuGet;
 
 namespace Deployd.Core
 {
@@ -9,6 +10,8 @@ namespace Deployd.Core
         public IEnumerable<string> AvailableVersions { get; set; }
         public string Environment { get; set; }
         public bool Contacted { get; set; }
+
+        public IList<IPackage> Updating { get; set; }
 
         public AgentStatusViewModel()
         {

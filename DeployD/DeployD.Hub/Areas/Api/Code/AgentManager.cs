@@ -95,6 +95,7 @@ namespace DeployD.Hub.Areas.Api.Code
             agent.Environment = agentStatus.environment;
             agent.Contacted = true;
             agent.LastContact = DateTime.Now;
+            agent.Updating = agentStatus.updating;
             _ravenSession.Store(agent);
             System.Diagnostics.Debug.WriteLine("Update agent");
 

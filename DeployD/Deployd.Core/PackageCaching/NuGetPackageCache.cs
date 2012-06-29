@@ -15,14 +15,19 @@ namespace Deployd.Core.PackageCaching
     public class NuGetPackageCache : ILocalPackageCache
     {
         private readonly IFileSystem _fileSystem;
-        protected readonly ILogger Logger; 
+        protected readonly ILogger Logger;
+        private readonly PackageUpdateList _currentlyUpdating;
+        public event EventHandler<PackageEventArgs> OnUpdateStarted;
+        public event EventHandler<PackageEventArgs> OnUpdateFinished;
+        public List<IPackage> Updating { get { return _currentlyUpdating; } } 
 
         private readonly string _cacheDirectory;
 
-        public NuGetPackageCache(IFileSystem fileSystem, IAgentSettingsManager agentSettings, ILogger logger)
+        public NuGetPackageCache(IFileSystem fileSystem, IAgentSettingsManager agentSettings, ILogger logger, PackageUpdateList currentlyUpdating)
             : this(fileSystem, agentSettings.Settings.CacheDirectory)
         {
             Logger = logger;
+            _currentlyUpdating = currentlyUpdating;
         }
 
         public NuGetPackageCache(IFileSystem fileSystem, string cacheDirectory)
@@ -98,9 +103,24 @@ namespace Deployd.Core.PackageCaching
                 return;
             }
 
+            _currentlyUpdating.Add(package);
             Logger.Info("Downloading {0} to {1}.", package.Id, package);
+
+            if (OnUpdateStarted != null)
+            {
+                OnUpdateStarted(this, new PackageEventArgs(package));
+            }
+
+            // save the package
             File.WriteAllBytes(cachedPackagePath, package.GetStream().ReadAllBytes());
+
+            if (OnUpdateFinished != null)
+            {
+                OnUpdateFinished(this, new PackageEventArgs(package));
+            }
+
             Logger.Info("Cached {0} to {1}.", package.Id, package);
+            _currentlyUpdating.Remove(package);
         }
 
         private bool CachedVersionExistsAndIsUpToDate(IPackage package, string packagePath)

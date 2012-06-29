@@ -12,6 +12,7 @@ using Deployd.Core.Installation;
 using Deployd.Core.Installation.Hooks;
 using Deployd.Core.PackageCaching;
 using Deployd.Core.PackageTransport;
+using Deployd.Core.Remoting;
 using Ninject;
 using Ninject.Modules;
 using NuGet;
@@ -30,6 +31,12 @@ namespace Deployd.Agent.Conventions
             Bind<IWindowsService>().To<PackageInstallationService>().InSingletonScope();
             Bind<IWindowsService>().To<ActionExecutionService>().InSingletonScope();
             Bind<IWindowsService>().To<HubCommunicationService>().InSingletonScope();
+            Bind<IWindowsService>().To<HubCommunicationsQueueService>().InSingletonScope();
+            
+            // hub comms
+            Bind<HubCommunicationService>().ToSelf().InSingletonScope();
+            Bind<HubCommunicationsQueue>().ToSelf().InSingletonScope();
+            Bind<IHubCommunicator>().To<HubCommunicator>();
 
             Bind<IAgentConfigurationManager>().To<AgentConfigurationManager>();
             Bind<IAgentSettingsManager>().To<AgentSettingsManager>().InSingletonScope();
@@ -49,6 +56,7 @@ namespace Deployd.Agent.Conventions
             Bind<RunningInstallationTaskList>().ToSelf().InSingletonScope();
             Bind<InstallationTaskQueue>().ToSelf().InSingletonScope();
             Bind<CompletedInstallationTaskList>().ToSelf().InSingletonScope();
+            Bind<PackageUpdateList>().ToSelf().InSingletonScope();
             
             // actions management
             Bind<IAgentActionsService>().To<AgentActionsService>().InSingletonScope();

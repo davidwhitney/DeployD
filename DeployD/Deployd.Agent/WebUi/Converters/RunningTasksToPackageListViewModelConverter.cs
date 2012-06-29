@@ -20,9 +20,12 @@ namespace Deployd.Agent.WebUi.Converters
             {
                 var package = new LocalPackageInformation
                                   {
-                                      PackageId = packageId,
-                                      LatestAvailableVersion = cache.GetLatestVersion(packageId).Version.ToString()
+                                      PackageId = packageId
                                   };
+                var latestVersion = cache.GetLatestVersion(packageId);
+                if (latestVersion != null)
+                    package.LatestAvailableVersion = latestVersion.ToString();
+
 
                 var installedPackage = installPackageArchive.GetCurrentInstalledVersion(packageId);
                 package.InstalledVersion = installedPackage == null ? "0.0.0.0" : installedPackage.Version.ToString();
@@ -50,18 +53,26 @@ namespace Deployd.Agent.WebUi.Converters
 
                 package.AvailableVersions = cache.AvailablePackageVersions(packageId).ToList();
 
-                var tags = cache.GetLatestVersion(packageId).Tags.Split(new[] { ' ' },
-                                                        StringSplitOptions.RemoveEmptyEntries);
-                package.Tags = tags;
-                model.Packages.Add(package);
-
-                foreach(var tag in tags)
+                if (latestVersion != null)
                 {
-                    if (!model.Tags.Any(t => t.Equals(tag.ToLower())))
+
+                    package.Tags = cache.GetLatestVersion(packageId).Tags.Split(new[] { ' ' },
+                                                                            StringSplitOptions.RemoveEmptyEntries);
+                    foreach (var tag in package.Tags)
                     {
-                        model.Tags.Add(tag.ToLower());
+                        if (!model.Tags.Any(t => t.Equals(tag.ToLower())))
+                        {
+                            model.Tags.Add(tag.ToLower());
+                        }
                     }
                 }
+                else
+                {
+                    package.Tags = new string[0];
+                }
+                model.Packages.Add(package);
+
+                model.Updating = cache.Updating;
             }
 
             model.CurrentTasks = runningTasks

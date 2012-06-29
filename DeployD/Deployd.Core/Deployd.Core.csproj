@@ -113,6 +113,7 @@
     <Compile Include="AgentManagement\IActionTaskManager.cs" />
     <Compile Include="AgentManagement\IAgentActionsRepository.cs" />
     <Compile Include="AgentManagement\IAgentActionsService.cs" />
+    <Compile Include="AgentStatusFactory.cs" />
     <Compile Include="AgentStatusReport.cs" />
     <Compile Include="AgentStatusViewModel.cs" />
     <Compile Include="AgentViewModel.cs" />
@@ -135,6 +136,8 @@
     <Compile Include="Installation\Hooks\ServiceDeploymentHook.cs" />
     <Compile Include="Installation\Hooks\TryThis.cs" />
     <Compile Include="Installation\IDeploymentService.cs" />
+    <Compile Include="PackageCaching\PackageEventArgs.cs" />
+    <Compile Include="PackageCaching\PackageUpdateList.cs" />
     <Compile Include="PackageFormats\NuGet\NuGetPackageExtractor.cs" />
     <Compile Include="FileSystemExtensions.cs" />
     <Compile Include="PackageCaching\ILocalPackageCache.cs" />
@@ -164,6 +167,10 @@
     <Compile Include="PackageTransport\IRetrievePackageQuery.cs" />
     <Compile Include="PackageTransport\FeedLocation.cs" />
     <Compile Include="PackageTransport\RetrieveNuGetPackageQuery.cs" />
+    <Compile Include="Remoting\HubCommunicationsQueue.cs" />
+    <Compile Include="Remoting\HubCommunicationsQueueService.cs" />
+    <Compile Include="Remoting\HubCommunicator.cs" />
+    <Compile Include="Remoting\IHubCommunicator.cs" />
     <Compile Include="TimedSingleExecutionTask.cs" />
   </ItemGroup>
   <ItemGroup>

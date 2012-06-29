@@ -27,5 +27,8 @@ namespace Deployd.Core
 
         [DataMember(Name="stale")]
         public bool Stale { get { return DateTime.Now.Subtract(LastContact).TotalMinutes > 1; } set {} }
+
+        [DataMember(Name = "updating")]
+        public List<string> Updating { get; set; }
     }
 }

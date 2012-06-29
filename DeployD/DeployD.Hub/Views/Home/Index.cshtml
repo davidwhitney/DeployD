@@ -59,6 +59,14 @@
                     <%});%>
                 </ul>
             <%}%>
+            
+            <%if (updating&&updating.length != 0) {%>
+                <ul class="tasks">
+                    <%_.each(updating, function(packageNameAndVersion) {%>
+                        <li>Updating <%=packageNameAndVersion%><li>
+                    <%});%>
+                </ul>
+            <%}%>
         <%} else {%>
             Not approved (<a href="/agents">Manage Agents</a>)
         <%}%>

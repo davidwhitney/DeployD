@@ -62,7 +62,8 @@ namespace Deployd.Agent.WebUi.Modules
                                 LastMessage = t.ProgressReports.Count > 0 ? t.ProgressReports.LastOrDefault().Message : ""
                             }).ToList(),
                     AvailableVersions = cache.AllCachedPackages().Select(p => p.Version.ToString()).Distinct().OrderByDescending(s => s),
-                    Environment = _agentSettings.DeploymentEnvironment
+                    Environment = _agentSettings.DeploymentEnvironment,
+                    Updating = cache.Updating
                 };
 
 

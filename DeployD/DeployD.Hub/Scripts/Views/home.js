@@ -183,7 +183,8 @@ var _manageAgentDialogOpen = false;
                 contacted: this.model.get('contacted'),
                 approved: this.model.get('approved'),
                 stale: this.model.get('stale'),
-                lastContact: this.model.get('lastContact')
+                lastContact: this.model.get('lastContact'),
+                updating: this.model.get('updating')
             };
 
             var template = _.template(_agentTemplate, viewModel);

@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using Deployd.Core;
+using NuGet;
 
 namespace Deployd.Agent.WebUi.Models
 {
@@ -11,6 +12,8 @@ namespace Deployd.Agent.WebUi.Models
         public List<string> Tags { get; set; }
 
         public string NugetRepository { get; set; }
+
+        public IList<IPackage> Updating { get; set; }
 
         public PackageListViewModel()
         {

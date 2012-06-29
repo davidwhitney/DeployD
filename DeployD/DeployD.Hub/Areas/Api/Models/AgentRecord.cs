@@ -16,6 +16,8 @@ namespace DeployD.Hub.Areas.Api.Models
         public bool Approved { get; set; }
         public DateTime LastContact { get; set; }
 
+        public List<string> Updating { get; set; }
+
         public AgentRecord(string hostname)
         {
             Packages = new List<PackageViewModel>();

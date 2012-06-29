@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Runtime.Serialization;
+using NuGet;
 
 namespace Deployd.Core
 {
@@ -17,5 +18,8 @@ namespace Deployd.Core
 
         [DataMember(Name = "environment")]
         public string environment { get; set; }
+
+        [DataMember(Name="updating")]
+        public List<string> updating { get; set; }
     }
 }
