@@ -55,7 +55,7 @@
             <%if (currentTasks&&currentTasks.length != 0) {%>
                 <ul class="tasks">
                     <%_.each(currentTasks, function(task) {%>
-                        <%=_.template(_taskTemplate, task)%>
+                        <%=_.template(_taskTemplate, task)%> - task
                     <%});%>
                 </ul>
             <%}%>
@@ -63,7 +63,7 @@
             <%if (updating&&updating.length != 0) {%>
                 <ul class="tasks">
                     <%_.each(updating, function(packageNameAndVersion) {%>
-                        <li>Updating <%=packageNameAndVersion%><li>
+                        <li>Updating <%=packageNameAndVersion%><li> - updating
                     <%});%>
                 </ul>
             <%}%>

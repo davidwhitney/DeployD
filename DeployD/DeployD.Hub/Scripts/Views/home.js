@@ -484,7 +484,7 @@ var _manageAgentDialogOpen = false;
                 if (matchingAgents.length == 1) {
                     dv.model = matchingAgents[0];
                 }
-                dv.render($('ul', self.el));
+                dv.render($('ul#agents', self.el));
                 dv.delegateEvents();
             });
         },
