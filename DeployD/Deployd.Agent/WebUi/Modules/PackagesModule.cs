@@ -75,14 +75,14 @@ namespace Deployd.Agent.WebUi.Modules
                 }
 
                 installationManager.Add(x.packageId, versionString);
-                return Response.AsRedirect("/packages");
+                return this.ResponseOrJson(Response.AsRedirect("/packages"));
             };
 
             Post["/{packageId}/install/{specificVersion}", y => true] = x =>
             {
                 var installationManager = Container().GetType<InstallationTaskQueue>();
                 installationManager.Add(x.packageId, x.specificVersion);
-                return Response.AsRedirect("/packages");
+                return this.ResponseOrJson(Response.AsRedirect("/packages"));
             };
 
             Post["/UpdateAllTo", y => true] = x =>
@@ -99,7 +99,7 @@ namespace Deployd.Agent.WebUi.Modules
                     queue.Add(packageVersions.Id, packageVersions.Version.ToString());
                 }
 
-                return Response.AsRedirect("/packages");
+                return this.ResponseOrJson(Response.AsRedirect("/packages"));
             };
 
             Post["/UpdateAllTo/latest", y => true] = x =>
@@ -115,7 +115,7 @@ namespace Deployd.Agent.WebUi.Modules
                     queue.Add(packageVersions.Key, packageVersions.Max(g=>g.Version).ToString());
                 }
 
-                return Response.AsRedirect("/packages");
+                return this.ResponseOrJson(Response.AsRedirect("/packages"));
             };
 
             Post["/UpdateAllTo/{specificVersion}", y => true] = x =>
@@ -131,7 +131,7 @@ namespace Deployd.Agent.WebUi.Modules
                     queue.Add(packageVersions.Id, packageVersions.Version.ToString());
                 }
 
-                return Response.AsRedirect("/packages");
+                return this.ResponseOrJson(Response.AsRedirect("/packages"));
             };
         }
 
