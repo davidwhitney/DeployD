@@ -185,7 +185,8 @@ var _manageAgentDialogOpen = false;
                 stale: this.model.get('stale'),
                 lastContact: this.model.get('lastContact'),
                 updating: this.model.get('updating'),
-                outOfDate: this.model.get('outOfDate')
+                outOfDate: this.model.get('outOfDate'),
+                latestVersion: this.model.get('latestVersion')
             };
 
             var template = _.template(_agentTemplate, viewModel);

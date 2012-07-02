@@ -10,6 +10,11 @@ namespace Deployd.Core
         public bool installed { get; set; }
         public string installedVersion { get; set; }
         public InstallTaskViewModel currentTask { get; set; }
+        public string latestVersion
+        {
+            get { return availableVersions.Max(v => Version.Parse(v)).ToString(); }
+            set { }
+        }
         public bool outOfDate
         {
             get

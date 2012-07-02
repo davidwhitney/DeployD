@@ -55,7 +55,7 @@
             <%if (currentTasks&&currentTasks.length != 0) {%>
                 <ul class="tasks">
                     <%_.each(currentTasks, function(task) {%>
-                        <%=_.template(_taskTemplate, task)%> - task
+                        <%=_.template(_taskTemplate, task)%>
                     <%});%>
                 </ul>
             <%}%>
@@ -63,7 +63,7 @@
             <%if (updating&&updating.length != 0) {%>
                 <ul class="tasks">
                     <%_.each(updating, function(packageNameAndVersion) {%>
-                        <li>Updating <%=packageNameAndVersion%><li> - updating
+                        <li>Updating <%=packageNameAndVersion%></li>
                     <%});%>
                 </ul>
             <%}%>
@@ -102,7 +102,7 @@
                 <%});%>
             </select> <button style="display:none" class="update-agent" data-packageid="<%=package.packageId%>">Update</button>
             </div>
-            <%if (package.outOfDate) {%>Out of date<%}%>
+            <%if (package.outOfDate) {%>Out of date (latest: <%=package.latestVersion%>)<%}%>
         <div class="manage-agent-current-task"><%if (package.currentTask!= null) {%>-> <%=package.currentTask.version%>: <%=package.currentTask.status%>, <%=package.currentTask.lastMessage%><%}%></div>
         </li>
     <%});%>
@@ -122,7 +122,7 @@
     <ul>
         <% _(serverLogCollection.models).each(function(log) {%>
             <%console.log('log file: ' + log.get('LogFileName'));%>
-            <li><a href="/#/logs/<%=hostname%>/server/<%=log.get('LogFileName')%>"><%=log.get('LogFileName')%> <%=log.get('DateCreatedString')%></a></li>
+            <li><a href="/#/logs/<%=hostname%>/server/<%=log.get('LogFileName')%>"><%=log.get('LogFileName')%> <%=log.get('DateModifiedString')%></a></li>
         <%});%>
     </ul>
     <h2>Package logs for <%=hostname%></h2>
@@ -140,7 +140,7 @@
     
     <ul>
     <%_(models).each(function(logFile) {%>
-        <li><a href="/#/logs/<%=hostname%>/<%=packageId%>/<%=logFile.get('LogFileName')%>"><%=logFile.get('DateCreatedString')%></a></li>
+        <li><a href="/#/logs/<%=hostname%>/<%=packageId%>/<%=logFile.get('LogFileName')%>"><%=logFile.get('DateModifiedString')%></a></li>
     <%});%>
     </ul>
 
