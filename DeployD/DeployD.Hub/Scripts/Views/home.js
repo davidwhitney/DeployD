@@ -465,6 +465,7 @@ var _manageAgentDialogOpen = false;
             var addHostnameValue = $('input[name=hostname]', this.$el).val();
             
             $(this.el).html(_appTemplate);
+            $("button#updateSelected", this.el).click(self.updateSelected);
             $('input[name=hostname]', this.$el).val(addHostnameValue);
 
             var queryableViews = new jsinq.Enumerable(self.agentViews);
