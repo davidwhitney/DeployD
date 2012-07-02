@@ -21,7 +21,7 @@ namespace Deployd.Agent.Services.HubCommunication
     {
         private readonly IHubCommunicator _hubCommunicator;
         private Timer _pingTimer = null;
-        private const int PingIntervalInMilliseconds = 60000;
+        private const int PingIntervalInMilliseconds = 15000;
         private readonly ILocalPackageCache _agentCache;
         private readonly IInstalledPackageArchive _installCache;
         private readonly RunningInstallationTaskList _runningTasks;
