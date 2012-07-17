@@ -17,5 +17,6 @@ namespace Deployd.Core.AgentConfiguration
         string MsDeployServiceUrl { get; }
         string LogsDirectory { get; }
         string HubAddress { get;  }
+        int MaxConcurrentInstallations { get; }
     }
 }

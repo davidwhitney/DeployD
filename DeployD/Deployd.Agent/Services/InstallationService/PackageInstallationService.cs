@@ -83,6 +83,13 @@ namespace Deployd.Agent.Services.InstallationService
                     continue;
                 }
 
+                if (RunningInstalls.Count >= _settingsManager.Settings.MaxConcurrentInstallations)
+                {
+                    _logger.Debug("{0} {1} - Max installations already running, will try again soon", nextPendingInstall.PackageId, nextPendingInstall.Version);
+                    alreadyRunning.Add(nextPendingInstall);
+                    continue;
+                }
+
                 _logger.Debug("{0} {1} - Starting installation", nextPendingInstall.PackageId, nextPendingInstall.Version);
                 RunningInstalls.Add(nextPendingInstall);
                 StartInstall(nextPendingInstall);

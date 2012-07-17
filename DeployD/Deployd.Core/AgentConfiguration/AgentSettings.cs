@@ -31,6 +31,8 @@ namespace Deployd.Core.AgentConfiguration
 
         public string HubAddress { get; set; }
 
+        public int MaxConcurrentInstallations { get; set; }
+
         public AgentSettings()
         {
             PackageSyncIntervalMs = 1000;
