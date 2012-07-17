@@ -22,8 +22,11 @@ namespace Deployd.Core.Installation.Hooks
             var appPools = GetApplicationPoolsForWebsite(context.Package.Title);
             foreach (var appPool in appPools)
             {
-                logger.InfoFormat("Stopping application pool {0}", appPool.Name);
-                appPool.Stop();
+                if (appPool.State == ObjectState.Started)
+                {
+                    logger.InfoFormat("Stopping application pool {0}", appPool.Name);
+                    appPool.Stop();
+                }
             }
         }
 
@@ -74,8 +77,11 @@ namespace Deployd.Core.Installation.Hooks
             var appPools = GetApplicationPoolsForWebsite(context.Package.Title);
             foreach(var appPool in appPools)
             {
-                logger.InfoFormat("Starting application pool {0}", appPool.Name);
-                appPool.Start();
+                if (appPool.State == ObjectState.Stopped)
+                {
+                    logger.InfoFormat("Starting application pool {0}", appPool.Name);
+                    appPool.Start();
+                }
             }
         }
 

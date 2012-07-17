@@ -68,7 +68,8 @@ namespace Deployd.Agent.WebUi.Modules
 
             Post["/{packageId}/install", y => true] = x =>
                                                           {
-
+                var log = LogManager.GetLogger(typeof (PackagesModule));
+                log.DebugFormat("Install {0} (latest)", x.packageId);
                 var installationManager = Container().GetType<InstallationTaskQueue>();
                 SemanticVersion version;
                 string versionString = null;
@@ -83,6 +84,8 @@ namespace Deployd.Agent.WebUi.Modules
 
             Post["/{packageId}/install/{specificVersion}", y => true] = x =>
             {
+                var log = LogManager.GetLogger(typeof(PackagesModule));
+                log.DebugFormat("Install {0} ({1})", x.packageId, x.specificVersion);
                 var installationManager = Container().GetType<InstallationTaskQueue>();
                 installationManager.Add(x.packageId, x.specificVersion);
                 return this.ResponseOrJson(Response.AsRedirect("/packages"));
@@ -90,6 +93,8 @@ namespace Deployd.Agent.WebUi.Modules
 
             Post["/UpdateAllTo", y => true] = x =>
             {
+                var log = LogManager.GetLogger(typeof(PackagesModule));
+                log.DebugFormat("update all to latest");
                 var cache = Container().GetType<ILocalPackageCache>();
                 var queue = Container().GetType<InstallationTaskQueue>();
 
@@ -107,9 +112,10 @@ namespace Deployd.Agent.WebUi.Modules
 
             Post["/UpdateAllTo/latest", y => true] = x =>
             {
+                var log = LogManager.GetLogger(typeof(PackagesModule));
+                log.DebugFormat("update all to {0}", x.specificVersion);
                 var cache = Container().GetType<ILocalPackageCache>();
                 var queue = Container().GetType<InstallationTaskQueue>();
-                var log = LogManager.GetLogger(typeof (PackagesModule));
                 
                 var packagesByVersion = cache.AllCachedPackages().GroupBy(p=>p.Id, g=>g.Version);
 

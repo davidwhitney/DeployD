@@ -1,12 +1,15 @@
 using System;
+using System.IO;
 using System.Linq;
 using Nancy;
 using Nancy.ViewEngines;
+using log4net;
 
 namespace Deployd.Agent.WebUi
 {
     public static class CustomFormatterExtensions
     {
+        private static ILog log = LogManager.GetLogger(typeof (CustomFormatterExtensions));
         public static Response AsNegotiated<TModel>(this IResponseFormatter formatter, TModel model, HttpStatusCode statusCode = HttpStatusCode.OK, Tuple<Func<Response>, string> defaultResponse = null)
         {
 
@@ -33,12 +36,25 @@ namespace Deployd.Agent.WebUi
                 var serializer = formatter.Serializers.FirstOrDefault(x => x.CanSerialize(contentType));
                 if (serializer != null && !(contentType.EndsWith("xml") && model.IsAnonymousType()))
                 {
-                    return new Response
-                               {
-                                   Contents = stream => serializer.Serialize(contentType, model, stream),
-                                   ContentType = contentType,
-                                   StatusCode = statusCode
-                               };
+                   
+                        return new Response
+                                   {
+                                       Contents =
+                                           delegate(Stream stream)
+                                               {
+                                                    try
+                                                    {
+                                                        serializer.Serialize(contentType, model, stream);
+                                                    }
+                                                    catch (Exception ex)
+                                                    {
+                                                        log.Error("Failed to serialize response of " + model.GetType(), ex);
+                                                    }
+                                               },
+                                       ContentType = contentType,
+                                       StatusCode = statusCode
+                                   };
+                    
                 }
             }
             return defaultResponseDelegate.Invoke();

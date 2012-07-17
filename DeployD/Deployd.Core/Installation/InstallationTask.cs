@@ -31,7 +31,8 @@ namespace Deployd.Core.Installation
         public string PackageId { get; private set; }
         [DataMember(Name = "version")]
         public string Version { get; private set; }
-        [DataMember(Name = "progress")]
+        //[DataMember(Name = "progress")]
+        [IgnoreDataMember]
         public List<ProgressReport> ProgressReports { get; private set; }
         [DataMember(Name = "lastMessage")]
         public string LastMessage { get { return ProgressReports.Count > 0 ? ProgressReports.Last().Message : ""; } }

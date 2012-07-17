@@ -103,8 +103,11 @@ namespace Deployd.Core.Installation
         {
             var baseLogger = LogManager.GetLogger(_logAppenderName);
 
-            ((Logger)baseLogger.Logger).AddAppender(_appender);
-    
+            if (_appender != null)
+            {
+                ((Logger) baseLogger.Logger).AddAppender(_appender);
+            }
+
             return baseLogger;
         }
 

@@ -9,6 +9,7 @@ namespace Deployd.Core.Installation
         public string PackageId { get; private set; }
         public string Message { get; private set; }
         public string Level { get; private set; }
+        
         public DeploymentContext Context { get; private set; }
 
         public Exception Exception { get; private set; }

@@ -32,10 +32,10 @@ namespace Deployd.Agent.WebUi.Converters
                 var installedPackage = installPackageArchive.GetCurrentInstalledVersion(package.Key);
                 packageInfo.InstalledVersion = installedPackage == null ? "0.0.0.0" : installedPackage.Version.ToString();
 
-                packageInfo.LastInstallationTask =
+                /*packageInfo.LastInstallationTask =
                     completedTasks
                         .Where(t => t.PackageId == package.Key).OrderByDescending(t => t.LogFileName)
-                        .FirstOrDefault();
+                        .FirstOrDefault();*/
 
                 packageInfo.CurrentTask = runningTasks.Count > 0 ? runningTasks
                            .Where(t => t.PackageId == package.Key)
