@@ -9,8 +9,6 @@ namespace Deployd.Agent.Services.AgentConfiguration
 {
     public class AgentConfigurationService : IWindowsService
     {
-        protected static readonly ILogger Logger;
-        
         public ApplicationContext AppContext { get; set; }
         public TimedSingleExecutionTask TimedTask { get; private set; }
 
@@ -28,7 +26,7 @@ namespace Deployd.Agent.Services.AgentConfiguration
 
         ~AgentConfigurationService()
         {
-            Logger.Warn("Destroying a {0}", this.GetType());
+            _logger.Warn("Destroying a {0}", this.GetType());
 
         }
 

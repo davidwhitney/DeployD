@@ -32,5 +32,25 @@ namespace Deployd.Core.PackageTransport
                 throw;
             }
         }
+
+        public IPackage GetSpecificPackage(string packageId, string version)
+        {
+            try
+            {
+                return _packageRepository
+                    .GetPackages()
+                    .Where(x => x.Id == packageId && x.Version.Equals(version))
+                    .ToList()
+                    .SingleOrDefault();
+            } catch (ArgumentNullException)
+            {
+                return null;
+            }
+            catch (Exception ex)
+            {
+                _logger.Error(ex, "Could not get packages");
+                throw;
+            }
+        }
     }
 }

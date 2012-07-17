@@ -7,6 +7,7 @@ using Deployd.Core.Hosting;
 using Deployd.Core.Installation.Hooks;
 using Deployd.Core.PackageCaching;
 using Deployd.Core.PackageFormats.NuGet;
+using Deployd.Core.PackageTransport;
 using NuGet;
 using log4net;
 using ILogger = Ninject.Extensions.Logging.ILogger;
@@ -19,19 +20,21 @@ namespace Deployd.Core.Installation
         private readonly ILocalPackageCache _packageCache;
         private readonly IInstalledPackageArchive _installedPackageArchive;
         private readonly IAgentSettingsManager _agentSettingsManager;
-        protected readonly ILogger Logger; 
+        protected readonly ILogger Logger;
+        private readonly IRetrievePackageQuery _nugetPackageQuery;
         public ApplicationContext AppContext { get; set; }
 
         public DeploymentService(IEnumerable<IDeploymentHook> hooks, 
                                  ILocalPackageCache packageCache,
                                  IInstalledPackageArchive installedPackageArchive,
-            IAgentSettingsManager agentSettingsManager, ILogger logger)
+            IAgentSettingsManager agentSettingsManager, ILogger logger, IRetrievePackageQuery nugetPackageQuery)
         {
             _hooks = hooks;
             _packageCache = packageCache;
             _installedPackageArchive = installedPackageArchive;
             _agentSettingsManager = agentSettingsManager;
             Logger = logger;
+            _nugetPackageQuery = nugetPackageQuery;
         }
 
         public void InstallPackage(string packageId, string taskId, CancellationTokenSource cancellationToken, Action<ProgressReport> reportProgress)
@@ -43,9 +46,25 @@ namespace Deployd.Core.Installation
         {
             var packageSelector = specificVersion == null || specificVersion == "latest"
                                        ? (Func<IPackage>) (() => _packageCache.GetLatestVersion(packageId))
-                                       : (() => _packageCache.GetSpecificVersion(packageId, specificVersion));
+                                       : (() => LoadOrDownloadSpecificPackageVersion(packageId, specificVersion));
 
             InstallPackage(packageId, packageSelector, cancellationToken, reportProgress, taskId);
+        }
+
+        private IPackage LoadOrDownloadSpecificPackageVersion(string packageId, string specificVersion)
+        {
+            IPackage package = null;
+
+            try
+            {
+                package = _packageCache.GetSpecificVersion(packageId, specificVersion);
+            } catch (ArgumentOutOfRangeException)
+            {
+                package = _nugetPackageQuery.GetSpecificPackage(packageId, specificVersion);
+                _packageCache.Add(package);
+            }
+
+            return package;
         }
 
         public bool Deploy(string taskId, IPackage package, CancellationTokenSource cancellationToken, Action<ProgressReport> reportProgress)
