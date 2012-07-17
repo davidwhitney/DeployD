@@ -61,6 +61,11 @@ namespace Deployd.Core.Installation
             } catch (ArgumentOutOfRangeException)
             {
                 package = _nugetPackageQuery.GetSpecificPackage(packageId, specificVersion);
+                if (package == null)
+                {
+                    Logger.Debug("{0} Requested version {1} is not available at the given Nuget repository", packageId, specificVersion);
+                    return null;
+                }
                 _packageCache.Add(package);
             }
 
@@ -118,6 +123,12 @@ namespace Deployd.Core.Installation
         public void InstallPackage(string packageId, Func<IPackage> selectionCriteria, CancellationTokenSource cancellationToken, Action<ProgressReport> reportProgress, string taskId)
         {
             var package = selectionCriteria();
+
+            if (package ==null)
+            {
+                return;
+            }
+
             if (Deploy(taskId, package, cancellationToken, reportProgress))
             {
                 WriteInstallMarker(package);

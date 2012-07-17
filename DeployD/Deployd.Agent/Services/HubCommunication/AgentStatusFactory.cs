@@ -2,20 +2,21 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Deployd.Core;
 using Deployd.Core.AgentConfiguration;
 using Deployd.Core.Installation;
 using Deployd.Core.PackageCaching;
+using NuGet;
 
-namespace Deployd.Core
+namespace Deployd.Agent.Services.HubCommunication
 {
     public static class AgentStatusFactory
     {
-        public static AgentStatusReport BuildStatus(ILocalPackageCache agentCache, IInstalledPackageArchive installCache, RunningInstallationTaskList runningTasks, IAgentSettingsManager settingsManager)
+        public static AgentStatusReport BuildStatus(IPackagesList availablePackages, ILocalPackageCache packageCache, IInstalledPackageArchive installCache, RunningInstallationTaskList runningTasks, IAgentSettingsManager settingsManager)
         {
-
             var status= new AgentStatusReport
                        {
-                           packages = BuildPackageInformation(agentCache, installCache, runningTasks),
+                           packages = BuildPackageInformation(availablePackages.GetWatched(), installCache, runningTasks),
                            currentTasks = runningTasks != null ?
                                                     runningTasks.Select(t => new InstallTaskViewModel()
                                                                        {
@@ -26,11 +27,11 @@ namespace Deployd.Core
                                                                            LastMessage = t.ProgressReports.Count > 0 ? t.ProgressReports.LastOrDefault().Message : ""
                                                                        }).ToList()
                                                                        : new List<InstallTaskViewModel>(),
-                           availableVersions = agentCache.AllCachedPackages() != null ? 
-                                                agentCache.AllCachedPackages().Select(p => p.Version.ToString()).Distinct().OrderByDescending(s => s).ToList()
+                           availableVersions = availablePackages != null ? 
+                                                availablePackages.Select(p => p.Version.ToString()).Distinct().OrderByDescending(s => s).ToList()
                                                 : new List<string>(),
                            environment = settingsManager.Settings.DeploymentEnvironment,
-                           updating = agentCache.Updating.Select(p=>string.Format("{0} {1}", p.Id, p.Version)).ToList()
+                           updating = packageCache.Updating.Select(p => string.Format("{0} {1}", p.Id, p.Version)).ToList()
                        };
 
             status.OutOfDate =
@@ -39,23 +40,23 @@ namespace Deployd.Core
             return status;
         }
 
-        private static List<LocalPackageInformation> BuildPackageInformation(ILocalPackageCache agentCache, IInstalledPackageArchive installCache, RunningInstallationTaskList runningTasks)
+        private static List<LocalPackageInformation> BuildPackageInformation(IEnumerable<IPackage> packages, IInstalledPackageArchive installCache, RunningInstallationTaskList runningTasks)
         {
-            var packages = agentCache.AvailablePackages;
             List<LocalPackageInformation> packageInformations = new List<LocalPackageInformation>();
-            foreach(var packageId in packages)
+            var packagesById = packages.GroupBy(p=>p.Id);
+            foreach (var packageVersions in packagesById)
             {
-                var installedPackage = installCache.GetCurrentInstalledVersion(packageId);
-                var latestAvailablePackage = agentCache.GetLatestVersion(packageId);
-                var availablePackageVersions = agentCache.AvailablePackageVersions(packageId);
+                var installedPackage = installCache.GetCurrentInstalledVersion(packageVersions.Key);
+                var latestAvailablePackage = packageVersions.OrderByDescending(p => p.Version).FirstOrDefault();
+                var availablePackageVersions = packageVersions.OrderByDescending(p=>p.Version).Select(p => p.Version.ToString());
                 IEnumerable<InstallationTask> currentTasks = null;
                 if (runningTasks != null)
                 {
-                    currentTasks = runningTasks.Where(t => t.PackageId == packageId);
+                    currentTasks = runningTasks.Where(t => t.PackageId == packageVersions.Key);
                 }
 
                 var packageInfo = new LocalPackageInformation();
-                packageInfo.PackageId = packageId;
+                packageInfo.PackageId = packageVersions.Key;
 
 
                 if (installedPackage != null)

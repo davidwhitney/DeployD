@@ -113,7 +113,6 @@
     <Compile Include="AgentManagement\IActionTaskManager.cs" />
     <Compile Include="AgentManagement\IAgentActionsRepository.cs" />
     <Compile Include="AgentManagement\IAgentActionsService.cs" />
-    <Compile Include="AgentStatusFactory.cs" />
     <Compile Include="AgentStatusReport.cs" />
     <Compile Include="AgentStatusViewModel.cs" />
     <Compile Include="AgentViewModel.cs" />
@@ -123,6 +122,7 @@
     <Compile Include="Installation\Hooks\Iis7MsDeployDeploymentHook.cs" />
     <Compile Include="InstallTaskViewModel.cs" />
     <Compile Include="LocalPackageInformation.cs" />
+    <Compile Include="PackageCaching\IPackagesList.cs" />
     <Compile Include="PackageCaching\InstalledPackageArchive.cs" />
     <Compile Include="PackageCaching\IInstalledPackageArchive.cs" />
     <Compile Include="Installation\DeploymentContext.cs" />

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Deployd.Agent.Services.PackageDownloading;
 using Deployd.Agent.WebUi.Converters;
 using Deployd.Agent.WebUi.Models;
 using Deployd.Core.AgentConfiguration;
@@ -30,14 +31,15 @@ namespace Deployd.Agent.WebUi.Modules
                 var installCache = Container().GetType<IInstalledPackageArchive>();
                 var completedTasks = Container().GetType<CompletedInstallationTaskList>();
                 var agentSettings = Container().GetType<IAgentSettings>();
-                var model = RunningTasksToPackageListViewModelConverter.Convert(cache, runningTasks, installCache, completedTasks, agentSettings);
+                var allPackagesList = Container().GetType<IPackagesList>();
+                var model = RunningTasksToPackageListViewModelConverter.Convert(cache, runningTasks, installCache, completedTasks, agentSettings, allPackagesList);
                 return this.ViewOrJson("packages/index.cshtml", model);
             };
             
             Get["/{packageId}"] = x =>
             {
-                var cache = Container().GetType<ILocalPackageCache>();
-                var packageVersions = cache.AvailablePackageVersions(x.packageId);
+                var availableVersionsList = Container().GetType<IPackagesList>();
+                var packageVersions = availableVersionsList.Where(p=>p.Id==x.packageId).OrderByDescending(p=>p.Version).Select(p=>p.Version.ToString());
                 var runningTasks = Container().GetType<RunningInstallationTaskList>();
                 var installCache = Container().GetType<IInstalledPackageArchive>();
                 var actionsRepository = Container().GetType<IAgentActionsRepository>();

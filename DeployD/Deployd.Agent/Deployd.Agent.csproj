@@ -156,9 +156,11 @@
     <Compile Include="Services\AgentConfiguration\ConfigurationFiles.cs" />
     <Compile Include="Services\AgentConfiguration\IAgentConfigurationDownloader.cs" />
     <Compile Include="Services\AgentConfiguration\IAgentConfigurationManager.cs" />
+    <Compile Include="Services\HubCommunication\AgentStatusFactory.cs" />
     <Compile Include="Services\HubCommunication\HubCommunicationService.cs" />
     <Compile Include="Services\InstallationService\PackageInstallationService.cs" />
     <Compile Include="Services\Management\ManagementInterfaceHost.cs" />
+    <Compile Include="Services\PackageDownloading\AllPackagesList.cs" />
     <Compile Include="Services\PackageDownloading\PackageDownloadingService.cs" />
     <Compile Include="Program.cs">
       <SubType>Component</SubType>

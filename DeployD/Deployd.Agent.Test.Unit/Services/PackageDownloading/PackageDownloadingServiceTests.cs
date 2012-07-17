@@ -24,6 +24,8 @@ namespace Deployd.Agent.Test.Unit.Services.PackageDownloading
         private Mock<IAgentSettingsManager> _agentSettings;
         private Mock<ILogger> _logger = new Mock<ILogger>();
         private Mock<IHubCommunicator> _hubCommunicator;
+        private Mock<IPackageRepositoryFactory> _packageRepositoryFactory = new Mock<IPackageRepositoryFactory>();
+        private IPackagesList _allPackagesList;
         private const string PACKAGE_ID = "packageId";
 
         [SetUp]
@@ -37,8 +39,9 @@ namespace Deployd.Agent.Test.Unit.Services.PackageDownloading
             _packageRepoMock = new Mock<IRetrievePackageQuery>();
             _packageCacheMock = new Mock<ILocalPackageCache>();
             _installCached = new Mock<IInstalledPackageArchive>();
-            _pds = new PackageDownloadingService(_agentSettings.Object, _packageRepoMock.Object, _packageCacheMock.Object, 
-                _agentConfigManagerMock.Object, _logger.Object, _hubCommunicator.Object, _installCached.Object);
+            _pds = new PackageDownloadingService(_agentSettings.Object, _packageRepoMock.Object, _packageCacheMock.Object,
+                _agentConfigManagerMock.Object, _logger.Object, _hubCommunicator.Object, _installCached.Object, _packageRepositoryFactory.Object, _allPackagesList);
+            _allPackagesList = new AllPackagesList(_agentConfigManagerMock.Object, _agentSettings.Object.Settings);
         }
 
         [Test]

@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Deployd.Agent.Services.HubCommunication;
+using Deployd.Agent.Services.PackageDownloading;
 using Deployd.Core;
 using Deployd.Core.AgentConfiguration;
 using Deployd.Core.Hosting;
@@ -23,6 +25,7 @@ namespace Deployd.Agent.Services.InstallationService
         private IInstalledPackageArchive _installCache;
         private RunningInstallationTaskList _runningTasks;
         private IAgentSettingsManager _settingsManager;
+        private readonly IPackagesList _allPackagesList;
 
         public ApplicationContext AppContext { get; set; }
         public TimedSingleExecutionTask TimedTask { get; private set; }
@@ -36,7 +39,12 @@ namespace Deployd.Agent.Services.InstallationService
             CompletedInstallationTaskList completedInstalls,
             IDeploymentService deploymentService,
             ILogger logger,
-            IHubCommunicator hubCommunicator, ILocalPackageCache agentCache, IInstalledPackageArchive installCache, RunningInstallationTaskList runningTasks, IAgentSettingsManager settingsManager)
+            IHubCommunicator hubCommunicator, 
+            ILocalPackageCache agentCache, 
+            IInstalledPackageArchive installCache, 
+            RunningInstallationTaskList runningTasks, 
+            IAgentSettingsManager settingsManager,
+            IPackagesList allPackagesList)
         {
             CompletedInstalls = completedInstalls;
             _deploymentService = deploymentService;
@@ -46,6 +54,7 @@ namespace Deployd.Agent.Services.InstallationService
             _installCache = installCache;
             _runningTasks = runningTasks;
             _settingsManager = settingsManager;
+            _allPackagesList = allPackagesList;
             PendingInstalls = pendingInstalls;
             RunningInstalls = runningInstalls;
             TimedTask = new TimedSingleExecutionTask(5000, CheckForNewInstallations, _logger);
@@ -163,14 +172,14 @@ namespace Deployd.Agent.Services.InstallationService
 
             if (progressReport.Exception == null)
             {
-                _hubCommunicator.SendStatusToHubAsync(AgentStatusFactory.BuildStatus(_agentCache, _installCache, _runningTasks, _settingsManager));
+                _hubCommunicator.SendStatusToHubAsync(AgentStatusFactory.BuildStatus(_allPackagesList, _agentCache, _installCache, _runningTasks, _settingsManager));
                 return;
             }
 
             installationTask.HasErrors = true;
             installationTask.Errors.Add(progressReport.Exception);
 
-            _hubCommunicator.SendStatusToHubAsync(AgentStatusFactory.BuildStatus(_agentCache, _installCache, _runningTasks, _settingsManager));
+            _hubCommunicator.SendStatusToHubAsync(AgentStatusFactory.BuildStatus(_allPackagesList, _agentCache, _installCache, _runningTasks, _settingsManager));
         }
 
         private void RemoveFromRunningInstallationList(Task<InstallationResult> completedInstallationTask)

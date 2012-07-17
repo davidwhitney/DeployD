@@ -7,6 +7,7 @@ using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
 using System.Timers;
+using Deployd.Agent.Services.PackageDownloading;
 using Deployd.Core;
 using Deployd.Core.AgentConfiguration;
 using Deployd.Core.Hosting;
@@ -21,18 +22,26 @@ namespace Deployd.Agent.Services.HubCommunication
     public class HubCommunicationService : IWindowsService
     {
         private readonly IHubCommunicator _hubCommunicator;
+        private readonly IPackagesList _allPackagesList;
+        private readonly ILocalPackageCache _localPackageCache;
         private Timer _pingTimer = null;
         private const int PingIntervalInMilliseconds = 15000;
-        private readonly ILocalPackageCache _agentCache;
         private readonly IInstalledPackageArchive _installCache;
         private readonly RunningInstallationTaskList _runningTasks;
         private readonly IAgentSettingsManager _settingsManager;
         private readonly ILogger _logger;
 
-        public HubCommunicationService(IHubCommunicator hubCommunicator, ILocalPackageCache agentCache, IInstalledPackageArchive installCache, RunningInstallationTaskList runningTasks, IAgentSettingsManager settingsManager, ILogger logger)
+        public HubCommunicationService(IHubCommunicator hubCommunicator,
+            IPackagesList allPackagesList, 
+            ILocalPackageCache localPackageCache,
+            IInstalledPackageArchive installCache, 
+            RunningInstallationTaskList runningTasks, 
+            IAgentSettingsManager settingsManager, 
+            ILogger logger)
         {
             _hubCommunicator = hubCommunicator;
-            _agentCache = agentCache;
+            _allPackagesList = allPackagesList;
+            _localPackageCache = localPackageCache;
             _installCache = installCache;
             _runningTasks = runningTasks;
             _settingsManager = settingsManager;
@@ -52,12 +61,12 @@ namespace Deployd.Agent.Services.HubCommunication
             _pingTimer.Enabled = true;
 
             // say hello immediately
-            _hubCommunicator.SendStatusToHub(AgentStatusFactory.BuildStatus(_agentCache, _installCache, _runningTasks, _settingsManager));
+            SendStatusToHub(this, null);
         }
 
         public void SendStatusToHub(object sender, ElapsedEventArgs e)
         {
-            _hubCommunicator.SendStatusToHub(AgentStatusFactory.BuildStatus(_agentCache, _installCache, _runningTasks, _settingsManager));
+            _hubCommunicator.SendStatusToHub(AgentStatusFactory.BuildStatus(_allPackagesList, _localPackageCache, _installCache, _runningTasks, _settingsManager));
         }
 
         public void Stop()
