@@ -10,6 +10,7 @@ using Deployd.Core.Installation;
 using Deployd.Core.PackageCaching;
 using Nancy;
 using NuGet;
+using log4net;
 using ILogger = Ninject.Extensions.Logging.ILogger;
 
 namespace Deployd.Agent.WebUi.Modules
@@ -106,13 +107,15 @@ namespace Deployd.Agent.WebUi.Modules
             {
                 var cache = Container().GetType<ILocalPackageCache>();
                 var queue = Container().GetType<InstallationTaskQueue>();
-
-
+                var log = LogManager.GetLogger(typeof (PackagesModule));
+                
                 var packagesByVersion = cache.AllCachedPackages().GroupBy(p=>p.Id, g=>g.Version);
 
                 foreach (var packageVersions in packagesByVersion)
                 {
-                    queue.Add(packageVersions.Key, packageVersions.Max(g=>g.Version).ToString());
+                    var version = packageVersions.Max(g => g.Version);
+                    log.DebugFormat("Queuing {0} {1} for installation", packageVersions.Key, version);
+                    queue.Add(packageVersions.Key, version.ToString());
                 }
 
                 return this.ResponseOrJson(Response.AsRedirect("/packages"));

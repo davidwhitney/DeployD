@@ -51,6 +51,12 @@ namespace Deployd.Agent.Services.InstallationService
             TimedTask = new TimedSingleExecutionTask(5000, CheckForNewInstallations, _logger);
         }
 
+        ~PackageInstallationService()
+        {
+            _logger.Warn("Destroying a {0}", this.GetType());
+
+        }
+
         public void Start(string[] args)
         {
             TimedTask.Start(args);
@@ -68,13 +74,16 @@ namespace Deployd.Agent.Services.InstallationService
             while (PendingInstalls.Count > 0)
             {
                 var nextPendingInstall = PendingInstalls.Dequeue();
+                _logger.Debug("{0} {1} - Preparing installation", nextPendingInstall.PackageId, nextPendingInstall.Version);
                 
                 if (InstallationIsAlreadyRunningFor(nextPendingInstall.PackageId, nextPendingInstall.Version))
                 {
+                    _logger.Debug("{0} {1} - Already running, dropping", nextPendingInstall.PackageId, nextPendingInstall.Version);
                     alreadyRunning.Add(nextPendingInstall);
                     continue;
                 }
-                
+
+                _logger.Debug("{0} {1} - Starting installation", nextPendingInstall.PackageId, nextPendingInstall.Version);
                 RunningInstalls.Add(nextPendingInstall);
                 StartInstall(nextPendingInstall);
             }

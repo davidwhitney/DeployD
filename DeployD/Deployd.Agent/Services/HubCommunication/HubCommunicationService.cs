@@ -13,6 +13,7 @@ using Deployd.Core.Hosting;
 using Deployd.Core.Installation;
 using Deployd.Core.PackageCaching;
 using Deployd.Core.Remoting;
+using Ninject.Extensions.Logging;
 using log4net;
 
 namespace Deployd.Agent.Services.HubCommunication
@@ -26,14 +27,22 @@ namespace Deployd.Agent.Services.HubCommunication
         private readonly IInstalledPackageArchive _installCache;
         private readonly RunningInstallationTaskList _runningTasks;
         private readonly IAgentSettingsManager _settingsManager;
+        private readonly ILogger _logger;
 
-        public HubCommunicationService(IHubCommunicator hubCommunicator, ILocalPackageCache agentCache, IInstalledPackageArchive installCache, RunningInstallationTaskList runningTasks, IAgentSettingsManager settingsManager)
+        public HubCommunicationService(IHubCommunicator hubCommunicator, ILocalPackageCache agentCache, IInstalledPackageArchive installCache, RunningInstallationTaskList runningTasks, IAgentSettingsManager settingsManager, ILogger logger)
         {
             _hubCommunicator = hubCommunicator;
             _agentCache = agentCache;
             _installCache = installCache;
             _runningTasks = runningTasks;
             _settingsManager = settingsManager;
+            _logger = logger;
+        }
+
+        ~HubCommunicationService()
+        {
+            _logger.Warn("Destroying a {0}", this.GetType());
+
         }
 
         public void Start(string[] args)

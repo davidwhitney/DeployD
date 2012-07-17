@@ -6,7 +6,7 @@ var _manageAgentDialogTemplate;
 var _updateAgentsTemplate;
 var _addAgentFormTemplate;
 var _agentPackageLogFolderTemplate, _logFileListTemplate, _logFileTemplate;
-var _updateInterval = 6 * 1000;
+var _updateInterval = 2 * 1000;
 var agentsListView = null, addAgentFormView=null, updateAgentsToVersionView=null;
 var _apiBaseUrl = '/api';
 var _manageAgentDialogOpen = false;
@@ -155,7 +155,8 @@ var _manageAgentDialogOpen = false;
         selected: false,
         events: {
             'click a.unregister-agent': 'unregister',
-            'click a.manage-agent': 'manage'/*,
+            'click a.manage-agent': 'manage',
+            'click li.agent' :'toggleDetail'/*,
             'click a.agent-logs': 'viewLogs'*/
         },
         initialize: function () {
@@ -190,12 +191,17 @@ var _manageAgentDialogOpen = false;
             };
 
             var template = _.template(_agentTemplate, viewModel);
-
+            var expanded = $('div.agent-detail', this.$el).css("display")=="block";
+            
             this.$el.html(template);
             $(target).append(this.$el);
 
             if (checked) {
                 $('input[type=checkbox]', this.$el).attr('checked', 'checked');
+            }
+            
+            if (expanded) {
+                $('div.agent-detail', this.$el).show();
             }
 
             return this;
@@ -210,6 +216,9 @@ var _manageAgentDialogOpen = false;
         viewLogs: function () {
             app_router.navigate('logs/' + this.model.get('id'), {trigger: true});
             return true;
+        },
+        toggleDetail: function (event) {
+            $('div.agent-detail', event.target).toggle();
         }
     });
 

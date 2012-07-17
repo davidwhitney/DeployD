@@ -17,6 +17,12 @@ namespace Deployd.Agent.Services.Management
         {
             _logger = logger;
         }
+
+        ~ManagementInterfaceHost()
+        {
+            _logger.Warn("Destroying a {0}", this.GetType());
+
+        }
         
         private WebServiceHost _host;
 

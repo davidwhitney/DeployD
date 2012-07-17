@@ -37,6 +37,12 @@ namespace Deployd.Agent.Services
             TimedTask = new TimedSingleExecutionTask(2000, CheckForPendingActions, _logger);
         }
 
+        ~ActionExecutionService()
+        {
+            _logger.Warn("Destroying a {0}", this.GetType());
+
+        }
+
         public ActionTask GetAction(string id)
         {
             ActionTask action = null;

@@ -1,17 +1,25 @@
 using System;
 using System.Timers;
 using Deployd.Core.Hosting;
+using Ninject.Extensions.Logging;
 
 namespace Deployd.Core.Remoting
 {
     public class HubCommunicationsQueueService : IWindowsService
     {
+        private ILogger _logger;
         private readonly HubCommunicationsQueue _communicationsQueue;
         Timer _timer = new Timer(1000);
 
-        public HubCommunicationsQueueService(HubCommunicationsQueue communicationsQueue)
+        public HubCommunicationsQueueService(HubCommunicationsQueue communicationsQueue, ILogger logger)
         {
             _communicationsQueue = communicationsQueue;
+            _logger = logger;
+        }
+
+        ~HubCommunicationsQueueService()
+        {
+            _logger.Warn("Destroying a {0}", this.GetType());
         }
 
         public void Start(string[] args)

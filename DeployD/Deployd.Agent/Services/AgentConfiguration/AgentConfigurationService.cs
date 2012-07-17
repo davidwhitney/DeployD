@@ -26,6 +26,12 @@ namespace Deployd.Agent.Services.AgentConfiguration
             TimedTask = new TimedSingleExecutionTask(agentSettings.ConfigurationSyncIntervalMs, DownloadConfiguration,logger, true);
         }
 
+        ~AgentConfigurationService()
+        {
+            Logger.Warn("Destroying a {0}", this.GetType());
+
+        }
+
         public void Start(string[] args)
         {
             TimedTask.Start(args);

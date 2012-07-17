@@ -51,6 +51,11 @@ namespace Deployd.Agent.Services.PackageDownloading
             AgentCache.OnUpdateFinished += (sender, args) => _hubCommunicator.SendStatusToHub(AgentStatusFactory.BuildStatus(AgentCache, _installCache, _runningTasks, _settingsManager));
         }
 
+        ~PackageDownloadingService()
+        {
+            _logger.Warn("Destroying a {0}", this.GetType());
+
+        }
 
         public void Start(string[] args)
         {
