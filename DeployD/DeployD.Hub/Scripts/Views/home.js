@@ -624,7 +624,7 @@ var _manageAgentDialogOpen = false;
     });
     $('body').append(updateLink);*/
     
-
+    
     setInterval(function () {
         agentsListView.updateAll();
         if (_manageAgentDialogOpen) {

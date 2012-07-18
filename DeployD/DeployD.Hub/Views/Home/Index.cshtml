@@ -52,6 +52,10 @@
                     <%=version.version%> (<%=version.count%>)
                 <%});%>
             <%}
+            
+            if (currentTasks && currentTasks.length>0) {%>
+                <img src='/content/images/working.gif' />
+            <%}
         }%>
         <div class="agent-detail">
             <p>
@@ -63,26 +67,25 @@
             <p>Packages: (<span class="uptodate">Up to date</span> / <span class="outofdate">Out of date</span>)</p>
             <ul class="packages">
             <%_.each(packages, function(package) {
-                if (package.installed){%>
-                <li>
-                    <span class="<%if (package.installed) {
-                        if (package.outOfDate) {%>outofdate<%} else {%>uptodate<%}
-                    } else {%>notinstalled<%}%>">
+                var listClass="";
+                if (package.currentTask) {
+                    listClass=package.currentTask.status;
+                }%>
+                
+                <li class="package <%=listClass%>">
+                <%if (package.currentTask) {%>
+                    <span class="working">
+                        <%=package.packageId%> <%=package.currentTask.status%> <%=package.installedVersion%> -> <%=package.currentTask.version%> <%if (package.currentTask.lastMessage) {%><%=package.currentTask.lastMessage%><%}%>
+                    </span>
+                <%} else if (package.installed){%>
+                    <span class="<%if (package.outOfDate) {%>outofdate<%} else {%>uptodate<%}%>">
                         <%=package.packageId%> <%=package.installedVersion%>
                     </span>
-                </li>
-            <%  }
-            });%>
+                <%}%>
+            </li>
+            <%});%>
             </ul>
-            
-            <%if (currentTasks&&currentTasks.length != 0) {%>
-                <ul class="tasks">
-                    <%_.each(currentTasks, function(task) {%>
-                        <%=_.template(_taskTemplate, task)%>
-                    <%});%>
-                </ul>
-            <%}%>
-            
+
             <%if (updating&&updating.length != 0) {%>
                 <ul class="tasks">
                     <%_.each(updating, function(packageNameAndVersion) {%>

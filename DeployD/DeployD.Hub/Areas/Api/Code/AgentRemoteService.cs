@@ -7,11 +7,19 @@ using System.Runtime.Serialization;
 using System.Text;
 using DeployD.Hub.Areas.Api.Models;
 using Deployd.Core;
+using Ninject.Extensions.Logging;
 
 namespace DeployD.Hub.Areas.Api.Code
 {
     public class AgentRemoteService : IAgentRemoteService
     {
+        private readonly ILogger _logger;
+
+        public AgentRemoteService(ILogger logger)
+        {
+            _logger = logger;
+        }
+
         public List<PackageViewModel> ListPackages(string hostname)
         {
             string url = string.Format("http://{0}:9999/packages", hostname);
@@ -56,14 +64,25 @@ namespace DeployD.Hub.Areas.Api.Code
             request.Accept = "application/json";
             string contentType = "";
             using (var response = request.GetResponse() as HttpWebResponse)
-            using (var stream = response.GetResponseStream())
-            using (var streamReader = new StreamReader(stream, System.Text.Encoding.UTF8))
             {
-                responseContent = streamReader.ReadToEnd();
-                contentType = response.Headers["Content-Type"];
+                if (response.StatusCode == HttpStatusCode.InternalServerError)
+                {
+                    _logger.Debug("UpdateAll - agent had internal error");
+                }
+                else
+                {
+                    _logger.Debug("UpdateAll - agent returned {0}: {1}", response.StatusCode, response.StatusDescription);
+                    using (var stream = response.GetResponseStream())
+                    using (var streamReader = new StreamReader(stream, System.Text.Encoding.UTF8))
+                    {
+                        responseContent = streamReader.ReadToEnd();
+                        contentType = response.Headers["Content-Type"];
+                        _logger.Debug(responseContent);
+                    }
+                }
             }
-            
-            
+
+
         }
 
         public void StartUpdate(string hostname, string packageId, string version)

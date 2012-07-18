@@ -31,6 +31,10 @@ li.package {
     margin-top: 0.5em;
 }
 
+li.package.Running {
+    list-style-image: url('/content/images/working.gif');
+}
+
 a.unregister-agent {
     float: right;
 }
