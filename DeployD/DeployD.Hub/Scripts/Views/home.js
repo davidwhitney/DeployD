@@ -156,7 +156,8 @@ var _manageAgentDialogOpen = false;
         events: {
             'click a.unregister-agent': 'unregister',
             'click a.manage-agent': 'manage',
-            'click li.agent' :'toggleDetail'/*,
+            'click li.agent' :'toggleDetail',
+            'click a.outofdate': 'toggleDetail'/*,
             'click a.agent-logs': 'viewLogs'*/
         },
         initialize: function () {
@@ -218,7 +219,11 @@ var _manageAgentDialogOpen = false;
             return true;
         },
         toggleDetail: function (event) {
-            $('div.agent-detail', event.target).toggle();
+            if (event.currentTarget.nodeName=="A") { // 'updates available' link
+                $('div.agent-detail', $(event.currentTarget).parent().parent()).toggle();
+            } else if (event.currentTarget.nodeName=="LI") { // agent header
+                $('div.agent-detail', event.target).toggle();
+            }
         }
     });
 
@@ -647,7 +652,6 @@ $(document).ready(function () {
     _agentPackageLogFolderTemplate = $('#agent-log-packages-list-template').html();
     _addAgentFormTemplate = $('#add-agent-form-template').html();
 
-    $('div#app').append(addAgentFormView.$el);
     $('div#app').append(updateAgentsToVersionView.$el);
     $('div#app').append(agentsListView.$el);
     

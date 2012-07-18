@@ -33,38 +33,48 @@
 
 <script type="text/template" id="agent-row-template">
 	<li class="agent" id="<%=hostname%>">
-        <input type="checkbox" id="select-<%=hostname%>" data-value="<%=hostname%>" name="select-agent"  />
-        <label for="select-<%=hostname%>" class="agent-hostname <%if (stale) {%>stale<%}%>">
-            <%=hostname%>
-        </label> (<%=environment%>) 
-        <%if (approved) {
-            if (contacted && !stale) {%>
-            <a class="manage-agent" data-id="<%=hostname%>" href="javascript:void(0);">Start Deployment...</a>&nbsp;
-            <a class="agent-logs" href="#/logs/<%=hostname%>">Logs</a>&nbsp;
-            <a class="unregister-agent" href="javascript:void(0);"><img src="/content/images/delete.png" alt="unregister agent" title="unregister agent" /></a>
-            <%if (packages&&packages.length>0) {
-                var distinctVersions=[];
-                var installedVersions = new jsinq.Enumerable(packages)
-                                                    .where(function(p) { return p.installed; })
-                                                    .groupBy(function(p) { return p.installedVersion; })
-                                                    .select(function(g) { return { version: g.key, count: g.count()}; });
-                installedVersions.each(function(version, index) {%>
-                    <%=version.version%> (<%=version.count%>)
-                <%});%>
-            <%}
+        <%
+        var headerClass = "uptodate";
+        if (currentTasks && currentTasks.length > 0)
+            headerClass = "Running";
+        else if (outOfDate)
+            headerClass = "outofdate";
+        %>
+        <span class="agent-header <%=headerClass%>">
+            <input type="checkbox" id="select-<%=hostname%>" data-value="<%=hostname%>" name="select-agent"  />
+            <label for="select-<%=hostname%>" class="agent-hostname <%if (stale) {%>stale<%}%>">
+                <%=hostname%>
+            </label> (<%=environment%>) 
+            <%if (approved) {
+                if (contacted && !stale) {%>
+                <a class="unregister-agent" href="javascript:void(0);"><img src="/content/images/delete.png" alt="unregister agent" title="unregister agent" /></a>
+                <%if (packages&&packages.length>0) {
+                    var distinctVersions=[];
+                    var installedVersions = new jsinq.Enumerable(packages)
+                                                        .where(function(p) { return p.installed; })
+                                                        .groupBy(function(p) { return p.installedVersion; })
+                                                        .select(function(g) { return { version: g.key, count: g.count()}; });
+                    installedVersions.each(function(version, index) {%>
+                        <%=version.version%> (<%=version.count%>)
+                    <%});%>
+                <%}%>
             
-            if (currentTasks && currentTasks.length>0) {%>
-                <img src='/content/images/working.gif' />
-            <%}
-        }%>
+                <%if (outOfDate) {%><a class="outofdate" href="#<%=hostname%>"><strong>Updates available</strong></a><%}%>
+
+                <%if (currentTasks && currentTasks.length>0) {%>
+                    <img src='/content/images/working.gif' />
+                <%}
+            }%>
+        </span>
         <div class="agent-detail">
             <p>
             <%if (stale) {%>
             Last contact <%=moment(lastContact).format("dddd Do MMM YYYY HH:mm")%>
             <%}%>
+                <a class="manage-agent" data-id="<%=hostname%>" href="javascript:void(0);">Start Deployment...</a>&nbsp;
+                <a class="agent-logs" href="#/logs/<%=hostname%>">Logs</a>&nbsp;
             </p>
             
-            <p>Packages: (<span class="uptodate">Up to date</span> / <span class="outofdate">Out of date</span>)</p>
             <ul class="packages">
             <%_.each(packages, function(package) {
                 var listClass="";
@@ -72,17 +82,20 @@
                     listClass=package.currentTask.status;
                 }%>
                 
-                <li class="package <%=listClass%>">
-                <%if (package.currentTask) {%>
-                    <span class="working">
-                        <%=package.packageId%> <%=package.currentTask.status%> <%=package.installedVersion%> -> <%=package.currentTask.version%> <%if (package.currentTask.lastMessage) {%><%=package.currentTask.lastMessage%><%}%>
-                    </span>
-                <%} else if (package.installed){%>
-                    <span class="<%if (package.outOfDate) {%>outofdate<%} else {%>uptodate<%}%>">
-                        <%=package.packageId%> <%=package.installedVersion%>
-                    </span>
+                <%if (package.installed || package.currentTask) {%>
+                    <li class="package <%=listClass%>">
+                        <%=package.packageId%>
+                        <%if (package.currentTask) {%>
+                            <span class="working">
+                                 <%=package.currentTask.status%> <%=package.installedVersion%> -> <%=package.currentTask.version%> <%if (package.currentTask.lastMessage) {%><%=package.currentTask.lastMessage%><%}%>
+                            </span>
+                        <%} else if (package.installed){%>
+                            <span class="<%if (package.outOfDate) {%>outofdate<%} else {%>uptodate<%}%>">
+                                 <%=package.installedVersion%>
+                            </span>
+                        <%}%>
+                    </li>
                 <%}%>
-            </li>
             <%});%>
             </ul>
 
@@ -96,8 +109,6 @@
         <%} else {%>
             Not approved (<a href="/agents">Manage Agents</a>)
         <%}%>
-        
-        <%if (outOfDate) {%>Out of date<%}%>
         </div>
     </li>
 </script>
@@ -117,10 +128,18 @@
     <h2><%=hostname%></h2>
     <ul class="manage-agent">
         <form id="apply-versions-form" method="POST" action="/api/agent/<%=hostname%>/applyVersions">
-    <%_.each(packages, function(package) {%>
+    <%_.each(packages, function(package) {
+        var statusClass="";
+            if (package.currentTask) {
+                statusClass=package.currentTask.status;
+            } else if (package.outOfDate) {
+                statusClass="outofdate";
+            } else {
+                statusClass="uptodate";
+            }%>
         <li>
             <input type="checkbox" id="select-<%=package.packageId%>" name="select-<%=package.packageId%>" data-id="<%=package.packageId%>" class="select-package" />
-            <label for="select-<%=package.packageId%>" data-id="<%=package.packageId%>"><%=package.packageId%> <%if (package.installed) {%>(<%=package.installedVersion%>)<%}%></label>
+            <label for="select-<%=package.packageId%>" data-id="<%=package.packageId%>" class="<%=statusClass%>"><%=package.packageId%> <%if (package.installed) {%>(<%=package.installedVersion%>)<%}%><%if (package.outOfDate) {%>*<%}%></label>
             &nbsp; <a href="/#/logs/<%=hostname%>/<%=package.packageId%>">Logs</a>
             <div class="package-control" style="display:none">
             <select name="<%=package.packageId%>">
@@ -129,8 +148,8 @@
                 <%});%>
             </select> <button style="display:none" class="update-agent" data-packageid="<%=package.packageId%>">Update</button>
             </div>
-            <%if (package.outOfDate) {%>Out of date (latest: <%=package.latestVersion%>)<%}%>
-        <div class="manage-agent-current-task"><%if (package.currentTask!= null) {%>-> <%=package.currentTask.version%>: <%=package.currentTask.status%>, <%=package.currentTask.lastMessage%><%}%></div>
+            
+        <div class="manage-agent-current-task <%=statusClass%>"><%if (package.currentTask!= null) {%>-> <%=package.currentTask.version%>: <%=package.currentTask.status%>, <%=package.currentTask.lastMessage%><%}%></div>
         </li>
     <%});%>
         <input type="submit" value="Start deployment on <%=hostname%>" />
@@ -145,7 +164,7 @@
 
 <script type="text/template" id="agent-log-packages-list-template">
     <p><a href="/#">&lt; up to agent list</a></p>
-    <h2>Server logs for <%=hostname%></h2>
+    <h2>Agent logs for <%=hostname%></h2>
     <ul>
         <% _(serverLogCollection.models).each(function(log) {%>
             <%console.log('log file: ' + log.get('LogFileName'));%>

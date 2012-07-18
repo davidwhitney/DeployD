@@ -17,9 +17,9 @@ li.agent {
     margin-bottom: 2px;
 }
 
-li.agent:hover{
-    background-color: #E6E4DE;
-}
+/*li.agent:hover{
+    background-color: #f3f3f3;
+}*/
 ul.packages {
     list-style: none;
 }
@@ -51,14 +51,18 @@ ul.tasks li {
     color: green;
 }
 
-span.notinstalled {
+.notinstalled {
     color: #888888;
 }
-span.uptodate {
+.uptodate {
     color: green;
 }
-span.outofdate {
-    color: orangered;
+.Running {
+    color: rgb(0, 131, 215);
+}
+.outofdate {
+    color: rgb(255, 168, 0);
+    font-weight: bold;
 }
 div.agent-detail {
     display: none;
