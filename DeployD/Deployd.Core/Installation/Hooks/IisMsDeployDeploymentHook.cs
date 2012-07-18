@@ -52,8 +52,10 @@ namespace Deployd.Core.Installation.Hooks
                 && TryFindWebsite("localhost", context.Package.Title, out website);
         }
 
-        public override void Deploy(DeploymentContext context)
+        public override void Deploy(DeploymentContext context, Action<ProgressReport> reportProgress)
         {
+            reportProgress(new ProgressReport(context, GetType(), "Deploying website")); 
+            
             var installationLogger = context.GetLoggerFor(this);
             LocateMsDeploy(installationLogger);
 
@@ -69,11 +71,18 @@ namespace Deployd.Core.Installation.Hooks
                 Ignore.AppOffline().And().LogFiles().And().MaintenanceFile());
         }
 
-        public override void AfterDeploy(DeploymentContext context)
+        public override void AfterDeploy(DeploymentContext context, Action<ProgressReport> reportProgress)
         {
+            reportProgress(new ProgressReport(context, GetType(), "Starting website"));
+
             var installationLogger = context.GetLoggerFor(this);
             RestartApplication(context, installationLogger);
 
+        }
+
+        public override string ProgressMessage
+        {
+            get { return "Installing website on server"; }
         }
 
         private void RestartApplication(DeploymentContext context, ILog logger)

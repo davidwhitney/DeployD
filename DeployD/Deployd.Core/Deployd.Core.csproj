@@ -137,7 +137,6 @@
     <Compile Include="Installation\Hooks\TryThis.cs" />
     <Compile Include="Installation\IDeploymentService.cs" />
     <Compile Include="PackageCaching\PackageEventArgs.cs" />
-    <Compile Include="PackageCaching\PackageUpdateList.cs" />
     <Compile Include="PackageFormats\NuGet\NuGetPackageExtractor.cs" />
     <Compile Include="FileSystemExtensions.cs" />
     <Compile Include="PackageCaching\ILocalPackageCache.cs" />

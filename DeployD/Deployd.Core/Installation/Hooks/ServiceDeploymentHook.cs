@@ -27,7 +27,7 @@ namespace Deployd.Core.Installation.Hooks
             _serviceInstallationPath = Path.Combine(agentSettingsManager.Settings.BaseInstallationPath, "services");
         }
 
-        public override void BeforeDeploy(DeploymentContext context)
+        public override void BeforeDeploy(DeploymentContext context, Action<ProgressReport> reportProgress)
         {
             var logger = context.GetLoggerFor(this);
             if (!EnvironmentIsValidForPackage(context))
@@ -35,6 +35,7 @@ namespace Deployd.Core.Installation.Hooks
                 return;
             }
 
+            reportProgress(new ProgressReport(context, GetType(), "Stopping service"));
             ShutdownRequiredServices(context, logger);
         }
 
@@ -75,12 +76,14 @@ namespace Deployd.Core.Installation.Hooks
             return serviceName;
         }
 
-        public override void Deploy(DeploymentContext context)
+        public override void Deploy(DeploymentContext context, Action<ProgressReport> reportProgress)
         {
             if (!EnvironmentIsValidForPackage(context))
             {
                 return;
             }
+
+            reportProgress(new ProgressReport(context, GetType(), "Copying service files"));
 
             // services are installed in a '\services' subfolder
             context.TargetInstallationFolder = Path.Combine(_serviceInstallationPath, context.Package.Id);
@@ -88,13 +91,17 @@ namespace Deployd.Core.Installation.Hooks
             CopyAllFilesToDestination(context);
         }
 
-        public override void AfterDeploy(DeploymentContext context)
+        public override void AfterDeploy(DeploymentContext context, Action<ProgressReport> reportProgress)
         {
+
+
             var logger = context.GetLoggerFor(this);
             if (!EnvironmentIsValidForPackage(context))
             {
                 return;
             }
+
+            reportProgress(new ProgressReport(context, GetType(), "Starting service"));
 
             var pathToExecutable = Path.Combine(Path.Combine(_serviceInstallationPath, context.Package.Id), context.Package.Id + ".exe");
             var serviceName = DetermineServiceName(context, pathToExecutable, logger);
@@ -132,6 +139,11 @@ namespace Deployd.Core.Installation.Hooks
                 
                 ChangeServiceStateTo(service, ServiceControllerStatus.Running, service.Start, logger);
             }
+        }
+
+        public override string ProgressMessage
+        {
+            get { return "Installing service"; }
         }
 
         private static ServiceController GetServiceByNameOrDisplayName(string serviceName)

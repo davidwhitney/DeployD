@@ -17,9 +17,12 @@ namespace Deployd.Core.Installation.Hooks
             return true;
         }
 
-        public override void AfterDeploy(DeploymentContext context)
+        public override void AfterDeploy(DeploymentContext context, Action<ProgressReport> reportProgress)
         {
             var installationLogger = context.GetLoggerFor(this);
+
+            reportProgress(new ProgressReport(context, GetType(), "Transforming configuration files"));
+
             //  find base config files
             if (context.Package.Tags.ToLower().Split(' ', ',', ';').Contains("website"))
             {
@@ -56,6 +59,11 @@ namespace Deployd.Core.Installation.Hooks
                     installationLogger.DebugFormat("No transform found for {0}", baseConfigurationPath);
                 }
             }
+        }
+
+        public override string ProgressMessage
+        {
+            get { return "Configuration Transformations"; }
         }
     }
 }

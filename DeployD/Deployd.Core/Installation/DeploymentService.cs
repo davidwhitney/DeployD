@@ -149,17 +149,17 @@ namespace Deployd.Core.Installation
 
         protected virtual void BeforeDeploy(DeploymentContext context, Action<ProgressReport> reportProgress)
         {
-            ForEachHook(context, "BeforeDeploy", hook => hook.BeforeDeploy(context), reportProgress);
+            ForEachHook(context, "BeforeDeploy", hook => hook.BeforeDeploy(context, reportProgress), reportProgress);
         }
 
         protected virtual void AfterDeploy(DeploymentContext context, Action<ProgressReport> reportProgress)
         {
-            ForEachHook(context, "AfterDeploy", hook => hook.AfterDeploy(context), reportProgress);
+            ForEachHook(context, "AfterDeploy", hook => hook.AfterDeploy(context, reportProgress), reportProgress);
         }
 
         protected virtual void PerformDeploy(DeploymentContext context, Action<ProgressReport> reportProgress)
         {
-            ForEachHook(context, "PerformDeploy", hook => hook.Deploy(context), reportProgress);
+            ForEachHook(context, "PerformDeploy", hook => hook.Deploy(context, reportProgress), reportProgress);
         }
         
         private void ForEachHook(DeploymentContext context, string comment, Action<IDeploymentHook> action, Action<ProgressReport> reportProgress)
@@ -169,7 +169,7 @@ namespace Deployd.Core.Installation
             {
                 if (hook.HookValidForPackage(context))
                 {
-                    reportProgress(ProgressReport.InfoFormat(context, this, context.Package.Id, context.Package.Version.Version.ToString(), context.InstallationTaskId, "Running {0} hook {1}...", comment, hook.GetType().Name));
+                    reportProgress(ProgressReport.InfoFormat(context, this, context.Package.Id, context.Package.Version.Version.ToString(), context.InstallationTaskId, "Running {0} hook {1}...", comment, hook.ProgressMessage));
 
                     action(hook);
                 }

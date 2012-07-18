@@ -16,18 +16,15 @@ namespace Deployd.Core.PackageCaching
     {
         private readonly IFileSystem _fileSystem;
         protected readonly ILogger Logger;
-        private readonly PackageUpdateList _currentlyUpdating;
         public event EventHandler<PackageEventArgs> OnUpdateStarted;
         public event EventHandler<PackageEventArgs> OnUpdateFinished;
-        public List<IPackage> Updating { get { return _currentlyUpdating; } } 
 
         private readonly string _cacheDirectory;
 
-        public NuGetPackageCache(IFileSystem fileSystem, IAgentSettingsManager agentSettings, ILogger logger, PackageUpdateList currentlyUpdating)
+        public NuGetPackageCache(IFileSystem fileSystem, IAgentSettingsManager agentSettings, ILogger logger)
             : this(fileSystem, agentSettings.Settings.CacheDirectory)
         {
             Logger = logger;
-            _currentlyUpdating = currentlyUpdating;
         }
 
         public NuGetPackageCache(IFileSystem fileSystem, string cacheDirectory)
@@ -103,7 +100,6 @@ namespace Deployd.Core.PackageCaching
                 return;
             }
 
-            _currentlyUpdating.Add(package);
             Logger.Info("Downloading {0} to {1}.", package.Id, package);
 
             if (OnUpdateStarted != null)
@@ -115,7 +111,6 @@ namespace Deployd.Core.PackageCaching
             File.WriteAllBytes(cachedPackagePath, package.GetStream().ReadAllBytes());
 
             Logger.Info("Cached {0} to {1}.", package.Id, package);
-            _currentlyUpdating.Remove(package);
 
             if (OnUpdateFinished != null)
             {

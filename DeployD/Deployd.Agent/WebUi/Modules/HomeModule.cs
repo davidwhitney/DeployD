@@ -63,7 +63,6 @@ namespace Deployd.Agent.WebUi.Modules
                             }).ToList(),
                     AvailableVersions = cache.AllCachedPackages().Select(p => p.Version.ToString()).Distinct().OrderByDescending(s => s),
                     Environment = _agentSettings.DeploymentEnvironment,
-                    Updating = cache.Updating
                 };
 
 

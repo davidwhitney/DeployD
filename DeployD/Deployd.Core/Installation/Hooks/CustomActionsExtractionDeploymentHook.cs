@@ -22,16 +22,18 @@ namespace Deployd.Core.Installation.Hooks
             return true;
         }
 
-        public void BeforeDeploy(DeploymentContext context)
+        public void BeforeDeploy(DeploymentContext context, Action<ProgressReport> reportProgress)
         {
         }
 
-        public void Deploy(DeploymentContext context)
+        public void Deploy(DeploymentContext context, Action<ProgressReport> reportProgress)
         {
         }
 
-        public void AfterDeploy(DeploymentContext context)
+        public void AfterDeploy(DeploymentContext context, Action<ProgressReport> reportProgress)
         {
+            reportProgress(new ProgressReport(context, GetType(), "Running custom actions"));
+
             string customActionsFolder = Path.Combine(context.WorkingFolder, "customActions");
             string customActionsInstallFolder =
                 Path.Combine(Path.Combine(AgentSettings.AgentProgramDataPath, "customActions"), context.Package.Id);
@@ -51,6 +53,11 @@ namespace Deployd.Core.Installation.Hooks
                     _fileSystem.File.Copy(file.FullName, Path.Combine(customActionsInstallFolder, file.Name), true);
                 }
             }
+        }
+
+        public string ProgressMessage
+        {
+            get { return "Custom Actions"; }
         }
     }
 }

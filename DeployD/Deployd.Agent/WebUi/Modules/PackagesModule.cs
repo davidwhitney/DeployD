@@ -95,11 +95,11 @@ namespace Deployd.Agent.WebUi.Modules
             {
                 var log = LogManager.GetLogger(typeof(PackagesModule));
                 log.DebugFormat("update all to latest");
-                var cache = Container().GetType<ILocalPackageCache>();
+                var allPackagesList = Container().GetType<IPackagesList>();
                 var queue = Container().GetType<InstallationTaskQueue>();
 
                 string specificVersion = Response.Context.Request.Form["specificVersion"];
-                IEnumerable<IPackage> packagesToInstall = cache.AllCachedPackages().Where(p => p.Version.Equals(new SemanticVersion(specificVersion)));
+                IEnumerable<IPackage> packagesToInstall = allPackagesList.GetWatched().Where(p => p.Version.Equals(new SemanticVersion(specificVersion)));
                 packagesToInstall = FilterPackagesByTags(packagesToInstall);
 
                 foreach (var packageVersions in packagesToInstall)
@@ -114,10 +114,10 @@ namespace Deployd.Agent.WebUi.Modules
             {
                 var log = LogManager.GetLogger(typeof(PackagesModule));
                 log.DebugFormat("update all to {0}", x.specificVersion);
-                var cache = Container().GetType<ILocalPackageCache>();
+                var allPackagesList = Container().GetType<IPackagesList>();
                 var queue = Container().GetType<InstallationTaskQueue>();
                 
-                var packagesByVersion = cache.AllCachedPackages().GroupBy(p=>p.Id, g=>g.Version);
+                var packagesByVersion = allPackagesList.GetWatched().GroupBy(p=>p.Id, g=>g.Version);
 
                 foreach (var packageVersions in packagesByVersion)
                 {
@@ -131,10 +131,10 @@ namespace Deployd.Agent.WebUi.Modules
 
             Post["/UpdateAllTo/{specificVersion}", y => true] = x =>
             {
-                var cache = Container().GetType<ILocalPackageCache>();
+                var allPackagesList = Container().GetType<IPackagesList>();
                 var queue = Container().GetType<InstallationTaskQueue>();
                 IEnumerable<IPackage> packagesToInstall = 
-                    cache.AllCachedPackages().Where(p=>p.Version.Equals(new SemanticVersion(x.specificVersion)));
+                    allPackagesList.GetWatched().Where(p=>p.Version.Equals(new SemanticVersion(x.specificVersion)));
                 packagesToInstall = FilterPackagesByTags(packagesToInstall);
 
                 foreach (var packageVersions in packagesToInstall)

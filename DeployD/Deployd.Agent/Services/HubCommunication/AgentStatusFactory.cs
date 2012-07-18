@@ -31,7 +31,6 @@ namespace Deployd.Agent.Services.HubCommunication
                                                 availablePackages.Select(p => p.Version.ToString()).Distinct().OrderByDescending(s => s).ToList()
                                                 : new List<string>(),
                            environment = settingsManager.Settings.DeploymentEnvironment,
-                           updating = packageCache.Updating.Select(p => string.Format("{0} {1}", p.Id, p.Version)).ToList()
                        };
 
             status.OutOfDate =

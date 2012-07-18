@@ -91,7 +91,6 @@ namespace Deployd.Core.Remoting
                 using (StreamReader reader = new StreamReader(response.GetResponseStream()))
                 {
                     string content = reader.ReadToEnd();
-                    _log.Debug(content);
                 }
                 if (response.StatusCode == HttpStatusCode.Unauthorized)
                 {
@@ -100,6 +99,10 @@ namespace Deployd.Core.Remoting
                 else if (response.StatusCode == HttpStatusCode.NotFound)
                 {
                     RegisterWithHub();
+                }
+                else if (response.StatusCode == HttpStatusCode.InternalServerError)
+                {
+                    _log.Debug("Hub had internal error");
                 }
                 else
                 {

@@ -16,8 +16,10 @@ namespace Deployd.Core.Installation.Hooks
         {
         }
 
-        public override void BeforeDeploy(DeploymentContext context)
+        public override void BeforeDeploy(DeploymentContext context, Action<ProgressReport> reportProgress)
         {
+            reportProgress(new ProgressReport(context, GetType(), "Stopping application pool(s)")); 
+            
             var logger = context.GetLoggerFor(this);
             var appPools = GetApplicationPoolsForWebsite(context.Package.Title);
             foreach (var appPool in appPools)
@@ -71,9 +73,10 @@ namespace Deployd.Core.Installation.Hooks
             }
         }
 
-        public override void AfterDeploy(DeploymentContext context)
+        public override void AfterDeploy(DeploymentContext context, Action<ProgressReport> reportProgress)
         {
             var logger = context.GetLoggerFor(this);
+            reportProgress(new ProgressReport(context, GetType(), "Starting application pool(s)")); 
             var appPools = GetApplicationPoolsForWebsite(context.Package.Title);
             foreach(var appPool in appPools)
             {

@@ -72,8 +72,6 @@ namespace Deployd.Agent.WebUi.Converters
                     packageInfo.Tags = new string[0];
                 }
                 model.Packages.Add(packageInfo);
-
-                model.Updating = cache.Updating;
             }
 
             model.CurrentTasks = runningTasks

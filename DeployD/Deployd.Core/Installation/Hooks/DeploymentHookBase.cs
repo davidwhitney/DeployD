@@ -23,9 +23,11 @@ namespace Deployd.Core.Installation.Hooks
         }
 
         public abstract bool HookValidForPackage(DeploymentContext context);
-        public virtual void BeforeDeploy(DeploymentContext context){}
-        public virtual void Deploy(DeploymentContext context){}
-        public virtual void AfterDeploy(DeploymentContext context) { }
+        public virtual void BeforeDeploy(DeploymentContext context, Action<ProgressReport> reportProgress) { }
+        public virtual void Deploy(DeploymentContext context, Action<ProgressReport> reportProgress) { }
+        public virtual void AfterDeploy(DeploymentContext context, Action<ProgressReport> reportProgress) { }
+
+        public abstract string ProgressMessage { get; }
 
         protected void CopyAllFilesToDestination(DeploymentContext context)
         {

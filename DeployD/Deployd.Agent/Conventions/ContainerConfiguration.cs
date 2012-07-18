@@ -57,7 +57,6 @@ namespace Deployd.Agent.Conventions
             Bind<RunningInstallationTaskList>().ToSelf().InSingletonScope();
             Bind<InstallationTaskQueue>().ToSelf().InSingletonScope();
             Bind<CompletedInstallationTaskList>().ToSelf().InSingletonScope();
-            Bind<PackageUpdateList>().ToSelf().InSingletonScope();
             
             // actions management
             Bind<IAgentActionsService>().To<AgentActionsService>().InSingletonScope();
