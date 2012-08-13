@@ -98,12 +98,19 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AgentConfiguration\AgentSettingsManager.cs" />
+    <Compile Include="AgentConfiguration\AgentWatchList.cs" />
+    <Compile Include="AgentConfiguration\AgentWatchListManager.cs" />
     <Compile Include="AgentConfiguration\AppSettings.cs" />
     <Compile Include="AgentConfiguration\GlobalAgentConfiguration.cs" />
     <Compile Include="AgentConfiguration\DeploymentEnvironment.cs" />
     <Compile Include="AgentConfiguration\AgentSettings.cs" />
     <Compile Include="AgentConfiguration\IAgentSettings.cs" />
     <Compile Include="AgentConfiguration\IAgentSettingsManager.cs" />
+    <Compile Include="AgentConfiguration\IAgentWatchList.cs" />
+    <Compile Include="AgentConfiguration\IPackageGroupConfiguration.cs" />
+    <Compile Include="AgentConfiguration\PackageGroup.cs" />
+    <Compile Include="AgentConfiguration\PackageGroupConfiguration.cs" />
+    <Compile Include="AgentConfiguration\PackageGroupConfigurationFactory.cs" />
     <Compile Include="AgentManagement\ActionTask.cs" />
     <Compile Include="AgentManagement\AgentActionsRepository.cs" />
     <Compile Include="AgentManagement\PendingActionsQueue.cs" />
@@ -173,9 +180,6 @@
     <Compile Include="TimedSingleExecutionTask.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="sampleConfig.config">
-      <SubType>Designer</SubType>
-    </None>
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup />

@@ -18,5 +18,6 @@ namespace Deployd.Core.AgentConfiguration
         string LogsDirectory { get; }
         string HubAddress { get;  }
         int MaxConcurrentInstallations { get; }
+        bool EnableConfigurationSync { get; }
     }
 }

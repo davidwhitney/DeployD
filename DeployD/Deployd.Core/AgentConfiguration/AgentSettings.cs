@@ -33,6 +33,8 @@ namespace Deployd.Core.AgentConfiguration
 
         public int MaxConcurrentInstallations { get; set; }
 
+        public bool EnableConfigurationSync { get; set; }
+
         public AgentSettings()
         {
             PackageSyncIntervalMs = 1000;

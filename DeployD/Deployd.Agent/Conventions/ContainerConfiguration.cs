@@ -24,6 +24,12 @@ namespace Deployd.Agent.Conventions
     {
         public override void Load()
         {
+            // configuration
+            Bind<IAgentWatchListManager>().To<AgentWatchListManager>();
+            Bind<IAgentWatchList>().ToMethod(ctx => ctx.Kernel.Get<IAgentWatchListManager>().Build());
+            Bind<IPackageGroupConfiguration>().ToMethod(ctx => PackageGroupConfigurationFactory.Build());
+            Bind<IConfigurationDefaults>().To<ConfigurationDefaults>();
+
             // services
             Bind<IWindowsService>().To<AgentConfigurationService>().InSingletonScope();
             Bind<IWindowsService>().To<PackageDownloadingService>().InSingletonScope();

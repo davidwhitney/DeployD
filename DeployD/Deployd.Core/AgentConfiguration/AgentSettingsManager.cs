@@ -56,7 +56,8 @@ namespace Deployd.Core.AgentConfiguration
                 {"Tags",""},
                 {"LogsDirectory", "~\\logs"},
                 {"Hub.Address", "http://localhost:80"},
-                {"MaxConcurrentInstallations", "3"}
+                {"MaxConcurrentInstallations", "3"},
+                {"EnableConfigurationSync", "false"}
             };
         }
 

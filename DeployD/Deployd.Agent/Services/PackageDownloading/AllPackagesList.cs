@@ -11,18 +11,17 @@ namespace Deployd.Agent.Services.PackageDownloading
     {
         private readonly IAgentConfigurationManager _agentConfiguration;
         private readonly IAgentSettings _agentSettings;
-        private IList<string> _watchedPackages;
 
         public AllPackagesList(IAgentConfigurationManager agentConfiguration, IAgentSettings agentSettings)
         {
             _agentConfiguration = agentConfiguration;
             _agentSettings = agentSettings;
-            _watchedPackages = _agentConfiguration.GetWatchedPackages(_agentSettings.DeploymentEnvironment);
         }
 
         public IEnumerable<IPackage> GetWatched()
         {
-            return this.Where(p => _watchedPackages.Contains(p.Id));
+            var watched = _agentConfiguration.GetWatchedPackages(_agentSettings.DeploymentEnvironment);
+            return this.Where(p => watched.Contains(p.Id));
         }
     }
 }

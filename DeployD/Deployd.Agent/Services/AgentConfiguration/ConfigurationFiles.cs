@@ -1,11 +1,12 @@
 ﻿using System;
 using System.IO;
+using Deployd.Core;
 
 namespace Deployd.Agent.Services.AgentConfiguration
 {
-    public class ConfigurationFiles
+    public class ConfigurationDefaults : IConfigurationDefaults
     {
-        public const string AgentConfigurationFile = @"GlobalAgentConfiguration.xml";
-        public const string AgentConfigurationFileLocation = @"~\";
+        public string AgentConfigurationFile { get { return @"GlobalAgentConfiguration.xml"; } }
+        public string AgentConfigurationFileLocation { get { return @"~\"; } }
     }
 }

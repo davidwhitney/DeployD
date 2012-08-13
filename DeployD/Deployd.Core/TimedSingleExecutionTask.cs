@@ -55,7 +55,6 @@ namespace Deployd.Core
         {
             if (!Monitor.TryEnter(OneSyncAtATimeLock))
             {
-                _logger.Info("Skipping sync operation because a previous sync is still running.");
                 return;
             }
 

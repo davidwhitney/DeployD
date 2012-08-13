@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Runtime.Versioning;
 using Deployd.Agent.Services.AgentConfiguration;
@@ -21,16 +22,20 @@ namespace Deployd.Agent.Test.Unit.Services.AgentConfiguration
         private PackageFileStub _nugetPackageFile;
         private Mock<IAgentSettingsManager> _agentSettingsManagerMock;
         private Mock<ILogger> _logger=new Mock<ILogger>();
+        private Mock<IConfigurationDefaults> _configurationDefaults = null;
 
         [SetUp]
         public void SetUp()
         {
+            _configurationDefaults = new Mock<IConfigurationDefaults>();
+            _configurationDefaults.SetupGet(c => c.AgentConfigurationFile).Returns(Guid.NewGuid().ToString());
+            _configurationDefaults.SetupGet(c => c.AgentConfigurationFileLocation).Returns(Environment.CurrentDirectory);
             _agentSettingsManagerMock = new Mock<IAgentSettingsManager>();
             _nugetPackageMock = new Mock<IPackage>();
-            _nugetPackageFile = new PackageFileStub { Path = ConfigurationFiles.AgentConfigurationFile };
+            _nugetPackageFile = new PackageFileStub { Path = Environment.CurrentDirectory };
             _agentConfigManagerMock = new Mock<IAgentConfigurationManager>();
             _retrieveQueryMock = new Mock<IRetrievePackageQuery>();
-            _downloader = new AgentConfigurationDownloader(_agentConfigManagerMock.Object, _retrieveQueryMock.Object, _agentSettingsManagerMock.Object, _logger.Object);
+            _downloader = new AgentConfigurationDownloader(_agentConfigManagerMock.Object, _retrieveQueryMock.Object, _agentSettingsManagerMock.Object, _logger.Object, _configurationDefaults.Object);
         }
 
         [Test]

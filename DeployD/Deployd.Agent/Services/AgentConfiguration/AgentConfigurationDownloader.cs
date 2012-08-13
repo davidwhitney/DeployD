@@ -18,20 +18,26 @@ namespace Deployd.Agent.Services.AgentConfiguration
         private readonly IRetrievePackageQuery _packageQuery;
         private readonly IAgentSettingsManager _agentSettingsManager;
         private readonly ILogger _logger;
+        private readonly IConfigurationDefaults _configurationDefaults;
 
         public AgentConfigurationDownloader(IAgentConfigurationManager agentConfigurationManager,
                                             IRetrievePackageQuery packageQuery,
                                             IAgentSettingsManager agentSettingsManager,
-            ILogger logger)
+            ILogger logger,
+            IConfigurationDefaults configurationDefaults)
         {
             _agentConfigurationManager = agentConfigurationManager;
             _packageQuery = packageQuery;
             _agentSettingsManager = agentSettingsManager;
             _logger = logger;
+            _configurationDefaults = configurationDefaults;
         }
 
         public void DownloadAgentConfiguration()
         {
+            if (!_agentSettingsManager.Settings.EnableConfigurationSync)
+                return;
+
             IPackage configPackage = null;
             try
             {
@@ -68,12 +74,12 @@ namespace Deployd.Agent.Services.AgentConfiguration
             }
         }
 
-        private static IPackageFile ExtractConfig(IPackage configPackage)
+        private IPackageFile ExtractConfig(IPackage configPackage)
         {
             using (new DebugTimer("Extracting config from " + DeploydConfigurationPackageName))
             {
                 var files = configPackage.GetFiles();
-                var agentConfigurationFile = ExtractAgentConfigurationFile(ConfigurationFiles.AgentConfigurationFile, files);
+                var agentConfigurationFile = ExtractAgentConfigurationFile(_configurationDefaults.AgentConfigurationFile, files);
                 return agentConfigurationFile;
             }
         }
@@ -83,7 +89,7 @@ namespace Deployd.Agent.Services.AgentConfiguration
             using (new DebugTimer("Saving config from " + DeploydConfigurationPackageName))
             {
                 var configBytes = GetConfigurationFileAsBytes(agentConfigurationFile);
-                _agentConfigurationManager.SaveToDisk(configBytes);
+                _agentConfigurationManager.SaveToDisk(configBytes, _agentConfigurationManager.ApplicationFilePath(_configurationDefaults.AgentConfigurationFile));
                 _agentSettingsManager.UnloadSettings();
             }
         }

@@ -47,7 +47,7 @@ namespace Deployd.Core.Installation
             var packageSelector = specificVersion == null || specificVersion == "latest"
                                        ? (Func<IPackage>) (() => _packageCache.GetLatestVersion(packageId))
                                        : (() => LoadOrDownloadSpecificPackageVersion(packageId, specificVersion));
-
+            
             InstallPackage(packageId, packageSelector, cancellationToken, reportProgress, taskId);
         }
 
@@ -126,9 +126,11 @@ namespace Deployd.Core.Installation
 
             if (package ==null)
             {
+                Logger.Debug("No package matching criteria could be found, aborting");
                 return;
             }
 
+            Logger.Debug("Installing {0} {1}", package.Title, package.Version);
             if (Deploy(taskId, package, cancellationToken, reportProgress))
             {
                 WriteInstallMarker(package);

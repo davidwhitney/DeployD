@@ -13,15 +13,28 @@ namespace Deployd.Agent.Test.Unit.Services.AgentConfiguration
     {
         private AgentConfigurationManager _mgr;
         private Mock<ILogger> _logger=new Mock<ILogger>();
+        private Mock<IConfigurationDefaults> _configurationDefaults = null;
 
         private const string CONFIG_FILE = @"<?xml version=""1.0"" encoding=""utf-8""?>
 <GlobalAgentConfiguration xmlns:xsd=""http://www.w3.org/2001/XMLSchema"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"">
   <Environments>
     <DeploymentEnvironment>
-      <Name>Staging</Name>
+      <Name>Web</Name>
       <Packages>
-        <string>justgiving-sdk</string>
-        <string>justgivingTwo-sdk</string>
+          <string>main-website</string>
+      </Packages>
+    </DeploymentEnvironment>
+    <DeploymentEnvironment>
+      <Name>Backoffice</Name>
+      <Packages>
+          <string>background-service</string>
+      </Packages>
+    </DeploymentEnvironment>
+    <DeploymentEnvironment>
+      <Name>Reporting</Name>
+      <Packages>
+          <string>report-update-service</string>
+          <string>reporting-website</string>
       </Packages>
     </DeploymentEnvironment>
   </Environments>
@@ -32,9 +45,13 @@ namespace Deployd.Agent.Test.Unit.Services.AgentConfiguration
         [SetUp]
         public void SetUp()
         {
+            var agentWatchList = new AgentWatchList() {Groups = new string[] {"Web", "Backoffice", "Reporting"}};
+            _configurationDefaults = new Mock<IConfigurationDefaults>();
+            _configurationDefaults.SetupGet(c => c.AgentConfigurationFile).Returns(Guid.NewGuid().ToString());
+            _configurationDefaults.SetupGet(c => c.AgentConfigurationFileLocation).Returns(Environment.CurrentDirectory);
             _fileName = Guid.NewGuid().ToString();
             File.WriteAllText(_fileName, CONFIG_FILE);
-            _mgr = new AgentConfigurationManager(_logger.Object);
+            _mgr = new AgentConfigurationManager(_logger.Object, _configurationDefaults.Object);
         }
 
         [Test]
@@ -42,7 +59,7 @@ namespace Deployd.Agent.Test.Unit.Services.AgentConfiguration
         {
             var configurationFile = _mgr.ReadFromDisk(_fileName);
 
-            Assert.That(configurationFile.Environments.Count, Is.EqualTo(1));
+            Assert.That(configurationFile.Environments.Count, Is.EqualTo(3));
         }
 
         [Test]
@@ -50,7 +67,7 @@ namespace Deployd.Agent.Test.Unit.Services.AgentConfiguration
         {
             var configurationFile = _mgr.ReadFromDisk(_fileName);
 
-            Assert.That(configurationFile.Environments[0].Name, Is.EqualTo("Staging"));
+            Assert.That(configurationFile.Environments[0].Name, Is.EqualTo("Web"));
         }
 
         [Test]
@@ -58,7 +75,7 @@ namespace Deployd.Agent.Test.Unit.Services.AgentConfiguration
         {
             var configurationFile = _mgr.ReadFromDisk(_fileName);
 
-            Assert.That(configurationFile.Environments[0].Packages.Count, Is.EqualTo(2));
+            Assert.That(configurationFile.Environments[0].Packages.Count, Is.EqualTo(1));
         }
 
         [Test]
@@ -66,7 +83,7 @@ namespace Deployd.Agent.Test.Unit.Services.AgentConfiguration
         {
             var configurationFile = _mgr.ReadFromDisk(_fileName);
 
-            Assert.That(configurationFile.Environments[0].Packages[0], Is.EqualTo("justgiving-sdk"));
+            Assert.That(configurationFile.Environments[0].Packages[0], Is.EqualTo("main-website"));
         }
 
         [Test]

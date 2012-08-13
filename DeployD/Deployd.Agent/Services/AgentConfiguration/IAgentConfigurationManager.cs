@@ -6,8 +6,9 @@ namespace Deployd.Agent.Services.AgentConfiguration
     public interface IAgentConfigurationManager
     {
         IList<string> GetWatchedPackages(string environmentName);
-        GlobalAgentConfiguration ReadFromDisk(string fileName = ConfigurationFiles.AgentConfigurationFile);
-        void SaveToDisk(GlobalAgentConfiguration configuration, string fileName = ConfigurationFiles.AgentConfigurationFile);
-        void SaveToDisk(byte[] configuration, string fileName = ConfigurationFiles.AgentConfigurationFile);
+        GlobalAgentConfiguration ReadFromDisk(string fileName = null);
+        void SaveToDisk(GlobalAgentConfiguration configuration, string fileName = null);
+        void SaveToDisk(byte[] configuration, string fileName = null);
+        string ApplicationFilePath(string agentConfigurationFile);
     }
 }

@@ -76,6 +76,13 @@ namespace Deployd.Agent.Services.PackageDownloading
         {
             TimedTask.Start(args);
 
+            var packages = _agentConfigurationManager.GetWatchedPackages(_settingsManager.Settings.DeploymentEnvironment);
+            _logger.Debug("Downloading service will download the following packages:");
+            foreach(var package in packages)
+            {
+                _logger.Debug(package);
+            }
+
             // do an initial check/fetch
             FetchPackages();
         }

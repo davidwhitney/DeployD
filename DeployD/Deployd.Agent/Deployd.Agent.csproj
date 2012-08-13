@@ -153,9 +153,11 @@
     <Compile Include="Services\AgentConfiguration\AgentConfigurationNotFoundException.cs" />
     <Compile Include="Services\AgentConfiguration\AgentConfigurationPackageNotFoundException.cs" />
     <Compile Include="Services\AgentConfiguration\AgentConfigurationService.cs" />
+    <Compile Include="Services\AgentConfiguration\AgentPackageScope.cs" />
     <Compile Include="Services\AgentConfiguration\ConfigurationFiles.cs" />
     <Compile Include="Services\AgentConfiguration\IAgentConfigurationDownloader.cs" />
     <Compile Include="Services\AgentConfiguration\IAgentConfigurationManager.cs" />
+    <Compile Include="Services\AgentConfiguration\IConfigurationDefaults.cs" />
     <Compile Include="Services\HubCommunication\AgentStatusFactory.cs" />
     <Compile Include="Services\HubCommunication\HubCommunicationService.cs" />
     <Compile Include="Services\InstallationService\PackageInstallationService.cs" />
@@ -175,6 +177,7 @@
     <Compile Include="WebUi\CustomFormatterExtensions.cs" />
     <Compile Include="WebUi\Modules\ActionDetailsViewModel.cs" />
     <Compile Include="WebUi\Modules\ActionsModule.cs" />
+    <Compile Include="WebUi\Modules\ConfigurationModule.cs" />
     <Compile Include="WebUi\Modules\InstallationsModule.cs" />
     <Compile Include="WebUi\Modules\LogModule.cs" />
     <Compile Include="WebUi\NancyModuleExtensions.cs" />
@@ -210,6 +213,7 @@
     <Content Include="Scripts\PS\Services.ps1">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <None Include="watchList.config" />
     <None Include="web.config" />
     <Content Include="WebUi\Views\logs\log.cshtml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
@@ -254,6 +258,9 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="WebUi\Views\actions\task.cshtml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="WebUi\Views\configuration\index.cshtml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>

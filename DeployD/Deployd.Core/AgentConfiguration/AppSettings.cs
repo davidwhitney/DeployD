@@ -71,6 +71,11 @@ namespace Deployd.Core.AgentConfiguration
             get { return this["Hub.Address"]; }
         }
 
+        public bool EnableConfigurationSync
+        {
+            get { return bool.Parse(this["EnableConfigurationSync"]); }
+        }
+
         public int MaxConcurrentInstallations { get { return Math.Max(1, int.Parse(this["MaxConcurrentInstallations"])); } }
     }
 }

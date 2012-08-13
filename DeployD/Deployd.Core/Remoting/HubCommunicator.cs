@@ -23,7 +23,6 @@ namespace Deployd.Core.Remoting
 
         public void SendStatusToHubAsync(AgentStatusReport status)
         {
-            _log.Debug("communicate async");
             Task task = new Task(()=>
             {
                 var status1 = status;
@@ -34,7 +33,6 @@ namespace Deployd.Core.Remoting
 
         public void SendStatusToHub(AgentStatusReport status)
         {
-            _log.Debug("communicate");
             var _pingRequest = HttpWebRequest.Create(string.Format("{0}/api/agent/{1}/status",
                                                                    _agentSettingsManager.Settings.HubAddress,
                                                                    Environment.MachineName)) as HttpWebRequest;

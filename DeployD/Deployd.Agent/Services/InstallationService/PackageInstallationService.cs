@@ -132,7 +132,7 @@ namespace Deployd.Agent.Services.InstallationService
             nextPendingInstall.Task
                 .ContinueWith(RemoveFromRunningInstallationList)
                 .ContinueWith(task => _logger.Error(task.Exception, "Installation task failed."), TaskContinuationOptions.OnlyOnFaulted);
-
+            _logger.Debug("Installation task queued");
             nextPendingInstall.Task.Start();
         }
 
