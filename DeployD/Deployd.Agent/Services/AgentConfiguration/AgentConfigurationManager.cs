@@ -26,21 +26,18 @@ namespace Deployd.Agent.Services.AgentConfiguration
             _fileLock = new object();
         }
 
-        public GlobalAgentConfiguration GlobalAgentConfiguration
+        public GlobalAgentConfiguration GetConfiguration()
         {
-            get
-            {
                 if (_cachedConfiguration == null)
-                    _cachedConfiguration = ReadFromDisk(ApplicationFilePath(_configurationDefaults.AgentConfigurationFile));
-                
+                    _cachedConfiguration =
+                        ReadFromDisk(ApplicationFilePath(_configurationDefaults.AgentConfigurationFile));
+
                 return _cachedConfiguration;
-            }
         }
 
         public string ApplicationFilePath(string fileName)
         {
             return Path.Combine(_configurationDefaults.AgentConfigurationFileLocation.MapVirtualPath(), fileName);
-            
         }
 
         public IList<string> GetWatchedPackages(string environmentName)
@@ -49,7 +46,7 @@ namespace Deployd.Agent.Services.AgentConfiguration
             var watchList = _agentWatchListManager.Build();
             if (watchList.Groups != null)
             {
-                var groups = GlobalAgentConfiguration.Environments.Where(g => watchList.Groups.Contains(g.Name));
+                var groups = GetConfiguration().Environments.Where(g => watchList.Groups.Contains(g.Name));
                 packages.AddRange(groups.SelectMany(g => g.Packages));
             }
 

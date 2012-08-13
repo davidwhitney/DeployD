@@ -44,7 +44,7 @@ namespace Deployd.Agent.Conventions
             Bind<HubCommunicationsQueue>().ToSelf().InSingletonScope();
             Bind<IHubCommunicator>().To<HubCommunicator>();
 
-            Bind<IAgentConfigurationManager>().To<AgentConfigurationManager>();
+            Bind<IAgentConfigurationManager>().To<AgentConfigurationManager>().InSingletonScope();
             Bind<IAgentSettingsManager>().To<AgentSettingsManager>().InSingletonScope();
             Bind<IAgentSettings>().ToMethod(context => GetService<IAgentSettingsManager>().Settings);
             Bind<FeedLocation>().ToMethod(context => new FeedLocation { Source = GetService<IAgentSettings>().NuGetRepository });

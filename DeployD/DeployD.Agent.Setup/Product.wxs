@@ -53,6 +53,9 @@
             <Component Id="cmp375F226751B298CD70903C1646985757" Directory="INSTALLDIR" Guid="{139C7143-3436-4973-840A-8DBDF4E5E6D9}">
                 <File Id="filBF38EEDD7B5695007E9582D7EF347826" KeyPath="yes" Source="$(var.Deployd.Agent.ProjectDir)\bin\$(var.Deployd.Agent.Configuration)\log4net.config" />
             </Component>
+            <Component Id="cmp375F226751B298CD70903C1646985758" Directory="INSTALLDIR" Guid="{139C7143-3436-4973-840A-8DBDF4E5E6D0}">
+                <File Id="filBF38EEDD7B5695007E9582D7EF347828" KeyPath="yes" Source="$(var.Deployd.Agent.ProjectDir)\watchList.config" />
+            </Component>
         </ComponentGroup>
         <ComponentGroup Id="DeployD.Agent.Binaries">
             <Component Id="cmp66EB1842F6EC4B5E33CBF12BCD5ABBBC" Directory="INSTALLDIR" Guid="{F6070E0A-1B92-41CD-8D18-B06F516060ED}">

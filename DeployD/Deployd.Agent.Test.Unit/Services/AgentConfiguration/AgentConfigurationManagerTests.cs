@@ -46,12 +46,14 @@ namespace Deployd.Agent.Test.Unit.Services.AgentConfiguration
         public void SetUp()
         {
             var agentWatchList = new AgentWatchList() {Groups = new string[] {"Web", "Backoffice", "Reporting"}};
+            var agentWatchListManager = new Mock<IAgentWatchListManager>();
+            agentWatchListManager.Setup(m => m.Build()).Returns(agentWatchList);
             _configurationDefaults = new Mock<IConfigurationDefaults>();
             _configurationDefaults.SetupGet(c => c.AgentConfigurationFile).Returns(Guid.NewGuid().ToString());
             _configurationDefaults.SetupGet(c => c.AgentConfigurationFileLocation).Returns(Environment.CurrentDirectory);
             _fileName = Guid.NewGuid().ToString();
             File.WriteAllText(_fileName, CONFIG_FILE);
-            _mgr = new AgentConfigurationManager(_logger.Object, _configurationDefaults.Object);
+            _mgr = new AgentConfigurationManager(_logger.Object, agentWatchListManager.Object, _configurationDefaults.Object);
         }
 
         [Test]
