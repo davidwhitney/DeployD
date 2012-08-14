@@ -8,10 +8,10 @@ using log4net.Repository.Hierarchy;
 
 namespace Deployd.Core.Installation
 {
-    public class DeploymentContext
+    public class DeploymentContext : IDisposable
     {
-        private readonly IPackage _package;
-        private readonly IAgentSettingsManager _agentSettingsManager;
+        private IPackage _package;
+        private IAgentSettingsManager _agentSettingsManager;
         private readonly string _workingFolder;
         private readonly string _installationTaskId;
         private readonly DateTime _contextCreateTime = DateTime.Now;
@@ -29,7 +29,6 @@ namespace Deployd.Core.Installation
             _installationTaskId = installationTaskId;
 
             ConfigureInstallationLogging();
-            var logger = GetLoggerFor(this);
 
             TargetInstallationFolder = targetInstallationFolder;
         }
@@ -84,7 +83,12 @@ namespace Deployd.Core.Installation
 
         public string TargetInstallationFolder { get; set; }
         public string WorkingFolder { get { return _workingFolder; } }
-        public IPackage Package { get { return _package; } }
+        public IPackage Package
+        {
+            get { return _package; }
+            set { _package = value; }
+        }
+
         public string InstallationTaskId { get { return _installationTaskId; } }
         public string LogFileName { get { return _logFileName; } }
         public DeployDMetaData MetaData
@@ -117,6 +121,14 @@ namespace Deployd.Core.Installation
             var connectionAppender = (IAppenderAttachable) GetLoggerFor(this).Logger;
             connectionAppender.RemoveAppender(_appender);
             _appender = null;
+        }
+
+        public void Dispose()
+        {
+            Package = null;
+            _agentSettingsManager = null;
+            _appender = null;
+            _metaData = null;
         }
     }
 }

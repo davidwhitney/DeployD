@@ -51,6 +51,17 @@ namespace Deployd.Core.Installation
             InstallationTasks.Add(new InstallationTask(packageId, version, taskId, task, cancellationToken));
         }
 
+        public void ClearCompletedTasks()
+        {
+            foreach(var task in InstallationTasks)
+            {
+                if (task.Task.IsCompleted || task.Task.IsCanceled || task.Task.IsFaulted)
+                {
+                    task.Task.Dispose();
+                }
+            }
+        }
+
         public InstallationTask GetTaskById(string installationTaskId)
         {
             return InstallationTasks.SingleOrDefault(t => t.InstallationTaskId == installationTaskId);

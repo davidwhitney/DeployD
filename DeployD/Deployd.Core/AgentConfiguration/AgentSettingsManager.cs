@@ -113,6 +113,18 @@ namespace Deployd.Core.AgentConfiguration
                         .SaveAs(agentConfigFilePath, ConfigurationSaveMode.Full);
                 }
 
+                if (!fileSystem.File.Exists(Path.Combine(AgentSettings.AgentProgramDataPath, "watchList.config"))
+                    && fileSystem.File.Exists(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "watchList.config")))
+                {
+                    try
+                    {
+                        fileSystem.File.Copy(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "watchList.config"),
+                                             Path.Combine(AgentSettings.AgentProgramDataPath, "watchList.config"), false);
+                    } catch
+                    {
+                    }
+                }
+
                 ExeConfigurationFileMap configMap = new ExeConfigurationFileMap();
                 configMap.ExeConfigFilename = agentConfigFilePath;
 

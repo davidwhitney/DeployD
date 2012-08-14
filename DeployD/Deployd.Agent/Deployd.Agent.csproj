@@ -213,7 +213,9 @@
     <Content Include="Scripts\PS\Services.ps1">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <None Include="watchList.config" />
+    <None Include="watchList.config">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Include="web.config" />
     <Content Include="WebUi\Views\logs\log.cshtml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>

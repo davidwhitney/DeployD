@@ -77,46 +77,52 @@ namespace Deployd.Core.Installation
             var unpackFolder = Path.Combine(AgentSettings.AgentProgramDataPath, _agentSettingsManager.Settings.UnpackingLocation);
             var workingFolder = Path.Combine(unpackFolder, package.GetFullName());
             var targetInstallationFolder = Path.Combine(_agentSettingsManager.Settings.BaseInstallationPath, package.Id);
-            var deploymentContext = new DeploymentContext(package, _agentSettingsManager, workingFolder, targetInstallationFolder, taskId);
+            using (var deploymentContext = new DeploymentContext(package, _agentSettingsManager, workingFolder, targetInstallationFolder, taskId))
+            {
 
-            var logger = deploymentContext.GetLoggerFor(this);
-            var frameworks = package.GetSupportedFrameworks();
-            foreach(var framework in frameworks)
-            {
-                logger.DebugFormat("package supports {0}", framework.FullName);
-            }
+                var logger = deploymentContext.GetLoggerFor(this);
+                var frameworks = package.GetSupportedFrameworks();
+                foreach (var framework in frameworks)
+                {
+                    logger.DebugFormat("package supports {0}", framework.FullName);
+                }
 
-            
-            try
-            {
-                reportProgress(ProgressReport.Info(deploymentContext, this, package.Id, package.Version.Version.ToString(), taskId, "Extracting package to temp folder..."));
-                new NuGetPackageExtractor(Logger).Extract(package, workingFolder);
-            } 
-            catch (Exception ex)
-            {
-                logger.Fatal("Could not extract package", ex);
-            }
 
-            try
-            {
-                BeforeDeploy(deploymentContext, reportProgress);
-                PerformDeploy(deploymentContext, reportProgress);
-                AfterDeploy(deploymentContext, reportProgress);
+                try
+                {
+                    reportProgress(ProgressReport.Info(deploymentContext, this, package.Id,
+                                                       package.Version.Version.ToString(), taskId,
+                                                       "Extracting package to temp folder..."));
+                    new NuGetPackageExtractor(Logger).Extract(package, workingFolder);
+                }
+                catch (Exception ex)
+                {
+                    logger.Fatal("Could not extract package", ex);
+                }
 
-                reportProgress(ProgressReport.Info(deploymentContext, this, package.Id, package.Version.Version.ToString(), taskId,
-                                       "Deployment complete"));
-                return true;
-            }
-            catch (Exception ex)
-            {
-                logger.Error("An error occurred", ex);
-                reportProgress(ProgressReport.Error(deploymentContext, this, package.Id, package.Version.Version.ToString(), taskId,
-                                       "Deployment failed", ex));
-                return false;
-            }
-            finally
-            {
-                deploymentContext.RemoveAppender();
+                try
+                {
+                    BeforeDeploy(deploymentContext, reportProgress);
+                    PerformDeploy(deploymentContext, reportProgress);
+                    AfterDeploy(deploymentContext, reportProgress);
+
+                    reportProgress(ProgressReport.Info(deploymentContext, this, package.Id,
+                                                       package.Version.Version.ToString(), taskId,
+                                                       "Deployment complete"));
+                    return true;
+                }
+                catch (Exception ex)
+                {
+                    logger.Error("An error occurred", ex);
+                    reportProgress(ProgressReport.Error(deploymentContext, this, package.Id,
+                                                        package.Version.Version.ToString(), taskId,
+                                                        "Deployment failed", ex));
+                    return false;
+                }
+                finally
+                {
+                    deploymentContext.RemoveAppender();
+                }
             }
         }
 

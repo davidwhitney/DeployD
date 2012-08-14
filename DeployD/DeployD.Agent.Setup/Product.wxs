@@ -43,17 +43,17 @@
 
     <Fragment>
         <ComponentGroup Id="DeployD.Agent.ConfigurationFiles">
-            <Component Id="ConfigurationFiles" Directory="INSTALLDIR" Guid="{8EED8300-C2D4-483C-B840-04C1F7E85A7C}">
+            <Component Id="ConfigurationFiles" Directory="INSTALLDIR" Guid="{8EED8300-C2D4-483C-B840-04C1F7E85A7C}" NeverOverwrite="yes">
                 <File Id="filC92427964CCBF4CD9956EB39F3DDCDDC" KeyPath="yes" Source="$(var.Deployd.Agent.ProjectDir)\bin\$(var.Deployd.Agent.Configuration)\Deployd.Agent.exe.config" />
                 <util:XmlFile Id="AppConfigSetNugetFeedUrl" Action="setValue" Permanent="yes"
                               File="[#filC92427964CCBF4CD9956EB39F3DDCDDC]"
                      ElementPath="/configuration/appSettings/add[\[]@key='NuGetRepository'[\]]" Name="value"
                      Value="[NUGETFEEDURL]" />
             </Component>
-            <Component Id="cmp375F226751B298CD70903C1646985757" Directory="INSTALLDIR" Guid="{139C7143-3436-4973-840A-8DBDF4E5E6D9}">
+            <Component Id="cmp375F226751B298CD70903C1646985757" Directory="INSTALLDIR" Guid="{139C7143-3436-4973-840A-8DBDF4E5E6D9}" NeverOverwrite="yes">
                 <File Id="filBF38EEDD7B5695007E9582D7EF347826" KeyPath="yes" Source="$(var.Deployd.Agent.ProjectDir)\bin\$(var.Deployd.Agent.Configuration)\log4net.config" />
             </Component>
-            <Component Id="cmp375F226751B298CD70903C1646985758" Directory="INSTALLDIR" Guid="{139C7143-3436-4973-840A-8DBDF4E5E6D0}">
+            <Component Id="cmp375F226751B298CD70903C1646985758" Directory="INSTALLDIR" Guid="{139C7143-3436-4973-840A-8DBDF4E5E6D0}" NeverOverwrite="yes">
                 <File Id="filBF38EEDD7B5695007E9582D7EF347828" KeyPath="yes" Source="$(var.Deployd.Agent.ProjectDir)\watchList.config" />
             </Component>
         </ComponentGroup>
