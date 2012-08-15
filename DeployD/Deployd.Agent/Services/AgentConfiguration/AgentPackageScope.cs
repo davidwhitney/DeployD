@@ -31,7 +31,7 @@ namespace Deployd.Agent.Services.AgentConfiguration
                 }
             }
 
-            if (_agentWatchList.Packages != null && _agentWatchList.Packages.Length > 0)
+            if (_agentWatchList.Packages != null && _agentWatchList.Packages.Count > 0)
             {
                 packageIds.AddRange(_agentWatchList.Packages);
             }

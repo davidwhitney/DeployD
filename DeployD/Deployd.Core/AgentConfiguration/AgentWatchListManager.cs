@@ -41,8 +41,8 @@ namespace Deployd.Core.AgentConfiguration
 
         public void SaveWatchList(string agentWatchList)
         {
-            
-            using (XmlReader reader = XmlReader.Create(new StringReader(agentWatchList)))
+            XmlReaderSettings settings = new XmlReaderSettings();
+            using (XmlReader reader = XmlReader.Create(new StringReader(agentWatchList), settings))
             {
                 var serialized = new XmlSerializer(typeof (AgentWatchList)).Deserialize(reader);
             }

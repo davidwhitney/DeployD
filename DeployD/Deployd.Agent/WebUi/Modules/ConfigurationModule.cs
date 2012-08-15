@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Xml;
+using System.Xml.Serialization;
 using Deployd.Agent.Services.PackageDownloading;
 using Deployd.Core.AgentConfiguration;
 using Deployd.Core.Hosting;
@@ -30,6 +32,26 @@ namespace Deployd.Agent.WebUi.Modules
 
                                return this.ViewOrJson("configuration/index.cshtml", configurationViewModel);
                            };
+
+            Get["/watchList"] = x =>
+                                 {
+                                     var agentWatchListManager = Container().GetType<IAgentWatchListManager>();
+                                     var watchList = agentWatchListManager.Build();
+                                     var watchSample = new AgentWatchList()
+                                                           {
+                                                               Groups = new List<string>(new[] { "Web", "Services" }),
+                                                               Packages = new List<string>(new[] { "package1", "package2" })
+                                                           };
+                                     var serializer = new XmlSerializer(typeof (AgentWatchList));
+                                     StringBuilder sb = new StringBuilder();
+                                     using (var writer = XmlWriter.Create(sb))
+                                     {
+                                         serializer.Serialize(writer, watchSample);
+                                         writer.Flush();
+                                     }
+
+                                     return new TextResponse(sb.ToString(), "text/xml");
+                                 };
 
             Put["/watchList"] = x =>
                                     {
