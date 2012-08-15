@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using Deployd.Agent.Services.AgentConfiguration;
 using Deployd.Core.AgentConfiguration;
@@ -45,7 +46,7 @@ namespace Deployd.Agent.Test.Unit.Services.AgentConfiguration
         [SetUp]
         public void SetUp()
         {
-            var agentWatchList = new AgentWatchList() {Groups = new string[] {"Web", "Backoffice", "Reporting"}};
+            var agentWatchList = new AgentWatchList() {Groups = new List<string>() {"Web", "Backoffice", "Reporting"}};
             var agentWatchListManager = new Mock<IAgentWatchListManager>();
             agentWatchListManager.Setup(m => m.Build()).Returns(agentWatchList);
             _configurationDefaults = new Mock<IConfigurationDefaults>();
