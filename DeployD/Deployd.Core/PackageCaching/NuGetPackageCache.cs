@@ -108,7 +108,13 @@ namespace Deployd.Core.PackageCaching
             }
 
             // save the package
-            File.WriteAllBytes(cachedPackagePath, package.GetStream().ReadAllBytes());
+            try
+            {
+                File.WriteAllBytes(cachedPackagePath, package.GetStream().ReadAllBytes());
+            } catch (OutOfMemoryException)
+            {
+                
+            }
 
             Logger.Info("Cached {0} to {1}.", package.Id, package);
 
@@ -123,17 +129,6 @@ namespace Deployd.Core.PackageCaching
             bool exists = File.Exists(packagePath);
             bool upToDate = !package.Published.HasValue
                              || package.Published.Value.LocalDateTime < File.GetLastWriteTime(packagePath);
-            if (exists)
-            {
-                Logger.Debug("Evaluating packageId: '{0}' - ver '{1}', cached item already exists.", package.Id, package.Version);
-            }
-            if (upToDate)
-            {
-                Logger.Debug("Cached package is up to date");
-            } else
-            {
-                Logger.Debug("Cached package needs updating");
-            }
             return exists && upToDate;
         }
 

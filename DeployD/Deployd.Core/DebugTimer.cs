@@ -14,13 +14,13 @@ namespace Deployd.Core
         public DebugTimer(string name = null)
         {
             _name = name ?? Guid.NewGuid().ToString();
-            Log.Info(string.Format("{0} started.", _name));
+            Log.Debug(string.Format("{0} started.", _name));
             Start();
         }
 
         public void Dispose()
         {
-            Log.Info(string.Format("{0} took {1} ms", _name, ElapsedMilliseconds));
+            Log.Debug(string.Format("{0} took {1} ms", _name, ElapsedMilliseconds));
             Stop();
         }
     }

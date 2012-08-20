@@ -103,41 +103,50 @@ namespace Deployd.Core.Installation.Hooks
 
             reportProgress(new ProgressReport(context, GetType(), "Starting service"));
 
-            var pathToExecutable = Path.Combine(Path.Combine(_serviceInstallationPath, context.Package.Id), context.Package.Id + ".exe");
+            var pathToExecutable = Path.Combine(Path.Combine(_serviceInstallationPath, context.Package.Id),
+                                                context.Package.Id + ".exe");
             var serviceName = DetermineServiceName(context, pathToExecutable, logger);
 
             // if no such service then install it
-            using (var service = GetServiceByNameOrDisplayName(serviceName))
+            try
             {
-                if (service == null)
+                using (var service = GetServiceByNameOrDisplayName(serviceName))
                 {
-                    logger.InfoFormat("Installing service {0} from {1}", serviceName, pathToExecutable);
+                    if (service == null)
+                    {
+                        logger.InfoFormat("Installing service {0} from {1}", serviceName, pathToExecutable);
 
-                    ManagedInstallerClass.InstallHelper(new[] {pathToExecutable});
-                    serviceName = DetermineServiceName(context, pathToExecutable, logger);
+                        ManagedInstallerClass.InstallHelper(new[] {pathToExecutable});
+                        serviceName = DetermineServiceName(context, pathToExecutable, logger);
+                    }
+                }
+
+                // check that installation succeeded
+                using (var service = GetServiceByNameOrDisplayName(serviceName))
+                {
+                    // it didn't... installutil might be presenting a credentials dialog on the terminal
+                    if (service == null)
+                    {
+                        throw new InstallException(
+                            string.Format(
+                                "The executable {0} was installed, so a service named '{1}' was expected but it could not be found",
+                                Path.GetFileNameWithoutExtension(pathToExecutable), serviceName));
+                    }
+                }
+
+                using (var service = GetServiceByNameOrDisplayName(serviceName))
+                {
+                    if (!service.Status.Equals(ServiceControllerStatus.Stopped) &&
+                        !service.Status.Equals(ServiceControllerStatus.StopPending))
+                    {
+                        return;
+                    }
+
+                    ChangeServiceStateTo(service, ServiceControllerStatus.Running, service.Start, logger);
                 }
             }
-
-            // check that installation succeeded
-            using (var service = GetServiceByNameOrDisplayName(serviceName))
+            catch
             {
-                // it didn't... installutil might be presenting a credentials dialog on the terminal
-                if (service == null)
-                {
-                    throw new InstallException(string.Format("The executable {0} was installed, so a service named '{1}' was expected but it could not be found", 
-                        Path.GetFileNameWithoutExtension(pathToExecutable), serviceName));
-                }
-            }
-
-            using (var service = GetServiceByNameOrDisplayName(serviceName))
-            {
-                if (!service.Status.Equals(ServiceControllerStatus.Stopped) &&
-                    !service.Status.Equals(ServiceControllerStatus.StopPending))
-                {
-                    return;
-                }
-                
-                ChangeServiceStateTo(service, ServiceControllerStatus.Running, service.Start, logger);
             }
         }
 

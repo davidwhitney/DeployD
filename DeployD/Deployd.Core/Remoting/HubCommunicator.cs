@@ -52,12 +52,6 @@ namespace Deployd.Core.Remoting
                         requestStream.Flush();
                         requestStream.Close();
                     }
-
-                    ms.Position = 0;
-                    using (var streamReader = new StreamReader(ms))
-                    {
-                        _log.Debug("{0}", streamReader.ReadToEnd());
-                    }
                 }
             }
             catch (Exception ex)
@@ -117,39 +111,6 @@ namespace Deployd.Core.Remoting
                 _log.Warn("Unknown error sending status to hub", exception);
             }
         }
-        /*
-        private AgentStatusReport GetAgentStatus()
-        {
-            return new AgentStatusReport
-                       {
-                           packages = _cache.AvailablePackages.Select(name => new LocalPackageInformation()
-                                                                                  {
-                                                                                      PackageId = name,
-                                                                                      InstalledVersion = _installCache.GetCurrentInstalledVersion(name) != null ? _installCache.GetCurrentInstalledVersion(name).Version.ToString() : "",
-                                                                                      LatestAvailableVersion = _cache.GetLatestVersion(name) != null ? _cache.GetLatestVersion(name).Version.ToString() : "",
-                                                                                      AvailableVersions = _cache.AvailablePackageVersions(name).ToList(),
-                                                                                      CurrentTask = _runningTasks.Where(t => t.PackageId == name)
-                                                                                          .Select(t => new InstallTaskViewModel()
-                                                                                                           {
-                                                                                                               Messages = t.ProgressReports.Select(pr => pr.Message).ToArray(),
-                                                                                                               Status = Enum.GetName(typeof(TaskStatus), t.Task.Status),
-                                                                                                               PackageId = t.PackageId,
-                                                                                                               Version = t.Version,
-                                                                                                               LastMessage = t.ProgressReports.Count > 0 ? t.ProgressReports.LastOrDefault().Message : ""
-                                                                                                           }).FirstOrDefault()
-                                                                                  }).ToList(),
-                           currentTasks = _runningTasks.Select(t => new InstallTaskViewModel()
-                                                                        {
-                                                                            Messages = t.ProgressReports.Select(pr => pr.Message).ToArray(),
-                                                                            Status = Enum.GetName(typeof(TaskStatus), t.Task.Status),
-                                                                            PackageId = t.PackageId,
-                                                                            Version = t.Version,
-                                                                            LastMessage = t.ProgressReports.Count > 0 ? t.ProgressReports.LastOrDefault().Message : ""
-                                                                        }).ToList(),
-                           availableVersions = _cache.AllCachedPackages().Select(p => p.Version.ToString()).Distinct().OrderByDescending(s => s).ToList(),
-                           environment = _agentSettingsManager.Settings.DeploymentEnvironment
-                       };
-        }*/
 
         private void RegisterWithHub()
         {
