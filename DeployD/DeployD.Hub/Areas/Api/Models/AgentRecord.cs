@@ -15,8 +15,8 @@ namespace DeployD.Hub.Areas.Api.Models
         public bool Contacted { get; set; }
         public bool Approved { get; set; }
         public DateTime LastContact { get; set; }
-
         public List<string> Updating { get; set; }
+        public DateTime ShowUpdatingStatusUntil { get; set; }
 
         public AgentRecord(string hostname)
         {

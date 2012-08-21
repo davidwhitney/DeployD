@@ -188,8 +188,11 @@ var _manageAgentDialogOpen = false;
                 lastContact: this.model.get('lastContact'),
                 updating: this.model.get('updating'),
                 outOfDate: this.model.get('outOfDate'),
-                latestVersion: this.model.get('latestVersion')
+                latestVersion: this.model.get('latestVersion'),
+                isUpdating: this.model.get('isUpdating')
             };
+
+            console.log('agent updating? ' + viewModel.isUpdating);
 
             var template = _.template(_agentTemplate, viewModel);
             var expanded = $('div.agent-detail', this.$el).css("display")=="block";

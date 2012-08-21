@@ -124,7 +124,14 @@ namespace Deployd.Core.PackageCaching
             }
         }
 
-        private bool CachedVersionExistsAndIsUpToDate(IPackage package, string packagePath)
+        public bool CachedVersionExistsAndIsUpToDate(IPackage package)
+        {
+            var packageCacheLocation = PackageCacheLocation(package);
+            var cachedPackagePath = Path.Combine(packageCacheLocation, CachedPackageVersionFilename(package.Id, package.Version.ToString()));
+            return CachedVersionExistsAndIsUpToDate(package, cachedPackagePath);
+        }
+
+        public bool CachedVersionExistsAndIsUpToDate(IPackage package, string packagePath)
         {
             bool exists = File.Exists(packagePath);
             bool upToDate = !package.Published.HasValue

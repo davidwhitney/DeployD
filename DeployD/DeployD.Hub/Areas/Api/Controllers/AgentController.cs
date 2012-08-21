@@ -29,7 +29,9 @@ namespace DeployD.Hub.Areas.Api.Controllers
             _agentRemoteService = agentRemoteService;
             _log = log;
 
-            AutoMapper.Mapper.CreateMap<AgentRecord, AgentViewModel>().ForMember(viewModel=>viewModel.id, mo=>mo.MapFrom(record=>record.Id));
+            AutoMapper.Mapper.CreateMap<AgentRecord, AgentViewModel>()
+                .ForMember(viewModel=>viewModel.id, mo=>mo.MapFrom(record=>record.Id))
+                .ForMember(viewModel=>viewModel.IsUpdating, mo=>mo.MapFrom(record=>record.ShowUpdatingStatusUntil > DateTime.Now));
 
             AutoMapper.Mapper.CreateMap<PackageRecord, PackageViewModel>().ForMember(viewModel => viewModel.packageId, mo => mo.MapFrom(record => record.PackageId));
         }

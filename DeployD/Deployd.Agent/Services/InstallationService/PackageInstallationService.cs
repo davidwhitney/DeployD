@@ -26,6 +26,7 @@ namespace Deployd.Agent.Services.InstallationService
         private RunningInstallationTaskList _runningTasks;
         private IAgentSettingsManager _settingsManager;
         private readonly IPackagesList _allPackagesList;
+        private readonly CurrentlyDownloadingList _currentlyDownloadingList;
 
         public ApplicationContext AppContext { get; set; }
         public TimedSingleExecutionTask TimedTask { get; private set; }
@@ -44,7 +45,8 @@ namespace Deployd.Agent.Services.InstallationService
             IInstalledPackageArchive installCache, 
             RunningInstallationTaskList runningTasks, 
             IAgentSettingsManager settingsManager,
-            IPackagesList allPackagesList)
+            IPackagesList allPackagesList,
+            CurrentlyDownloadingList currentlyDownloadingList)
         {
             CompletedInstalls = completedInstalls;
             _deploymentService = deploymentService;
@@ -55,6 +57,7 @@ namespace Deployd.Agent.Services.InstallationService
             _runningTasks = runningTasks;
             _settingsManager = settingsManager;
             _allPackagesList = allPackagesList;
+            _currentlyDownloadingList = currentlyDownloadingList;
             PendingInstalls = pendingInstalls;
             RunningInstalls = runningInstalls;
             TimedTask = new TimedSingleExecutionTask(5000, CheckForNewInstallations, _logger);
@@ -172,14 +175,14 @@ namespace Deployd.Agent.Services.InstallationService
 
             if (progressReport.Exception == null)
             {
-                _hubCommunicator.SendStatusToHubAsync(AgentStatusFactory.BuildStatus(_allPackagesList, _agentCache, _installCache, _runningTasks, _settingsManager));
+                _hubCommunicator.SendStatusToHubAsync(AgentStatusFactory.BuildStatus(_allPackagesList, _agentCache, _installCache, _runningTasks, _settingsManager, _currentlyDownloadingList));
                 return;
             }
 
             installationTask.HasErrors = true;
             installationTask.Errors.Add(progressReport.Exception);
 
-            _hubCommunicator.SendStatusToHubAsync(AgentStatusFactory.BuildStatus(_allPackagesList, _agentCache, _installCache, _runningTasks, _settingsManager));
+            _hubCommunicator.SendStatusToHubAsync(AgentStatusFactory.BuildStatus(_allPackagesList, _agentCache, _installCache, _runningTasks, _settingsManager, _currentlyDownloadingList));
         }
 
         private void RemoveFromRunningInstallationList(Task<InstallationResult> completedInstallationTask)

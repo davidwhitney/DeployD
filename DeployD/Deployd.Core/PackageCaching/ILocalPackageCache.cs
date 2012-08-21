@@ -16,5 +16,7 @@ namespace Deployd.Core.PackageCaching
 
         event EventHandler<PackageEventArgs> OnUpdateStarted;
         event EventHandler<PackageEventArgs> OnUpdateFinished;
+        bool CachedVersionExistsAndIsUpToDate(IPackage package, string packagePath);
+        bool CachedVersionExistsAndIsUpToDate(IPackage package);
     }
 }

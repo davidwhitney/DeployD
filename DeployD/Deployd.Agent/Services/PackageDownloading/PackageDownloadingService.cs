@@ -25,6 +25,7 @@ namespace Deployd.Agent.Services.PackageDownloading
         private readonly IInstalledPackageArchive _installCache;
         private readonly IPackageRepository _packageRepository;
         private readonly IPackagesList _allPackagesList;
+        private readonly ICurrentlyDownloadingList _currentlyDownloadingList;
         private readonly RunningInstallationTaskList _runningTasks;
 
         public ApplicationContext AppContext { get; set; }
@@ -43,7 +44,8 @@ namespace Deployd.Agent.Services.PackageDownloading
                                          IHubCommunicator hubCommunicator,
                                          IInstalledPackageArchive installCache,
                                          IPackageRepositoryFactory packageRepositoryFactory,
-                                        IPackagesList allPackagesList)
+                                        IPackagesList allPackagesList,
+            ICurrentlyDownloadingList currentlyDownloadingList)
         {
             _settingsManager = agentSettingsManager;
             AllPackagesQuery = allPackagesQuery;
@@ -54,17 +56,9 @@ namespace Deployd.Agent.Services.PackageDownloading
             _installCache = installCache;
             _packageRepository = packageRepositoryFactory.CreateRepository(agentSettingsManager.Settings.NuGetRepository);
             _allPackagesList = allPackagesList;
+            _currentlyDownloadingList = currentlyDownloadingList;
             TimedTask = new TimedSingleExecutionTask(agentSettingsManager.Settings.PackageSyncIntervalMs, FetchPackages,
                                                      _logger);
-
-            AgentCache.OnUpdateStarted +=
-                (sender, args) =>
-                _hubCommunicator.SendStatusToHub(AgentStatusFactory.BuildStatus(_allPackagesList, AgentCache, _installCache, _runningTasks,
-                                                                                _settingsManager));
-            AgentCache.OnUpdateFinished +=
-                (sender, args) =>
-                _hubCommunicator.SendStatusToHub(AgentStatusFactory.BuildStatus(_allPackagesList, AgentCache, _installCache, _runningTasks,
-                                                                                _settingsManager));
         }
 
         ~PackageDownloadingService()
@@ -101,6 +95,7 @@ namespace Deployd.Agent.Services.PackageDownloading
             _allPackagesList.AddRange(_packageRepository.GetPackages());
             _logger.Debug("added {0} packages to all packages list", _allPackagesList.Count);
 
+            List<IPackage> toUpdate = new List<IPackage>();
             foreach (var packageId in packages)
             {
                 IPackage latestPackage = null;
@@ -117,7 +112,21 @@ namespace Deployd.Agent.Services.PackageDownloading
                 if (latestPackage == null)
                     continue;
 
-                AgentCache.Add(latestPackage);
+                if (AgentCache.CachedVersionExistsAndIsUpToDate(latestPackage))
+                    continue;
+
+                toUpdate.Add(latestPackage);
+            }
+            _currentlyDownloadingList.AddRange(toUpdate.Select(p=>p.Title));
+            _hubCommunicator.SendStatusToHub(AgentStatusFactory.BuildStatus(_allPackagesList, AgentCache, _installCache, _runningTasks,
+                                                                                _settingsManager, _currentlyDownloadingList));
+
+            foreach(var package in toUpdate)
+            {
+                AgentCache.Add(package);
+                _currentlyDownloadingList.RemoveAll(p=>p.Equals(package.Title, StringComparison.InvariantCulture));
+                _hubCommunicator.SendStatusToHub(AgentStatusFactory.BuildStatus(_allPackagesList, AgentCache, _installCache, _runningTasks,
+                                                                                    _settingsManager, _currentlyDownloadingList));
             }
         }
     }

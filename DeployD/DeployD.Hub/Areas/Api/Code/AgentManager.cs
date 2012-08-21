@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
+using System.Xml;
+using System.Xml.Serialization;
 using DeployD.Hub.Areas.Api.Models;
 using Deployd.Core;
 using Ninject.Extensions.Logging;
@@ -66,6 +69,11 @@ namespace DeployD.Hub.Areas.Api.Code
 
         public void ReceiveStatus(string hostname, AgentStatusReport agentStatus)
         {
+            if (agentStatus.updating != null)
+            {
+                _logger.Debug("agent {0} report: {1}", hostname, string.Join(", ", agentStatus.updating.ToArray()));
+            }
+
             var agent = GetAgent(hostname) ?? RegisterAgent(hostname);
             _ravenSession.Advanced.Refresh(agent);
 
@@ -87,7 +95,7 @@ namespace DeployD.Hub.Areas.Api.Code
                                          currentTask = p.CurrentTask,
                                          installedVersion = p.InstalledVersion,
                                          packageId = p.PackageId,
-                                         installed = p.Installed
+                                         installed = p.Installed,
                                      }).ToList();
             }
             agent.CurrentTasks = agentStatus.currentTasks;
@@ -95,7 +103,11 @@ namespace DeployD.Hub.Areas.Api.Code
             agent.Environment = agentStatus.environment;
             agent.Contacted = true;
             agent.LastContact = DateTime.Now;
-            agent.Updating = agentStatus.updating;
+            agent.Updating = agentStatus.updating ?? new List<string>();
+            if (agent.Updating.Count > 0)
+            {
+                agent.ShowUpdatingStatusUntil = DateTime.Now.AddSeconds(5);
+            }
             _ravenSession.Store(agent);
             System.Diagnostics.Debug.WriteLine("Update agent");
 

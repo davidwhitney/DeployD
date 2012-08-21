@@ -35,7 +35,7 @@
     <BootstrapperEnabled>true</BootstrapperEnabled>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
-    <PlatformTarget>x64</PlatformTarget>
+    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -163,6 +163,7 @@
     <Compile Include="Services\InstallationService\PackageInstallationService.cs" />
     <Compile Include="Services\Management\ManagementInterfaceHost.cs" />
     <Compile Include="Services\PackageDownloading\AllPackagesList.cs" />
+    <Compile Include="Services\PackageDownloading\CurrentlyDownloadingList.cs" />
     <Compile Include="Services\PackageDownloading\PackageDownloadingService.cs" />
     <Compile Include="Program.cs">
       <SubType>Component</SubType>

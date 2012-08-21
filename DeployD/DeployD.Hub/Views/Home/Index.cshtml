@@ -64,6 +64,10 @@
                 <%if (currentTasks && currentTasks.length>0) {%>
                     <img src='/content/images/working.gif' />
                 <%}
+                
+                if (isUpdating) {%>
+                    <img src='/content/images/downloading.gif' />
+                <%}
             }%>
         </span>
         <div class="agent-detail">

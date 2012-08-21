@@ -24,5 +24,8 @@ namespace Deployd.Core
 
         [DataMember(Name="outOfDate")]
         public bool OutOfDate { get; set; }
+
+        [DataMember(Name="isUpdating")]
+        public bool isUpdating { get; set; }
     }
 }

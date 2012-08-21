@@ -192,6 +192,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Content\images\downloading.gif" />
     <Content Include="Content\images\delete.png" />
     <Content Include="Content\images\working.gif" />
     <Content Include="Content\Site.css" />

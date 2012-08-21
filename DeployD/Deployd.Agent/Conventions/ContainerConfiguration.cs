@@ -57,6 +57,7 @@ namespace Deployd.Agent.Conventions
             Bind<IDeploymentService>().To<DeploymentService>();
             Bind<IInstalledPackageArchive>().To<InstalledPackageArchive>();
             Bind<IPackagesList>().To<AllPackagesList>().InSingletonScope();
+            Bind<ICurrentlyDownloadingList>().To<CurrentlyDownloadingList>().InSingletonScope();
 
             // installations management
             Bind<IInstallationManager>().To<InstallationManager>().InSingletonScope();

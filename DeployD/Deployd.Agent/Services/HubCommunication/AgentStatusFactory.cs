@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Deployd.Agent.Services.PackageDownloading;
 using Deployd.Core;
 using Deployd.Core.AgentConfiguration;
 using Deployd.Core.Installation;
@@ -12,7 +13,7 @@ namespace Deployd.Agent.Services.HubCommunication
 {
     public static class AgentStatusFactory
     {
-        public static AgentStatusReport BuildStatus(IPackagesList availablePackages, ILocalPackageCache packageCache, IInstalledPackageArchive installCache, RunningInstallationTaskList runningTasks, IAgentSettingsManager settingsManager)
+        public static AgentStatusReport BuildStatus(IPackagesList availablePackages, ILocalPackageCache packageCache, IInstalledPackageArchive installCache, RunningInstallationTaskList runningTasks, IAgentSettingsManager settingsManager, ICurrentlyDownloadingList currentlyDownloadingList)
         {
             var status= new AgentStatusReport
                        {
@@ -31,6 +32,8 @@ namespace Deployd.Agent.Services.HubCommunication
                                                 availablePackages.Select(p => p.Version.ToString()).Distinct().OrderByDescending(s => s).ToList()
                                                 : new List<string>(),
                            environment = settingsManager.Settings.DeploymentEnvironment,
+                           updating = currentlyDownloadingList.Select(s=>s).ToList(),
+                           isUpdating = currentlyDownloadingList.Downloading
                        };
 
             status.OutOfDate =
