@@ -48,7 +48,10 @@ namespace DeployD.Hub.Areas.Api.Controllers
             List<AgentRecord> agents = _agentManager.ListAgents();
                 agents = agents.Where(a => a.Approved || includeUnapproved.Value) 
                     .ToList(); 
-            var viewModel = agents.Select(AutoMapper.Mapper.Map<AgentRecord, AgentViewModel>).ToList();
+            var viewModel = agents
+                .Select(AutoMapper.Mapper.Map<AgentRecord, AgentViewModel>)
+                .OrderBy(a=>a.id)
+                .ToList();
 
             return _httpChannel.RepresentationOf(viewModel, HttpContext);
         }
