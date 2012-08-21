@@ -17,47 +17,53 @@ namespace Deployd.Core.Installation.Hooks
             return true;
         }
 
+        public override void BeforeDeploy(DeploymentContext context, Action<ProgressReport> reportProgress)
+        {
+            
+        }
+
         public override void AfterDeploy(DeploymentContext context, Action<ProgressReport> reportProgress)
+        {
+            FindAndTransformAppropriateConfiguration(context, reportProgress);
+        }
+
+        private void FindAndTransformAppropriateConfiguration(DeploymentContext context, Action<ProgressReport> reportProgress)
         {
             var installationLogger = context.GetLoggerFor(this);
 
             reportProgress(new ProgressReport(context, GetType(), "Transforming configuration files"));
 
             //  find base config files
+            string baseConfigurationFileName = "app.config";
+            string expectedTransformFileName = string.Format("app.{0}{1}",
+                                                             AgentSettingsManager.Settings.DeploymentEnvironment,
+                                                             Path.GetExtension(baseConfigurationFileName));
+            string outputFileName = string.Format("{0}.exe.config", context.Package.Title);
+
             if (context.Package.Tags.ToLower().Split(' ', ',', ';').Contains("website"))
             {
+                baseConfigurationFileName = "web.config";
+                expectedTransformFileName = string.Format("web.{0}.config", AgentSettingsManager.Settings.DeploymentEnvironment);
+                outputFileName = "web.config";
+            }
+            var baseConfigurationPath = Path.Combine(context.WorkingFolder + "\\config", baseConfigurationFileName);
+            var transformFilePath = Path.Combine(context.WorkingFolder + "\\config", expectedTransformFileName);
+            
+            if (!File.Exists(baseConfigurationPath))
+            {
+                installationLogger.DebugFormat("Config file not found, expected {0}", baseConfigurationPath);
             }
 
-            var configFiles = context.Package.GetFiles().Where(f=>f.Path.ToLower().StartsWith("config\\", StringComparison.InvariantCultureIgnoreCase));
-
-            foreach(var configFile in configFiles)
+            // find a matching transform
+            if (File.Exists(transformFilePath))
             {
-                var expectedTransformFileName = string.Format("{0}.{1}{2}",
-                    Path.GetFileNameWithoutExtension(configFile.Path),
-                    AgentSettingsManager.Settings.DeploymentEnvironment,
-                    Path.GetExtension(configFile.Path));
-
-
-                var baseConfigurationPath = Path.Combine(context.WorkingFolder, configFile.Path);
-                var transformFilePath = Path.Combine(context.WorkingFolder, Path.Combine(Path.GetDirectoryName(configFile.Path), expectedTransformFileName));
-                var outputPath = Path.Combine(context.TargetInstallationFolder, configFile.Path);
-
-                installationLogger.DebugFormat("looking for {0}", transformFilePath);
-                
-                if (File.Exists(transformFilePath))
-                {
-                    // todo: perform transform here
-                    installationLogger.InfoFormat(@"Transform ""{0}"" using ""{1}"" to ""{2}""", baseConfigurationPath, transformFilePath, outputPath);
-                    var transformArgs = string.Format(@"--source=""{0}"" --transform=""{1}"" --destination=""{2}""", 
-                        baseConfigurationPath,
-                        transformFilePath,
-                        outputPath);
-                    RunProcess(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"tools\TransformVsConfiguration.exe"), transformArgs, installationLogger);
-                } 
-                else
-                {
-                    installationLogger.DebugFormat("No transform found for {0}", baseConfigurationPath);
-                }
+                var outputPath = Path.Combine(context.TargetInstallationFolder, outputFileName);
+                var transformArgs = string.Format(@"--source=""{0}"" --transform=""{1}"" --destination=""{2}""",
+                                                    baseConfigurationPath,
+                                                    transformFilePath,
+                                                    outputPath);
+                RunProcess(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"tools\TransformVsConfiguration.exe"),
+                            transformArgs, installationLogger);
             }
         }
 
