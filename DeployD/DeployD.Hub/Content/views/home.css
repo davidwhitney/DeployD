@@ -64,6 +64,9 @@ ul.tasks li {
     color: rgb(255, 168, 0);
     font-weight: bold;
 }
+.notinstalled {
+    color: gray;   
+}
 div.agent-detail {
     display: none;
 }

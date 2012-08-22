@@ -138,6 +138,8 @@
                 statusClass=package.currentTask.status;
             } else if (package.outOfDate) {
                 statusClass="outofdate";
+            } else if (!package.installed) {
+                statusClass="notinstalled";
             } else {
                 statusClass="uptodate";
             }%>
