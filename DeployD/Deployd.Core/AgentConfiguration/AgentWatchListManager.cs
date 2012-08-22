@@ -16,15 +16,20 @@ namespace Deployd.Core.AgentConfiguration
     public class AgentWatchListManager : IAgentWatchListManager
     {
         private static object _fileLock=new object();
+        private AgentWatchList _watchList;
         public IAgentWatchList Build()
         {
-            lock (_fileLock)
+            if (_watchList == null)
             {
-                using (var fs = new FileStream("~\\watchList.config".MapVirtualPath(), FileMode.Open))
+                lock (_fileLock)
                 {
-                    return (AgentWatchList)new XmlSerializer(typeof(AgentWatchList)).Deserialize(fs);
+                    using (var fs = new FileStream("~\\watchList.config".MapVirtualPath(), FileMode.Open))
+                    {
+                        _watchList = (AgentWatchList) new XmlSerializer(typeof (AgentWatchList)).Deserialize(fs);
+                    }
                 }
             }
+            return _watchList;
         }
 
         public void SaveWatchList(IAgentWatchList agentWatchList)

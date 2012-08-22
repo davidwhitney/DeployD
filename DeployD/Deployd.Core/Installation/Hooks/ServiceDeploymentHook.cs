@@ -145,8 +145,10 @@ namespace Deployd.Core.Installation.Hooks
                     ChangeServiceStateTo(service, ServiceControllerStatus.Running, service.Start, logger);
                 }
             }
-            catch
+            catch (Exception exception)
             {
+                reportProgress(ProgressReport.Error(context, this, context.Package.Title, context.Package.Version.ToString(), context.InstallationTaskId, "Failed to install or start service " + serviceName, exception));
+                throw;
             }
         }
 
