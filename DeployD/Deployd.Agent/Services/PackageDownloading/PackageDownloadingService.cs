@@ -76,9 +76,6 @@ namespace Deployd.Agent.Services.PackageDownloading
             {
                 _logger.Debug(package);
             }
-
-            // do an initial check/fetch
-            FetchPackages();
         }
 
         public void Stop()
