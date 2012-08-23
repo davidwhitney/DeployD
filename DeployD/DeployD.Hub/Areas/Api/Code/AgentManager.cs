@@ -96,6 +96,7 @@ namespace DeployD.Hub.Areas.Api.Code
                                          installedVersion = p.InstalledVersion,
                                          packageId = p.PackageId,
                                          installed = p.Installed,
+                                         installationResult = p.InstallationResult
                                      }).ToList();
             }
             agent.CurrentTasks = agentStatus.currentTasks;

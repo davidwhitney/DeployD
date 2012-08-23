@@ -35,7 +35,7 @@ namespace Deployd.Core.Installation
         [IgnoreDataMember]
         public List<ProgressReport> ProgressReports { get; private set; }
         [DataMember(Name = "lastMessage")]
-        public string LastMessage { get { return ProgressReports.Count > 0 ? ProgressReports.Last().Message : ""; } }
+        public string LastMessage { get { return ProgressReports.Count > 0 ? ProgressReports.Last().Message : ""; } set { }}
         [DataMember(Name = "hasErrors")]
         public bool HasErrors { get; set; }
         [IgnoreDataMember]
@@ -46,5 +46,7 @@ namespace Deployd.Core.Installation
         public DateTime DateStarted { get; set; }
         [DataMember(Name = "dateCompleted")]
         public DateTime DateCompleted { get; set; }
+        [DataMember(Name="installationResult")]
+        public InstallationResult Result { get; set; }
     }
 }

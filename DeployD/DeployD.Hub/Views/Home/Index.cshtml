@@ -84,9 +84,13 @@
                 var listClass="";
                 if (package.currentTask) {
                     listClass=package.currentTask.status;
+                }
+                if (package.installationResult && package.installationResult.failed)
+                {
+                    listClass="failed";
                 }%>
                 
-                <%if (package.installed || package.currentTask) {%>
+                <%if (package.installed || package.currentTask || package.installationResult) {%>
                     <li class="package <%=listClass%>">
                         <%=package.packageId%>
                         <%if (package.currentTask) {%>
@@ -96,6 +100,16 @@
                         <%} else if (package.installed){%>
                             <span class="<%if (package.outOfDate) {%>outofdate<%} else {%>uptodate<%}%>">
                                  <%=package.installedVersion%>
+                            </span>
+                        <%}
+                        
+                        if (package.installationResult) {%>
+                            <span>
+                                <%if (package.installationResult.failed) {%>
+                                    Failed
+                                <%} else {%>
+                                    Succeeded
+                                <%}%>
                             </span>
                         <%}%>
                     </li>

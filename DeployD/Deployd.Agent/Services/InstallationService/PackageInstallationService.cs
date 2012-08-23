@@ -125,17 +125,16 @@ namespace Deployd.Agent.Services.InstallationService
 
         private void StartInstall(InstallationTask nextPendingInstall)
         {
-            nextPendingInstall.Task = new Task<InstallationResult>(() =>
-            {
+            nextPendingInstall.Task = new Task<InstallationResult>(() => 
                 _deploymentService.InstallPackage(nextPendingInstall.PackageId, nextPendingInstall.Version, Guid.NewGuid().ToString(), new CancellationTokenSource(),
-                                                    progressReport => HandleProgressReport(nextPendingInstall, progressReport));
-                return new InstallationResult();
-            });
+                                                                                            progressReport => HandleProgressReport(nextPendingInstall, progressReport)));
 
             nextPendingInstall.Task
                 .ContinueWith(RemoveFromRunningInstallationList)
                 .ContinueWith(task => _logger.Error(task.Exception, "Installation task failed."), TaskContinuationOptions.OnlyOnFaulted);
+
             _logger.Debug("Installation task queued");
+
             nextPendingInstall.Task.Start();
         }
 
@@ -175,14 +174,14 @@ namespace Deployd.Agent.Services.InstallationService
 
             if (progressReport.Exception == null)
             {
-                _hubCommunicator.SendStatusToHubAsync(AgentStatusFactory.BuildStatus(_allPackagesList, _agentCache, _installCache, _runningTasks, _settingsManager, _currentlyDownloadingList));
+                _hubCommunicator.SendStatusToHubAsync(AgentStatusFactory.BuildStatus(_allPackagesList, _agentCache, _installCache, _runningTasks, _settingsManager, _currentlyDownloadingList, CompletedInstalls));
                 return;
             }
 
             installationTask.HasErrors = true;
             installationTask.Errors.Add(progressReport.Exception);
 
-            _hubCommunicator.SendStatusToHubAsync(AgentStatusFactory.BuildStatus(_allPackagesList, _agentCache, _installCache, _runningTasks, _settingsManager, _currentlyDownloadingList));
+            _hubCommunicator.SendStatusToHubAsync(AgentStatusFactory.BuildStatus(_allPackagesList, _agentCache, _installCache, _runningTasks, _settingsManager, _currentlyDownloadingList, CompletedInstalls));
         }
 
         private void RemoveFromRunningInstallationList(Task<InstallationResult> completedInstallationTask)
@@ -192,7 +191,9 @@ namespace Deployd.Agent.Services.InstallationService
             {
                 RunningInstalls.Remove(installationTask);
             }
+            
             CompletedInstalls.Add(installationTask);
+            _hubCommunicator.SendStatusToHubAsync(AgentStatusFactory.BuildStatus(_allPackagesList, _agentCache, _installCache, _runningTasks, _settingsManager, _currentlyDownloadingList, CompletedInstalls));
         }
     }
 }

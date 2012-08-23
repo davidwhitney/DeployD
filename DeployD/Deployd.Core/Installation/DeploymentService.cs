@@ -37,18 +37,18 @@ namespace Deployd.Core.Installation
             _nugetPackageQuery = nugetPackageQuery;
         }
 
-        public void InstallPackage(string packageId, string taskId, CancellationTokenSource cancellationToken, Action<ProgressReport> reportProgress)
+        public InstallationResult InstallPackage(string packageId, string taskId, CancellationTokenSource cancellationToken, Action<ProgressReport> reportProgress)
         {
-            InstallPackage(packageId, () => _packageCache.GetLatestVersion(packageId), cancellationToken, reportProgress, taskId);
+            return InstallPackage(packageId, () => _packageCache.GetLatestVersion(packageId), cancellationToken, reportProgress, taskId);
         }
 
-        public void InstallPackage(string packageId, string specificVersion, string taskId, CancellationTokenSource cancellationToken, Action<ProgressReport> reportProgress)
+        public InstallationResult InstallPackage(string packageId, string specificVersion, string taskId, CancellationTokenSource cancellationToken, Action<ProgressReport> reportProgress)
         {
             var packageSelector = specificVersion == null || specificVersion == "latest"
                                        ? (Func<IPackage>) (() => _packageCache.GetLatestVersion(packageId))
                                        : (() => LoadOrDownloadSpecificPackageVersion(packageId, specificVersion));
             
-            InstallPackage(packageId, packageSelector, cancellationToken, reportProgress, taskId);
+            return InstallPackage(packageId, packageSelector, cancellationToken, reportProgress, taskId);
         }
 
         private IPackage LoadOrDownloadSpecificPackageVersion(string packageId, string specificVersion)
@@ -126,21 +126,26 @@ namespace Deployd.Core.Installation
             }
         }
 
-        public void InstallPackage(string packageId, Func<IPackage> selectionCriteria, CancellationTokenSource cancellationToken, Action<ProgressReport> reportProgress, string taskId)
+        public InstallationResult InstallPackage(string packageId, Func<IPackage> selectionCriteria, CancellationTokenSource cancellationToken, Action<ProgressReport> reportProgress, string taskId)
         {
             var package = selectionCriteria();
 
             if (package ==null)
             {
                 Logger.Debug("No package matching criteria could be found, aborting");
-                return;
+
+                return new InstallationResult(){Failed=true};
             }
 
             Logger.Debug("Installing {0} {1}", package.Title, package.Version);
             if (Deploy(taskId, package, cancellationToken, reportProgress))
             {
                 WriteInstallMarker(package);
+
+                return new InstallationResult() { Failed = false};
             }
+
+            return new InstallationResult(){Failed = true};
         }
 
         private void WriteInstallMarker(IPackage package)

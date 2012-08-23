@@ -3,6 +3,7 @@ using System.Threading;
 using Deployd.Agent.Services.AgentConfiguration;
 using Deployd.Agent.Services.PackageDownloading;
 using Deployd.Core.AgentConfiguration;
+using Deployd.Core.Installation;
 using Deployd.Core.PackageCaching;
 using Deployd.Core.PackageTransport;
 using Deployd.Core.Remoting;
@@ -26,6 +27,7 @@ namespace Deployd.Agent.Test.Unit.Services.PackageDownloading
         private Mock<IHubCommunicator> _hubCommunicator;
         private Mock<IPackageRepositoryFactory> _packageRepositoryFactory = new Mock<IPackageRepositoryFactory>();
         private Mock<ICurrentlyDownloadingList> _currentlyDownloadingList = new Mock<ICurrentlyDownloadingList>();
+        private Mock<CompletedInstallationTaskList> _installationResultDictionary = new Mock<CompletedInstallationTaskList>();
         private IPackagesList _allPackagesList;
         private const string PACKAGE_ID = "packageId";
 
@@ -42,7 +44,7 @@ namespace Deployd.Agent.Test.Unit.Services.PackageDownloading
             _installCached = new Mock<IInstalledPackageArchive>();
 
             _pds = new PackageDownloadingService(_agentSettings.Object, _packageRepoMock.Object, _packageCacheMock.Object,
-                _agentConfigManagerMock.Object, _logger.Object, _hubCommunicator.Object, _installCached.Object, _packageRepositoryFactory.Object, _allPackagesList, _currentlyDownloadingList.Object);
+                _agentConfigManagerMock.Object, _logger.Object, _hubCommunicator.Object, _installCached.Object, _packageRepositoryFactory.Object, _allPackagesList, _currentlyDownloadingList.Object, _installationResultDictionary.Object);
             _allPackagesList = new AllPackagesList(_agentConfigManagerMock.Object, _agentSettings.Object.Settings);
         }
 

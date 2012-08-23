@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Text;
 using System.Threading.Tasks;
 using Deployd.Core.AgentConfiguration;
 using Ninject.Extensions.Logging;
@@ -52,6 +53,14 @@ namespace Deployd.Core.Remoting
                         requestStream.Flush();
                         requestStream.Close();
                     }
+
+                    ms.Position = 0;
+                    if (status.packages.Any(p => p.InstallationResult != null))
+                    {
+                        byte[] json = ms.ToArray();
+                        _log.Debug(Encoding.UTF8.GetString(json, 0, json.Length));
+                    }
+                    ms.Close();
                 }
             }
             catch (Exception ex)

@@ -31,6 +31,7 @@ namespace Deployd.Agent.Services.HubCommunication
         private readonly IAgentSettingsManager _settingsManager;
         private readonly ILogger _logger;
         private readonly CurrentlyDownloadingList _currentlyDownloadingList;
+        private CompletedInstallationTaskList CompletedInstalls;
 
         public HubCommunicationService(IHubCommunicator hubCommunicator,
             IPackagesList allPackagesList, 
@@ -39,7 +40,8 @@ namespace Deployd.Agent.Services.HubCommunication
             RunningInstallationTaskList runningTasks, 
             IAgentSettingsManager settingsManager, 
             ILogger logger,
-            CurrentlyDownloadingList currentlyDownloadingList)
+            CurrentlyDownloadingList currentlyDownloadingList,
+            CompletedInstallationTaskList completedInstalls)
         {
             _hubCommunicator = hubCommunicator;
             _allPackagesList = allPackagesList;
@@ -49,6 +51,7 @@ namespace Deployd.Agent.Services.HubCommunication
             _settingsManager = settingsManager;
             _logger = logger;
             _currentlyDownloadingList = currentlyDownloadingList;
+            CompletedInstalls = completedInstalls;
         }
 
         ~HubCommunicationService()
@@ -69,7 +72,7 @@ namespace Deployd.Agent.Services.HubCommunication
 
         public void SendStatusToHub(object sender, ElapsedEventArgs e)
         {
-            _hubCommunicator.SendStatusToHub(AgentStatusFactory.BuildStatus(_allPackagesList, _localPackageCache, _installCache, _runningTasks, _settingsManager, _currentlyDownloadingList));
+            _hubCommunicator.SendStatusToHub(AgentStatusFactory.BuildStatus(_allPackagesList, _localPackageCache, _installCache, _runningTasks, _settingsManager, _currentlyDownloadingList, CompletedInstalls));
         }
 
         public void Stop()

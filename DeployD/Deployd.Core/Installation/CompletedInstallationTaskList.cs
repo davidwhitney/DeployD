@@ -8,11 +8,14 @@ namespace Deployd.Core.Installation
         private static ILog _logger = LogManager.GetLogger(typeof (CompletedInstallationTaskList));
         public new void Add(InstallationTask task)
         {
+            task.Result = task.Task.Result;
             _logger.InfoFormat("Disposing of task {0}", task.Task.Id);
             task.Task.Dispose();
             task.Task = null;
             task.ProgressReports.Clear();
             
+            base.Add(task);
+
         }
     }
 }

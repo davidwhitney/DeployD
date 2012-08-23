@@ -25,5 +25,7 @@ namespace Deployd.Core
         public string[] Tags { get; set; }
         [DataMember(Name="outOfDate")]
         public bool OutOfDate { get; set; }
+        [DataMember(Name="installationResult")]
+        public InstallationResult InstallationResult { get; set; }
     }
 }

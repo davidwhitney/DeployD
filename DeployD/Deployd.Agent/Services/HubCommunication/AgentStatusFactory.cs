@@ -13,7 +13,7 @@ namespace Deployd.Agent.Services.HubCommunication
 {
     public static class AgentStatusFactory
     {
-        public static AgentStatusReport BuildStatus(IPackagesList availablePackages, ILocalPackageCache packageCache, IInstalledPackageArchive installCache, RunningInstallationTaskList runningTasks, IAgentSettingsManager settingsManager, ICurrentlyDownloadingList currentlyDownloadingList)
+        public static AgentStatusReport BuildStatus(IPackagesList availablePackages, ILocalPackageCache packageCache, IInstalledPackageArchive installCache, RunningInstallationTaskList runningTasks, IAgentSettingsManager settingsManager, ICurrentlyDownloadingList currentlyDownloadingList, CompletedInstallationTaskList completedInstallations)
         {
             // copying these collections to variables because sometimes they get modified while building the status report object
             string[] updating = new string[currentlyDownloadingList != null ? currentlyDownloadingList.Count : 0];
@@ -29,17 +29,28 @@ namespace Deployd.Agent.Services.HubCommunication
             InstallationTask[] tasks=new InstallationTask[runningTasks != null ? runningTasks.Count : 0];
             if (runningTasks != null) runningTasks.CopyTo(tasks);
 
-            var status= new AgentStatusReport
+            var status = new AgentStatusReport
                        {
-                           packages = BuildPackageInformation(watchedPackages, installCache, tasks),
-                           currentTasks = tasks.Select(t => new InstallTaskViewModel()
-                                                                       {
-                                                                           Messages = t.ProgressReports.Select(pr => pr.Message).ToArray(),
-                                                                           Status = Enum.GetName(typeof(TaskStatus), t.Task.Status),
-                                                                           PackageId = t.PackageId,
-                                                                           Version = t.Version,
-                                                                           LastMessage = t.ProgressReports.Count > 0 ? t.ProgressReports.LastOrDefault().Message : ""
-                                                                       }).ToList(),
+                           packages = BuildPackageInformation(watchedPackages, installCache, tasks, completedInstallations),
+                           currentTasks = tasks.Select(t =>
+                                                           {
+                                                               var installation = new InstallTaskViewModel();
+                                                               installation.Messages =
+                                                                   t.ProgressReports.Select(pr => pr.Message).ToArray();
+                                                               if (t.Task != null)
+                                                               {
+                                                                   installation.Status =
+                                                                       Enum.GetName(typeof (TaskStatus), t.Task.Status);
+                                                               }
+                                                               installation.PackageId = t.PackageId;
+                                                               installation.Version = t.Version;
+                                                               installation.LastMessage = t.ProgressReports.Count > 0
+                                                                                              ? t.ProgressReports.
+                                                                                                    LastOrDefault().
+                                                                                                    Message
+                                                                                              : "";
+                                                               return installation;
+                                                           }).ToList(),
                            availableVersions = packages.Select(p => p.Version.ToString()).Distinct().OrderByDescending(s => s).ToList(),
                            environment = settingsManager.Settings.DeploymentEnvironment,
                            updating = updating.ToList(),
@@ -52,7 +63,7 @@ namespace Deployd.Agent.Services.HubCommunication
             return status;
         }
 
-        private static List<LocalPackageInformation> BuildPackageInformation(IEnumerable<IPackage> packages, IInstalledPackageArchive installCache, InstallationTask[] runningTasks)
+        private static List<LocalPackageInformation> BuildPackageInformation(IEnumerable<IPackage> packages, IInstalledPackageArchive installCache, InstallationTask[] runningTasks, CompletedInstallationTaskList completedInstallations)
         {
             List<LocalPackageInformation> packageInformations = new List<LocalPackageInformation>();
             var packagesById = packages.GroupBy(p=>p.Id);
@@ -81,14 +92,21 @@ namespace Deployd.Agent.Services.HubCommunication
                     packageInfo.AvailableVersions = availablePackageVersions.ToList();
 
                 if (currentTasks != null)
-                    packageInfo.CurrentTask = currentTasks.Select(t => new InstallTaskViewModel()
-                    {
-                        Messages = t.ProgressReports.Select(pr => pr.Message).ToArray(),
-                        Status = Enum.GetName(typeof (TaskStatus), t.Task.Status),
-                        PackageId = t.PackageId,
-                        Version = t.Version,
-                        LastMessage = t.ProgressReports.Count > 0 ? t.ProgressReports.LastOrDefault ().Message : ""
-                    }).FirstOrDefault();
+                    packageInfo.CurrentTask = currentTasks.Select(delegate(InstallationTask t)
+                                    {
+                                        var installation = new InstallTaskViewModel();
+                                        installation.Messages = t.ProgressReports.Select(pr => pr.Message).ToArray();
+                                        if (t.Task != null)
+                                        {
+                                            installation.Status = Enum.GetName(typeof (TaskStatus), t.Task.Status);
+                                        }
+                                        installation.PackageId = t.PackageId;
+                                        installation.Version = t.Version;
+                                        installation.LastMessage = t.ProgressReports.Count > 0
+                                                               ? t.ProgressReports.LastOrDefault().Message
+                                                               : "";
+                            return installation;
+                        }).FirstOrDefault();
 
                 packageInfo.OutOfDate = false;
                 if (installedPackage != null)
@@ -102,6 +120,17 @@ namespace Deployd.Agent.Services.HubCommunication
                     if (latestAvailablePackage != null)
                     {
                         packageInfo.OutOfDate = true;
+                    }
+                }
+
+                if (completedInstallations != null)
+                {
+                    var installationTask =
+                        completedInstallations.OrderByDescending(i => i.DateStarted).FirstOrDefault(
+                            i => i.PackageId == packageInfo.PackageId);
+                    if (installationTask != null)
+                    {
+                        packageInfo.InstallationResult = installationTask.Result;
                     }
                 }
 

@@ -33,6 +33,7 @@ namespace Deployd.Agent.Services.PackageDownloading
         private readonly IAgentSettingsManager _settingsManager;
         protected readonly IRetrievePackageQuery AllPackagesQuery;
         protected readonly ILocalPackageCache AgentCache;
+        private CompletedInstallationTaskList _installationResults;
 
         public TimedSingleExecutionTask TimedTask { get; private set; }
 
@@ -45,7 +46,7 @@ namespace Deployd.Agent.Services.PackageDownloading
                                          IInstalledPackageArchive installCache,
                                          IPackageRepositoryFactory packageRepositoryFactory,
                                         IPackagesList allPackagesList,
-            ICurrentlyDownloadingList currentlyDownloadingList)
+            ICurrentlyDownloadingList currentlyDownloadingList, CompletedInstallationTaskList installationResults)
         {
             _settingsManager = agentSettingsManager;
             AllPackagesQuery = allPackagesQuery;
@@ -57,6 +58,7 @@ namespace Deployd.Agent.Services.PackageDownloading
             _packageRepository = packageRepositoryFactory.CreateRepository(agentSettingsManager.Settings.NuGetRepository);
             _allPackagesList = allPackagesList;
             _currentlyDownloadingList = currentlyDownloadingList;
+            _installationResults = installationResults;
             TimedTask = new TimedSingleExecutionTask(agentSettingsManager.Settings.PackageSyncIntervalMs, FetchPackages,
                                                      _logger);
         }
@@ -116,14 +118,14 @@ namespace Deployd.Agent.Services.PackageDownloading
             }
             _currentlyDownloadingList.AddRange(toUpdate.Select(p=>p.Title));
             _hubCommunicator.SendStatusToHub(AgentStatusFactory.BuildStatus(_allPackagesList, AgentCache, _installCache, _runningTasks,
-                                                                                _settingsManager, _currentlyDownloadingList));
+                                                                                _settingsManager, _currentlyDownloadingList, _installationResults));
 
             foreach(var package in toUpdate)
             {
                 AgentCache.Add(package);
                 _currentlyDownloadingList.RemoveAll(p=>p.Equals(package.Title, StringComparison.InvariantCulture));
                 _hubCommunicator.SendStatusToHub(AgentStatusFactory.BuildStatus(_allPackagesList, AgentCache, _installCache, _runningTasks,
-                                                                                    _settingsManager, _currentlyDownloadingList));
+                                                                                    _settingsManager, _currentlyDownloadingList, _installationResults));
             }
         }
     }

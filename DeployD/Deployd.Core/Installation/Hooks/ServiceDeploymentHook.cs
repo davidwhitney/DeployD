@@ -108,47 +108,39 @@ namespace Deployd.Core.Installation.Hooks
             var serviceName = DetermineServiceName(context, pathToExecutable, logger);
 
             // if no such service then install it
-            try
+            using (var service = GetServiceByNameOrDisplayName(serviceName))
             {
-                using (var service = GetServiceByNameOrDisplayName(serviceName))
+                if (service == null)
                 {
-                    if (service == null)
-                    {
-                        logger.InfoFormat("Installing service {0} from {1}", serviceName, pathToExecutable);
+                    logger.InfoFormat("Installing service {0} from {1}", serviceName, pathToExecutable);
 
-                        ManagedInstallerClass.InstallHelper(new[] {pathToExecutable});
-                        serviceName = DetermineServiceName(context, pathToExecutable, logger);
-                    }
-                }
-
-                // check that installation succeeded
-                using (var service = GetServiceByNameOrDisplayName(serviceName))
-                {
-                    // it didn't... installutil might be presenting a credentials dialog on the terminal
-                    if (service == null)
-                    {
-                        throw new InstallException(
-                            string.Format(
-                                "The executable {0} was installed, so a service named '{1}' was expected but it could not be found",
-                                Path.GetFileNameWithoutExtension(pathToExecutable), serviceName));
-                    }
-                }
-
-                using (var service = GetServiceByNameOrDisplayName(serviceName))
-                {
-                    if (!service.Status.Equals(ServiceControllerStatus.Stopped) &&
-                        !service.Status.Equals(ServiceControllerStatus.StopPending))
-                    {
-                        return;
-                    }
-
-                    ChangeServiceStateTo(service, ServiceControllerStatus.Running, service.Start, logger);
+                    ManagedInstallerClass.InstallHelper(new[] {pathToExecutable});
+                    serviceName = DetermineServiceName(context, pathToExecutable, logger);
                 }
             }
-            catch (Exception exception)
+
+            // check that installation succeeded
+            using (var service = GetServiceByNameOrDisplayName(serviceName))
             {
-                reportProgress(ProgressReport.Error(context, this, context.Package.Title, context.Package.Version.ToString(), context.InstallationTaskId, "Failed to install or start service " + serviceName, exception));
-                throw;
+                // it didn't... installutil might be presenting a credentials dialog on the terminal
+                if (service == null)
+                {
+                    throw new InstallException(
+                        string.Format(
+                            "The executable {0} was installed, so a service named '{1}' was expected but it could not be found",
+                            Path.GetFileNameWithoutExtension(pathToExecutable), serviceName));
+                }
+            }
+
+            using (var service = GetServiceByNameOrDisplayName(serviceName))
+            {
+                if (!service.Status.Equals(ServiceControllerStatus.Stopped) &&
+                    !service.Status.Equals(ServiceControllerStatus.StopPending))
+                {
+                    return;
+                }
+
+                ChangeServiceStateTo(service, ServiceControllerStatus.Running, service.Start, logger);
             }
         }
 

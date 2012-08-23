@@ -67,6 +67,9 @@ ul.tasks li {
 .notinstalled {
     color: gray;   
 }
+.failed {
+    color: red;
+}
 div.agent-detail {
     display: none;
 }

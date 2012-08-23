@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using Deployd.Core.Installation;
 
 namespace Deployd.Core
 {
@@ -10,6 +11,7 @@ namespace Deployd.Core
         public bool installed { get; set; }
         public string installedVersion { get; set; }
         public InstallTaskViewModel currentTask { get; set; }
+        public InstallationResult installationResult { get; set; }
         public string latestVersion
         {
             get { return availableVersions.Max(v => Version.Parse(v)).ToString(); }
