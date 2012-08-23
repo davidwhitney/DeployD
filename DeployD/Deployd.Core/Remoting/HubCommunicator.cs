@@ -53,14 +53,6 @@ namespace Deployd.Core.Remoting
                         requestStream.Flush();
                         requestStream.Close();
                     }
-
-                    ms.Position = 0;
-                    if (status.packages.Any(p => p.InstallationResult != null))
-                    {
-                        byte[] json = ms.ToArray();
-                        _log.Debug(Encoding.UTF8.GetString(json, 0, json.Length));
-                    }
-                    ms.Close();
                 }
             }
             catch (Exception ex)
