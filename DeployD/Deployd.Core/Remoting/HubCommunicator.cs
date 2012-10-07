@@ -34,9 +34,21 @@ namespace Deployd.Core.Remoting
 
         public void SendStatusToHub(AgentStatusReport status)
         {
-            var _pingRequest = HttpWebRequest.Create(string.Format("{0}/api/agent/{1}/status",
+            if (string.IsNullOrWhiteSpace(_agentSettingsManager.Settings.HubAddress))
+                return;
+
+
+            HttpWebRequest _pingRequest = null;
+            try
+            {
+                _pingRequest = HttpWebRequest.Create(string.Format("{0}/api/agent/{1}/status",
                                                                    _agentSettingsManager.Settings.HubAddress,
                                                                    Environment.MachineName)) as HttpWebRequest;
+            } catch (Exception ex)
+            {
+                _log.Warn("{0} doesn't appear to be a valid address for the DeployD hub", _agentSettingsManager.Settings.HubAddress);
+                return;
+            }
             _pingRequest.Method = "POST";
             _pingRequest.ContentType = "application/json";
 
