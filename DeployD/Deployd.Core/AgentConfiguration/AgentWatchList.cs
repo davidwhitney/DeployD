@@ -12,7 +12,14 @@ namespace Deployd.Core.AgentConfiguration
 
         [XmlArray("packages")]
         [XmlArrayItem("package")]
-        public List<string> Packages { get; set; }
+        public List<WatchPackage> Packages { get; set; }
+    }
+
+    [XmlRoot("package")]
+    public class WatchPackage
+    {
+        public string Name { get; set; }
+        public bool AutoDeploy { get; set; }
     }
 
     public class GroupList : List<string>

@@ -51,7 +51,7 @@ namespace Deployd.Agent.Services.AgentConfiguration
             }
 
             if (watchList.Packages != null)
-                packages.AddRange(watchList.Packages);
+                packages.AddRange(watchList.Packages.Select(p=>p.Name));
             
             return packages;
         }

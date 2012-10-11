@@ -40,7 +40,11 @@ namespace Deployd.Agent.WebUi.Modules
                                      var watchSample = new AgentWatchList()
                                                            {
                                                                Groups = new List<string>(new[] { "Web", "Services" }),
-                                                               Packages = new List<string>(new[] { "package1", "package2" })
+                                                               Packages = new List<WatchPackage>(new[]
+                                                                   {
+                                                                       new WatchPackage(){Name="package1"}, 
+                                                                       new WatchPackage(){ Name="package2"}
+                                                                   })
                                                            };
                                      var serializer = new XmlSerializer(typeof (AgentWatchList));
                                      StringBuilder sb = new StringBuilder();

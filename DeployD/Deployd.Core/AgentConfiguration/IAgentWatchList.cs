@@ -8,6 +8,6 @@ namespace Deployd.Core.AgentConfiguration
     public interface IAgentWatchList
     {
         List<string> Groups { get; set; }
-        List<string> Packages { get; set; }
+        List<WatchPackage> Packages { get; set; }
     }
 }
