@@ -34,6 +34,8 @@ namespace Deployd.Agent.Services.PackageDownloading
         protected readonly IRetrievePackageQuery AllPackagesQuery;
         protected readonly ILocalPackageCache AgentCache;
         private CompletedInstallationTaskList _installationResults;
+        private readonly IAgentWatchList _watchList;
+        private readonly IInstallationManager _installationManager;
 
         public TimedSingleExecutionTask TimedTask { get; private set; }
 
@@ -46,7 +48,10 @@ namespace Deployd.Agent.Services.PackageDownloading
                                          IInstalledPackageArchive installCache,
                                          IPackageRepositoryFactory packageRepositoryFactory,
                                         IPackagesList allPackagesList,
-            ICurrentlyDownloadingList currentlyDownloadingList, CompletedInstallationTaskList installationResults)
+            ICurrentlyDownloadingList currentlyDownloadingList, 
+            CompletedInstallationTaskList installationResults,
+            IAgentWatchList watchList,
+            IInstallationManager installationManager)
         {
             _settingsManager = agentSettingsManager;
             AllPackagesQuery = allPackagesQuery;
@@ -59,6 +64,8 @@ namespace Deployd.Agent.Services.PackageDownloading
             _allPackagesList = allPackagesList;
             _currentlyDownloadingList = currentlyDownloadingList;
             _installationResults = installationResults;
+            _watchList = watchList;
+            _installationManager = installationManager;
             TimedTask = new TimedSingleExecutionTask(agentSettingsManager.Settings.PackageSyncIntervalMs, FetchPackages,
                                                      _logger);
         }
@@ -76,7 +83,7 @@ namespace Deployd.Agent.Services.PackageDownloading
             _logger.Debug("Downloading service will download the following packages:");
             foreach(var package in packages)
             {
-                _logger.Debug(package);
+                _logger.Debug("{0} ({1})", package.Name, package.AutoDeploy ? "Auto update" : "Manual update");
             }
         }
 
@@ -95,16 +102,16 @@ namespace Deployd.Agent.Services.PackageDownloading
             _logger.Debug("added {0} packages to all packages list", _allPackagesList.Count);
 
             List<IPackage> toUpdate = new List<IPackage>();
-            foreach (var packageId in packages)
+            foreach (var package in packages)
             {
                 IPackage latestPackage = null;
                 try
                 {
-                    latestPackage = AllPackagesQuery.GetLatestPackage(packageId);
+                    latestPackage = AllPackagesQuery.GetLatestPackage(package.Name);
                 }
                 catch (Exception ex)
                 {
-                    _logger.Error(ex, "Failed to download latest version of " + packageId);
+                    _logger.Error(ex, "Failed to download latest version of " + package.Name);
                     continue;
                 }
 
@@ -126,6 +133,14 @@ namespace Deployd.Agent.Services.PackageDownloading
                 _currentlyDownloadingList.RemoveAll(p=>p.Equals(package.Title, StringComparison.InvariantCulture));
                 _hubCommunicator.SendStatusToHub(AgentStatusFactory.BuildStatus(_allPackagesList, AgentCache, _installCache, _runningTasks,
                                                                                     _settingsManager, _currentlyDownloadingList, _installationResults));
+                var watch = _watchList.Packages.SingleOrDefault(p => p.Name == package.Id);
+                if (watch != null)
+                {
+                    if (watch.AutoDeploy)
+                    {
+                        _installationManager.StartInstall(package.Id, package.Version.Version.ToString());
+                    }
+                }
             }
         }
     }

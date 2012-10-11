@@ -40,9 +40,9 @@ namespace Deployd.Agent.Services.AgentConfiguration
             return Path.Combine(_configurationDefaults.AgentConfigurationFileLocation.MapVirtualPath(), fileName);
         }
 
-        public IList<string> GetWatchedPackages(string environmentName)
+        public IList<WatchPackage> GetWatchedPackages(string environmentName)
         {
-            List<string> packages = new List<string>();
+            var packages = new List<WatchPackage>();
             var watchList = _agentWatchListManager.Build();
             if (watchList.Groups != null)
             {
@@ -51,7 +51,7 @@ namespace Deployd.Agent.Services.AgentConfiguration
             }
 
             if (watchList.Packages != null)
-                packages.AddRange(watchList.Packages.Select(p=>p.Name));
+                packages.AddRange(watchList.Packages);
             
             return packages;
         }

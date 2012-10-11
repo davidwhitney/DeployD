@@ -18,7 +18,9 @@ namespace Deployd.Core.AgentConfiguration
     [XmlRoot("package")]
     public class WatchPackage
     {
+        [XmlAttribute]
         public string Name { get; set; }
+        [XmlAttribute]
         public bool AutoDeploy { get; set; }
     }
 

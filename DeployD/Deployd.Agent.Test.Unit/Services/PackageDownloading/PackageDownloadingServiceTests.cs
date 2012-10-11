@@ -38,7 +38,7 @@ namespace Deployd.Agent.Test.Unit.Services.PackageDownloading
             _agentSettings = new Mock<IAgentSettingsManager>();
             _agentSettings.SetupGet(s=>s.Settings).Returns(new AgentSettings { DeploymentEnvironment = "Staging", PackageSyncIntervalMs = 1 });
             _agentConfigManagerMock = new Mock<IAgentConfigurationManager>();
-            _agentConfigManagerMock.Setup(x => x.GetWatchedPackages(_agentSettings.Object.Settings.DeploymentEnvironment)).Returns(new List<string> { PACKAGE_ID });
+            _agentConfigManagerMock.Setup(x => x.GetWatchedPackages(_agentSettings.Object.Settings.DeploymentEnvironment)).Returns(new List<WatchPackage> { new WatchPackage() { Name = PACKAGE_ID } });
             _packageRepoMock = new Mock<IRetrievePackageQuery>();
             _packageCacheMock = new Mock<ILocalPackageCache>();
             _installCached = new Mock<IInstalledPackageArchive>();

@@ -20,8 +20,8 @@ namespace Deployd.Agent.Services.PackageDownloading
 
         public IEnumerable<IPackage> GetWatched()
         {
-            var watched = _agentConfiguration.GetWatchedPackages(_agentSettings.DeploymentEnvironment);
-            return this.Where(p => watched.Contains(p.Id));
+            var watchedPackages = _agentConfiguration.GetWatchedPackages(_agentSettings.DeploymentEnvironment);
+            return this.Where(p => watchedPackages.Any(watched => watched.Name == p.Id));
         }
     }
 }
