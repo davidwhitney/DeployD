@@ -9,14 +9,14 @@
 		Projects="Deployd.sln"
 		Targets="Clean;Build"
 		BuildInParallel="true"
-		Properties="Configuration=$(Configuration);WixToolPath=$(MSBuildProjectDirectory)\packages\Wix.3.5" />
+		Properties="Configuration=$(Configuration);WixToolPath=$(MSBuildProjectDirectory)\packages\Wix.3.7" />
 </Target>
 
 <Target Name="BuildMsi">
   <Message Text="Building package $(Vdproj)" />
   <msbuild
 	Projects="DeployD.Agent.Setup\DeployD.Agent.Setup.wixproj"
-	Properties="WixToolPath=$(MSBuildProjectDirectory)\packages\Wix.3.6" />
+	Properties="WixToolPath=$(MSBuildProjectDirectory)\packages\Wix.3.7" />
 </Target>
 
 </Project>
