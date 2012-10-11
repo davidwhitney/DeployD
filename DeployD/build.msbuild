@@ -16,7 +16,7 @@
   <Message Text="Building package $(Vdproj)" />
   <msbuild
 	Projects="DeployD.Agent.Setup\DeployD.Agent.Setup.wixproj"
-	Properties="WixToolPath=$(MSBuildProjectDirectory)\packages\Wix.3.7" />
+	Properties="WixToolPath=$(MSBuildProjectDirectory)\packages\Wix.3.7\bin" />
 </Target>
 
 </Project>
