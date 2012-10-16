@@ -99,7 +99,6 @@ namespace Deployd.Agent.Services.PackageDownloading
             // todo: this should probably only clean/update the packages that have changed
             _allPackagesList.Clear();
             _allPackagesList.AddRange(_packageRepository.GetPackages());
-            _logger.Debug("added {0} packages to all packages list", _allPackagesList.Count);
 
             List<IPackage> toUpdate = new List<IPackage>();
             foreach (var package in packages)
