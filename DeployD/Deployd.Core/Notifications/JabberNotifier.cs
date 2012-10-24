@@ -43,7 +43,10 @@ namespace Deployd.Core.Notifications
 
         private void Connect()
         {
-// connect
+            if (!_settingsManager.Settings.XMPPSettings.Enabled)
+                return;
+                
+            // connect
             _settingsManager.Settings.XMPPSettings.Port = _settingsManager.Settings.XMPPSettings.Port == 0
                                                               ? 80
                                                               : _settingsManager.Settings.XMPPSettings.Port;
@@ -104,6 +107,9 @@ namespace Deployd.Core.Notifications
 
         public void Notify(string message)
         {
+            if (!_settingsManager.Settings.XMPPSettings.Enabled)
+                return;
+
             _messageQueue.Enqueue(message);
         }
 

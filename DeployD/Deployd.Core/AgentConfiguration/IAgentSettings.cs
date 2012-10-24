@@ -25,6 +25,7 @@ namespace Deployd.Core.AgentConfiguration
 
     public interface IXMPPSettings
     {
+        bool Enabled { get; }
         string Host { get; }
         string Username { get; }
         string Password { get;  }
