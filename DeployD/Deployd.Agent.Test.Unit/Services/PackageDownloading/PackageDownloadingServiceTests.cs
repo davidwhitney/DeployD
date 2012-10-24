@@ -4,6 +4,7 @@ using Deployd.Agent.Services.AgentConfiguration;
 using Deployd.Agent.Services.PackageDownloading;
 using Deployd.Core.AgentConfiguration;
 using Deployd.Core.Installation;
+using Deployd.Core.Notifications;
 using Deployd.Core.PackageCaching;
 using Deployd.Core.PackageTransport;
 using Deployd.Core.Remoting;
@@ -48,7 +49,7 @@ namespace Deployd.Agent.Test.Unit.Services.PackageDownloading
 
             _pds = new PackageDownloadingService(_agentSettings.Object, _packageRepoMock.Object, _packageCacheMock.Object,
                 _agentConfigManagerMock.Object, _logger.Object, _hubCommunicator.Object, _installCached.Object, _packageRepositoryFactory.Object, _allPackagesList, _currentlyDownloadingList.Object, _installationResultDictionary.Object,
-                _agentWatchList.Object, _installationManager.Object);
+                _agentWatchList.Object, _installationManager.Object, new Mock<INotificationService>().Object);
             _allPackagesList = new AllPackagesList(_agentConfigManagerMock.Object, _agentSettings.Object.Settings);
         }
 
