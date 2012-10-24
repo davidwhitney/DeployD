@@ -1,0 +1,16 @@
+﻿@{
+	Layout  = "layout.cshtml";
+}
+
+<style>
+    .DEBUG { color: limegreen;}
+    .INFO { color: black;}
+    .WARN { color: orange;}
+    .ERROR,.FATAL{ color: red;}
+</style>
+
+<h2><a href="/log/@Model.Group">@Model.Group</a> - @Model.LogFileName</h2>
+        
+<div id="log">
+    @Html.Raw(Model.LogContents)
+</div>

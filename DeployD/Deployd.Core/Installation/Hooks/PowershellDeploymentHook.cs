@@ -2,8 +2,6 @@ using System;
 using System.IO;
 using System.IO.Abstractions;
 using System.Linq;
-using System.Management.Automation.Runspaces;
-using System.Text;
 using Deployd.Core.AgentConfiguration;
 using log4net;
 
@@ -13,7 +11,7 @@ namespace Deployd.Core.Installation.Hooks
     {
         private readonly IFileSystem _fileSystem;
 
-        public PowershellDeploymentHook(IAgentSettings agentSettings, IFileSystem fileSystem) : base(agentSettings, fileSystem)
+        public PowershellDeploymentHook(IAgentSettingsManager agentSettingsManager, IFileSystem fileSystem) : base(agentSettingsManager, fileSystem)
         {
             _fileSystem = fileSystem;
         }
@@ -23,22 +21,27 @@ namespace Deployd.Core.Installation.Hooks
             return context.Package.GetFiles().Any(f => f.Path.EndsWith(".ps1", StringComparison.CurrentCultureIgnoreCase));
         }
 
-        public override void BeforeDeploy(DeploymentContext context)
+        public override void BeforeDeploy(DeploymentContext context, Action<ProgressReport> reportProgress)
         {
-            ExecuteScriptIfFoundInPackage(context, "beforedeploy.ps1", context.GetLoggerFor(this));
+            ExecuteScriptIfFoundInPackage(context, "beforedeploy.ps1", context.GetLoggerFor(this), reportProgress);
         }
 
-        public override void Deploy(DeploymentContext context)
+        public override void Deploy(DeploymentContext context, Action<ProgressReport> reportProgress)
         {
-            ExecuteScriptIfFoundInPackage(context, "deploy.ps1", context.GetLoggerFor(this));
+            ExecuteScriptIfFoundInPackage(context, "deploy.ps1", context.GetLoggerFor(this), reportProgress);
         }
 
-        public override void AfterDeploy(DeploymentContext context)
+        public override void AfterDeploy(DeploymentContext context, Action<ProgressReport> reportProgress)
         {
-            ExecuteScriptIfFoundInPackage(context, "afterdeploy.ps1", context.GetLoggerFor(this));
+            ExecuteScriptIfFoundInPackage(context, "afterdeploy.ps1", context.GetLoggerFor(this), reportProgress);
         }
 
-        private void ExecuteScriptIfFoundInPackage(DeploymentContext context, string scriptPath, ILog logger)
+        public override string ProgressMessage
+        {
+            get { return "Running PowerShell scripts"; }
+        }
+
+        private void ExecuteScriptIfFoundInPackage(DeploymentContext context, string scriptPath, ILog logger, Action<ProgressReport> reportProgress)
         {
             var file = context.Package.GetFiles().SingleOrDefault(f => f.Path.Equals(scriptPath, StringComparison.InvariantCultureIgnoreCase));
             
@@ -47,6 +50,7 @@ namespace Deployd.Core.Installation.Hooks
                 return;
             }
 
+            reportProgress(new ProgressReport(context, GetType(), "Running " + Path.GetFileName(file.Path)));
             logger.DebugFormat("Found script {0}, executing...", scriptPath);
 
             try
@@ -61,39 +65,7 @@ namespace Deployd.Core.Installation.Hooks
 
         private void LoadAndExecuteScript(DeploymentContext context, string pathToScript, ILog logger)
         {
-            var serviceCommands = new Command("Scripts/PS/Services.ps1");
-
-            string scriptText = File.ReadAllText(pathToScript);
-
-            // create Powershell runspace
-            Runspace runspace = RunspaceFactory.CreateRunspace();
-
-            // open it
-            var command = new Command(pathToScript);
-            command.Parameters.Add("agentEnvironment", AgentSettings.DeploymentEnvironment);
-
-            // open it
-            runspace.Open();
-            var pipeline = runspace.CreatePipeline();
-            pipeline.Commands.Add(serviceCommands);
-            
-            // add the custom script
-            pipeline.Commands.Add(command);
-
-            // add an extra command to transform the script output objects into nicely formatted strings 
-            // remove this line to get the actual objects that the script returns. For example, the script 
-            // "Get-Process" returns a collection of System.Diagnostics.Process instances. 
-            pipeline.Commands.Add("Out-String");
-
-            var results = pipeline.Invoke();
-            runspace.Close();
-
-            // convert the script result into a single string 
-            var stringBuilder = new StringBuilder();
-            foreach (var obj in results)
-            {
-                stringBuilder.AppendLine(obj.ToString());
-            }
+            var stringBuilder = PowershellHelper.ExecutePowerShellScript(pathToScript, AgentSettingsManager.Settings);
 
             logger.Info(stringBuilder.ToString());
         }

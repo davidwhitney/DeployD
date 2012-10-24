@@ -1,0 +1,176 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+    <Fragment>
+        <DirectoryRef Id="INSTALLLOCATION">
+            <Directory Id="dirE2FDB4561F76975923C2A1D716D74139" Name="DebugPackageSource" />
+            <Directory Id="dir44C6187D68B2EA15E8619E5445C24FCE" Name="Scripts" />
+            <Directory Id="dir695E21DFB508ADBDA338D759B02CC608" Name="Tools" />
+            <Directory Id="dir4260894598C1B0FADF53E9437A67C4FF" Name="WebUi" />
+        </DirectoryRef>
+    </Fragment>
+    <Fragment>
+        <ComponentGroup Id="DeployD.Agent.Binaries">
+            <Component Id="cmp3D498CE383A455320147C443B7135446" Directory="INSTALLLOCATION" Guid="{10933E7B-A38C-4A5F-AC9A-2E916EDD99E8}">
+                <File Id="filD2C58C189FCAF2EC07D237110775C309" KeyPath="yes" Source="SourceDir\Deployd.Agent.application" />
+            </Component>
+            <Component Id="cmp277DE53AEA1C3D0F0D7D2C781756790A" Directory="INSTALLLOCATION" Guid="{B23CBF4F-7430-4417-90DE-712BF8E52BB0}">
+                <File Id="fil7E4D574ED9083665C3C141E5B6222085" KeyPath="yes" Source="SourceDir\Deployd.Agent.exe" />
+            </Component>
+            <Component Id="cmpBD6AAA90A08B116990023A5E4519ADF5" Directory="INSTALLLOCATION" Guid="{576462CD-88EF-4E98-8672-C70770469EBB}">
+                <File Id="fil2056A9CD7F16C103D53D5EF31443D2D3" KeyPath="yes" Source="SourceDir\Deployd.Agent.exe.config" />
+            </Component>
+            <Component Id="cmpA67FC2AB6E46875F44B79F5B65A0CDF5" Directory="INSTALLLOCATION" Guid="{875D93B1-1987-49F7-A738-8264048913FB}">
+                <File Id="fil7E978754C854BBEF8ED7B2CB7789F888" KeyPath="yes" Source="SourceDir\Deployd.Agent.exe.manifest" />
+            </Component>
+            <Component Id="cmp1E8FE9573F728B173AF2E9A5C3E230C2" Directory="INSTALLLOCATION" Guid="{6B8A418E-B7E0-46F8-AB15-E88A9F0A99A0}">
+                <File Id="filC64AA69E6AD9830DA9A557D5021C2DD2" KeyPath="yes" Source="SourceDir\Deployd.Agent.pdb" />
+            </Component>
+            <Component Id="cmp7792036454CE3DFEBB3454ED609F4A52" Directory="INSTALLLOCATION" Guid="{DFEA2900-FD88-4B86-A849-7D4685163EB1}">
+                <File Id="fil52C2344072C6E4AAAA318CC01010AE8F" KeyPath="yes" Source="SourceDir\Deployd.Agent.vshost.application" />
+            </Component>
+            <Component Id="cmp22D1DFC0F110A18191CD99563D82C50A" Directory="INSTALLLOCATION" Guid="{E5A1E8A2-E853-400E-ACD6-D491F5A0F332}">
+                <File Id="filF6267892403D917613C874D6531AB611" KeyPath="yes" Source="SourceDir\Deployd.Agent.vshost.exe" />
+            </Component>
+            <Component Id="cmpBF53AE82823E52C58CB3AF3FC7C20B50" Directory="INSTALLLOCATION" Guid="{B865F22D-EED5-442A-A215-FA8E5DE22B8F}">
+                <File Id="fil9300FF227E77FF17E395ABB222D01E17" KeyPath="yes" Source="SourceDir\Deployd.Agent.vshost.exe.config" />
+            </Component>
+            <Component Id="cmp6F7C995E9A85742FE0B9A26C254237B1" Directory="INSTALLLOCATION" Guid="{A3439064-F4BB-46D6-8095-B3B560DB5FC6}">
+                <File Id="fil7C325F719857E03640C5200014AC8671" KeyPath="yes" Source="SourceDir\Deployd.Agent.vshost.exe.manifest" />
+            </Component>
+            <Component Id="cmp585C86DFCC0DFBED2D83B7B89CECCADC" Directory="INSTALLLOCATION" Guid="{6E5B9116-04E9-4CDE-A8CD-F56B03614149}">
+                <File Id="filBC3EEB7DFA33E76B973C07EB4F72CC0C" KeyPath="yes" Source="SourceDir\Deployd.Core.dll" />
+            </Component>
+            <Component Id="cmp12FE7C66D6ACB49E73A75E937B652E3D" Directory="INSTALLLOCATION" Guid="{BFB7A80F-36C8-4ECC-8036-95643271CBD9}">
+                <File Id="filAE0CF480B5A62A10EDAF55A6342AF048" KeyPath="yes" Source="SourceDir\Deployd.Core.pdb" />
+            </Component>
+            <Component Id="cmp1F6DF8646619108DFBB033EF4679F1AC" Directory="INSTALLLOCATION" Guid="{7601DD63-F2BA-4026-A507-332F43F570D8}">
+                <File Id="filCAAC665964D1DB313016DB15221ED3C8" KeyPath="yes" Source="SourceDir\log4net.config" />
+            </Component>
+            <Component Id="cmpE5C01B5677C30D575CC15B4B558A57E0" Directory="INSTALLLOCATION" Guid="{FC78C81A-16C4-4BAB-8157-4503CFF3F853}">
+                <File Id="filD17F9AFAC4DF3D7A44817DFBA8510C1A" KeyPath="yes" Source="SourceDir\log4net.dll" />
+            </Component>
+            <Component Id="cmp877B7234C9DA19A7310544D169C9D4B4" Directory="INSTALLLOCATION" Guid="{D04702C6-5615-4B77-9B86-2C1C35005C5C}">
+                <File Id="fil62C89A12B49E1BF54AFB70F4277695E8" KeyPath="yes" Source="SourceDir\log4net.xml" />
+            </Component>
+            <Component Id="cmp6CB86847C421AB6E8FF9E4FCAE2A5FD8" Directory="INSTALLLOCATION" Guid="{1D412252-B583-48B3-8F3A-8C5991867602}">
+                <File Id="fil33609BD86DAC6422AF7763AFC6D6A315" KeyPath="yes" Source="SourceDir\Nancy.dll" />
+            </Component>
+            <Component Id="cmp91BE250CF96C7B1E8A4FA21C4249EAAA" Directory="INSTALLLOCATION" Guid="{51C83EFF-086C-472C-BBC9-9E4F113E105B}">
+                <File Id="fil5CDEF78EF6819292781FC1E8FE954641" KeyPath="yes" Source="SourceDir\Nancy.Hosting.Self.dll" />
+            </Component>
+            <Component Id="cmpC3D3DEB0242FB18BF7960F9B65DEC2D1" Directory="INSTALLLOCATION" Guid="{F03443D7-9263-46D6-BA04-FB4E27792BD8}">
+                <File Id="fil4F14533DA7FE48D9C84605898DBE0C5D" KeyPath="yes" Source="SourceDir\Nancy.Hosting.Wcf.dll" />
+            </Component>
+            <Component Id="cmp07FC1C844CED06A28663106E6A2C639C" Directory="INSTALLLOCATION" Guid="{9BD406A4-7664-4DE8-B881-48BC0A2A971E}">
+                <File Id="fil77B6A9DF5130EBB247AA110EE3FE6584" KeyPath="yes" Source="SourceDir\Nancy.ViewEngines.Razor.dll" />
+            </Component>
+            <Component Id="cmp2D609638E5E2D3A882C9917260DB1D48" Directory="INSTALLLOCATION" Guid="{95622231-6EC1-4A20-8234-8FA9853F9578}">
+                <File Id="filA43E267E171713A8439FA328BE288220" KeyPath="yes" Source="SourceDir\Nancy.ViewEngines.Spark.dll" />
+            </Component>
+            <Component Id="cmp09935A19E62F557F1283D8B2856AAFF4" Directory="INSTALLLOCATION" Guid="{092097C5-4610-4F19-BC46-FE156F970B85}">
+                <File Id="filB3467F5442DD3EF32A3C43894512D9CC" KeyPath="yes" Source="SourceDir\Ninject.dll" />
+            </Component>
+            <Component Id="cmp3E39614FD748A4BD22FDC106607694D0" Directory="INSTALLLOCATION" Guid="{E7A17E7B-64E2-4128-973D-E89EBC15EFFA}">
+                <File Id="fil09834775D6C4E42578062CBEA0006AF4" KeyPath="yes" Source="SourceDir\Ninject.pdb" />
+            </Component>
+            <Component Id="cmp60D646ACE2A9F9DF42B14DE09887741E" Directory="INSTALLLOCATION" Guid="{44D08CAE-3C26-49C6-9BD4-79EE5FE7C009}">
+                <File Id="fil8155D830C8B2F9195C82E0CD71FD522D" KeyPath="yes" Source="SourceDir\Ninject.xml" />
+            </Component>
+            <Component Id="cmpB2263C6FD0F6F878137054544990454D" Directory="INSTALLLOCATION" Guid="{18929197-5DA8-4666-A641-198A413C27AE}">
+                <File Id="fil24EB85CF7406C69FB19C09A589CDF53E" KeyPath="yes" Source="SourceDir\Spark.dll" />
+            </Component>
+            <Component Id="cmp99F9A47008C16DD66D77742E9E79BE4C" Directory="INSTALLLOCATION" Guid="{2ADCD20D-0E86-4F4A-9868-092394D0F71B}">
+                <File Id="filBA1D438D8C998B8FB8FCA5A2A2B0AAC1" KeyPath="yes" Source="SourceDir\System.IO.Abstractions.dll" />
+            </Component>
+            <Component Id="cmp59C6755EBC9801D040D22F01AB2EC33C" Directory="INSTALLLOCATION" Guid="{A775D59C-DF9E-4831-B260-49B0BAC8B48A}">
+                <File Id="fil02BE262109A1D86890E7D3D7B6B90B46" KeyPath="yes" Source="SourceDir\System.Web.Razor.dll" />
+            </Component>
+            <Component Id="cmpDEB20A3FD909BF1B1939E6B39E91D6CF" Directory="dirE2FDB4561F76975923C2A1D716D74139" Guid="{BE4498C6-1560-4FDB-9DEA-D74EB96191A7}">
+                <File Id="fil220045290ACBC90EF437A53F0300F8CE" KeyPath="yes" Source="SourceDir\DebugPackageSource\Deployd.Configuration.1.0.0.nupkg" />
+            </Component>
+            <Component Id="cmpDDDD3B1542E7A373EEFAFBA483D77D60" Directory="dirE2FDB4561F76975923C2A1D716D74139" Guid="{0A7E8232-7A96-4C5D-8611-AC445A3E74B2}">
+                <File Id="fil087ED20E5089D08D7836D4C44234B0A2" KeyPath="yes" Source="SourceDir\DebugPackageSource\justgiving-sdk-1.5.4.nupkg" />
+            </Component>
+            <Component Id="cmpCDA894AC83B3BDB1FA6A5A5C5D8C4606" Directory="dir98C0BE9975AACCADA57FDBD6AF815642" Guid="{9DD15C6E-068B-4211-AD19-CCE88ACA9A6A}">
+                <File Id="fil03958908101E839F7C433E95FDF8D76F" KeyPath="yes" Source="SourceDir\Scripts\PS\Services.ps1" />
+            </Component>
+            <Component Id="cmpDA98219FFBE5B22B7FCC567917F84016" Directory="dir695E21DFB508ADBDA338D759B02CC608" Guid="{45A7B982-7F2C-484E-B7D5-239A83F23A88}">
+                <File Id="filBB228ACC214F895BF4C0CBEA4CFDA1EB" KeyPath="yes" Source="SourceDir\Tools\Microsoft.Web.Publishing.Tasks.Dll" />
+            </Component>
+            <Component Id="cmp9026F710DF75D7766347F1E13EBB9DE7" Directory="dir695E21DFB508ADBDA338D759B02CC608" Guid="{07E772C5-FCCE-4CD0-BBC0-B47C98ECFD72}">
+                <File Id="filC83FC0CD68008F71E11D62E62F321159" KeyPath="yes" Source="SourceDir\Tools\NDesk.Options.dll" />
+            </Component>
+            <Component Id="cmpFF4B5A8EB08FEC4D0C98D39AC5CBACEB" Directory="dir695E21DFB508ADBDA338D759B02CC608" Guid="{316665B5-2516-4C04-94BC-B7FA72DE0D97}">
+                <File Id="filF6919AFF30ADE195699B4BD6569416FE" KeyPath="yes" Source="SourceDir\Tools\TransformVsConfiguration.exe" />
+            </Component>
+            <Component Id="cmp213E76914B5CC1758B5BE81681C4EEC1" Directory="dir18102477FD3303679537A18D6E0BA467" Guid="{EECDE3EB-D27E-4522-85C3-FAC89D37BAC0}">
+                <File Id="filF87534FD164E74A718805FE2E6C6EBFF" KeyPath="yes" Source="SourceDir\WebUi\Views\index.cshtml" />
+            </Component>
+            <Component Id="cmp1B42CBAFC4CB2DF665BCE88B7CF9618F" Directory="dir18102477FD3303679537A18D6E0BA467" Guid="{580CD7FF-EE44-4386-BF25-872F48808B60}">
+                <File Id="filEA46123D93E6323F7BD8B4204F2F76C7" KeyPath="yes" Source="SourceDir\WebUi\Views\layout.cshtml" />
+            </Component>
+            <Component Id="cmp2247EB7881BF1143F359D4F3E97C3F32" Directory="dir18102477FD3303679537A18D6E0BA467" Guid="{71E719B5-FF7D-4D4D-BE31-01A833E6C5C6}">
+                <File Id="fil4B9B3E296DB941A83744911B630324CD" KeyPath="yes" Source="SourceDir\WebUi\Views\package-details.cshtml" />
+            </Component>
+            <Component Id="cmpEF4A96AADC47377073574F6828FFE8CA" Directory="dir18102477FD3303679537A18D6E0BA467" Guid="{9FA4AF5D-37BD-48B7-B53F-2A5898B4D690}">
+                <File Id="fil163F75D58482E05754B1A25C49190F26" KeyPath="yes" Source="SourceDir\WebUi\Views\packages.cshtml" />
+            </Component>
+            <Component Id="cmp6F56BDF15356D457A02CF667F5969FEC" Directory="dir18102477FD3303679537A18D6E0BA467" Guid="{0C09E476-3A38-4DCA-BD13-D78E2390D2EE}">
+                <File Id="fil8A4621B93F547BE370F58924C9FCE4CA" KeyPath="yes" Source="SourceDir\WebUi\Views\sitrep.cshtml" />
+            </Component>
+            <Component Id="cmp80D2CDCD31E4F3BC3E9D95A0654749C2" Directory="dir9E5CFF16C72D4A4CD8C0CA07915284F6" Guid="{74155E02-0D22-434C-ABA3-2920DD331863}">
+                <File Id="fil911B06F1751C96171908BACE100B6497" KeyPath="yes" Source="SourceDir\WebUi\Views\installations\completed.cshtml" />
+            </Component>
+            <Component Id="cmpE9C769F8FA6B86759031F07C970526F2" Directory="dir9E5CFF16C72D4A4CD8C0CA07915284F6" Guid="{5C09DF85-2062-47AD-81CB-840770C8BCE8}">
+                <File Id="fil9CC3239711560D3BE4D7369DE1238A98" KeyPath="yes" Source="SourceDir\WebUi\Views\installations\current.cshtml" />
+            </Component>
+            <Component Id="cmp9B8C12A1BC593F74DF78247231499D13" Directory="dir44FA9EAE08D51264F96FD58ED894F1E4" Guid="{AB5F1A41-FF39-4AFA-B38F-3BA4A03FAD13}">
+                <File Id="fil6DEAF79D6136D5134BB80A4409856221" KeyPath="yes" Source="SourceDir\WebUi\Views\logs\list.cshtml" />
+            </Component>
+            <Component Id="cmpB18AC2DF145F8CE3F7AF5C5EF2EEAEE9" Directory="dir44FA9EAE08D51264F96FD58ED894F1E4" Guid="{1DC91A3A-B819-40E0-AD14-09A47AC26CC3}">
+                <File Id="fil02280960FD78F9D78D7793E87A1DC3BC" KeyPath="yes" Source="SourceDir\WebUi\Views\logs\log.cshtml" />
+            </Component>
+            <Component Id="cmpC605052EDB5C3922F13E4011B3E99745" Directory="dir44FA9EAE08D51264F96FD58ED894F1E4" Guid="{716A89D0-5A53-4487-81FA-5357CFDD80D0}">
+                <File Id="fil3915E8726C85A57A79BDB7801555B26C" KeyPath="yes" Source="SourceDir\WebUi\Views\logs\packages.cshtml" />
+            </Component>
+        </ComponentGroup>
+    </Fragment>
+    <Fragment>
+        <DirectoryRef Id="dir18102477FD3303679537A18D6E0BA467" />
+    </Fragment>
+    <Fragment>
+        <DirectoryRef Id="dir9E5CFF16C72D4A4CD8C0CA07915284F6" />
+    </Fragment>
+    <Fragment>
+        <DirectoryRef Id="dir44FA9EAE08D51264F96FD58ED894F1E4" />
+    </Fragment>
+    <Fragment>
+        <DirectoryRef Id="dir98C0BE9975AACCADA57FDBD6AF815642" />
+    </Fragment>
+    <Fragment>
+        <DirectoryRef Id="dir695E21DFB508ADBDA338D759B02CC608" />
+    </Fragment>
+    <Fragment>
+        <DirectoryRef Id="dirE2FDB4561F76975923C2A1D716D74139" />
+    </Fragment>
+    <Fragment>
+        <DirectoryRef Id="dir4260894598C1B0FADF53E9437A67C4FF">
+            <Directory Id="dir18102477FD3303679537A18D6E0BA467" Name="Views" />
+        </DirectoryRef>
+    </Fragment>
+    <Fragment>
+        <DirectoryRef Id="dir18102477FD3303679537A18D6E0BA467">
+            <Directory Id="dir44FA9EAE08D51264F96FD58ED894F1E4" Name="logs" />
+        </DirectoryRef>
+    </Fragment>
+    <Fragment>
+        <DirectoryRef Id="dir44C6187D68B2EA15E8619E5445C24FCE">
+            <Directory Id="dir98C0BE9975AACCADA57FDBD6AF815642" Name="PS" />
+        </DirectoryRef>
+    </Fragment>
+    <Fragment>
+        <DirectoryRef Id="dir18102477FD3303679537A18D6E0BA467">
+            <Directory Id="dir9E5CFF16C72D4A4CD8C0CA07915284F6" Name="installations" />
+        </DirectoryRef>
+    </Fragment>
+</Wix>

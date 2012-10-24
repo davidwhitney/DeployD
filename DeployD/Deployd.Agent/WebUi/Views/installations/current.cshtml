@@ -1,0 +1,22 @@
+﻿@{
+	Layout  = "layout.cshtml";
+}
+
+<ul>
+    <li><a href="/installations">Queued/Running</a></li>
+    <li><a href="/installations/completed">Completed</a></li>
+</ul>
+
+<h2>Task Queue</h2>
+
+@foreach (var task in Model.TaskQueue)
+{
+	<p>@task.DateCreated - @task.PackageId @task.Version</p>
+}
+
+<h2>Running Tasks</h2>
+
+@foreach (var task in Model.Tasks)
+{
+	<p>@task.DateCompleted - @task.PackageId @task.Version @task.LastMessage</p>
+}

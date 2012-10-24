@@ -1,0 +1,122 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+    <Product Id="{20225B9A-131C-4BD1-A93F-D6A87C2AB3EA}" Language="1033" Manufacturer="PUT-COMPANY-NAME-HERE" Name="PUT-PRODUCT-NAME-HERE" UpgradeCode="{AA0472ED-3C85-4365-BDF0-69CE6FD26EB1}" Version="1.0.0.0">
+        <Package Compressed="yes" InstallerVersion="200" />
+        <Directory Id="TARGETDIR" Name="SourceDir" />
+        <Feature Id="ProductFeature" Level="1" Title="PUT-FEATURE-TITLE-HERE">
+            <ComponentGroupRef Id="Deployd.Agent.Content" />
+            <ComponentGroupRef Id="DeployDAgentContent" />
+        </Feature>
+        <Media Id="1" Cabinet="product.cab" EmbedCab="yes" />
+    </Product>
+    <Fragment>
+        <DirectoryRef Id="Deployd.Agent.Content">
+            <Directory Id="dirF41E4107F0FD162EAEE206FB24EA287C" Name="Tools" />
+            <Directory Id="dirC8A7F557349A737FA107A0C3B07E388D" Name="Scripts" />
+            <Directory Id="dirA1CAC3D6B61BBA797674120498661DDC" Name="WebUi" />
+        </DirectoryRef>
+    </Fragment>
+    <Fragment>
+        <ComponentGroup Id="Deployd.Agent.Content">
+            <ComponentRef Id="cmp4E7294D7599D231E95BCEA5FBA2DE8A9" />
+            <ComponentRef Id="cmp257A86689CF8C773700262BFC0D96C87" />
+            <ComponentRef Id="cmpA0F2024123FCF0D8E30B1466FEBAEB39" />
+            <ComponentRef Id="cmp4F092DE421A7FBB76F65C5C8DBF892E4" />
+            <ComponentRef Id="cmpA21E4C140EDD6972023A8669B8C81CFA" />
+            <ComponentRef Id="cmp0DFA666E3F55E6DC8033C1F530A41332" />
+            <ComponentRef Id="cmpE3F114E5DF2108E587D360E08DB385D9" />
+            <ComponentRef Id="cmp4D3BA2ADD5FB933C31DB8A533765CE51" />
+            <ComponentRef Id="cmp43B6CB405DAD04AF6780CA4D02C9B473" />
+            <ComponentRef Id="cmp005A0EB8797BE06AAED66EE8B8C5A117" />
+            <ComponentRef Id="cmp78FDC2D582183906138AA7718AEBB4A2" />
+            <ComponentRef Id="cmpF51B77C2AC085E00E1425844D0D1D86F" />
+            <ComponentRef Id="cmp354866898DC400D53C4380B8A7589412" />
+            <ComponentRef Id="cmpF908EEA0C7CA7A91E5EFAAB06D2A2F74" />
+            <ComponentRef Id="cmpC0DA083A182051F4037D2C7ADB571187" />
+        </ComponentGroup>
+    </Fragment>
+    <Fragment>
+        <ComponentGroup Id="DeployDAgentContent">
+            <Component Id="cmp4E7294D7599D231E95BCEA5FBA2DE8A9" Directory="Deployd.Agent.Content" Guid="{440849AD-E1B7-4FAB-AB74-B5946C35CD07}">
+                <File Id="fil5333BAF16AB0F5A98CCF90186733CF09" Source="$(var.Deployd.Agent.ProjectDir)\log4net.config" />
+            </Component>
+            <Component Id="cmp257A86689CF8C773700262BFC0D96C87" Directory="dirF41E4107F0FD162EAEE206FB24EA287C" Guid="{A5C5C554-3C42-48E4-A384-2A549466909F}">
+                <File Id="fil84D960C72866484B71510D6ACD619D85" Source="$(var.Deployd.Agent.ProjectDir)\Tools\Microsoft.Web.Publishing.Tasks.Dll" />
+            </Component>
+            <Component Id="cmpA0F2024123FCF0D8E30B1466FEBAEB39" Directory="dirF41E4107F0FD162EAEE206FB24EA287C" Guid="{F2D43D16-3529-4FDD-9866-9792E4252CEC}">
+                <File Id="filACC43BDF60937F9352D2A20AF69128C9" Source="$(var.Deployd.Agent.ProjectDir)\Tools\NDesk.Options.dll" />
+            </Component>
+            <Component Id="cmp4F092DE421A7FBB76F65C5C8DBF892E4" Directory="dirF41E4107F0FD162EAEE206FB24EA287C" Guid="{2565744A-20F1-43C2-90C5-713A61B094AD}">
+                <File Id="fil8899A3711F6BFF197292D17F590F1F95" Source="$(var.Deployd.Agent.ProjectDir)\Tools\TransformVsConfiguration.exe" />
+            </Component>
+            <Component Id="cmpA21E4C140EDD6972023A8669B8C81CFA" Directory="dir8BF9D985A9E75B563A8DD364A638D2BD" Guid="{FA2D9818-972A-4998-BDC1-9C3CDB717185}">
+                <File Id="filD956E65847EF4FBF6D873CE6E2BCCCCC" Source="$(var.Deployd.Agent.ProjectDir)\Scripts\PS\Services.ps1" />
+            </Component>
+            <Component Id="cmp0DFA666E3F55E6DC8033C1F530A41332" Directory="dirBC56B417D5BD7D8CFC485A9D6FC1A45B" Guid="{A144A92F-E833-45FF-915A-0CD1EFCF6CE6}">
+                <File Id="fil3022C6B90A243EDEE454C51EC27261B3" Source="$(var.Deployd.Agent.ProjectDir)\WebUi\Views\sitrep.cshtml" />
+            </Component>
+            <Component Id="cmpE3F114E5DF2108E587D360E08DB385D9" Directory="dirBC56B417D5BD7D8CFC485A9D6FC1A45B" Guid="{46D2641E-565B-400C-ACAF-D693F5BE1DD3}">
+                <File Id="filD4704950CD9FF474C4B7690C596D8289" Source="$(var.Deployd.Agent.ProjectDir)\WebUi\Views\layout.cshtml" />
+            </Component>
+            <Component Id="cmp4D3BA2ADD5FB933C31DB8A533765CE51" Directory="dirBC56B417D5BD7D8CFC485A9D6FC1A45B" Guid="{821F7794-8C16-47A8-99DF-3BC5A928F737}">
+                <File Id="filF993359A77AE18382D9379B12D83181C" Source="$(var.Deployd.Agent.ProjectDir)\WebUi\Views\package-details.cshtml" />
+            </Component>
+            <Component Id="cmp43B6CB405DAD04AF6780CA4D02C9B473" Directory="dirBC56B417D5BD7D8CFC485A9D6FC1A45B" Guid="{FB45E80C-0026-41BF-A1BC-3BBEB097A45D}">
+                <File Id="filD89F891B260BFA77E1FB7402ECC78B4E" Source="$(var.Deployd.Agent.ProjectDir)\WebUi\Views\packages.cshtml" />
+            </Component>
+            <Component Id="cmp005A0EB8797BE06AAED66EE8B8C5A117" Directory="dirBC56B417D5BD7D8CFC485A9D6FC1A45B" Guid="{D0C91A68-C1E6-48DD-9397-F8DCE1A6C08B}">
+                <File Id="fil8A8ADFC06D9C486ACE6A90F41867BABE" Source="$(var.Deployd.Agent.ProjectDir)\WebUi\Views\index.cshtml" />
+            </Component>
+            <Component Id="cmp78FDC2D582183906138AA7718AEBB4A2" Directory="dir4E6DB4E9577F293CDBEA6A8B4DE9F880" Guid="{68506794-E251-4776-85C7-A8CB06651947}">
+                <File Id="fil6EDA1F5B775E285D352C904F71F70316" Source="$(var.Deployd.Agent.ProjectDir)\WebUi\Views\logs\log.cshtml" />
+            </Component>
+            <Component Id="cmpF51B77C2AC085E00E1425844D0D1D86F" Directory="dir4E6DB4E9577F293CDBEA6A8B4DE9F880" Guid="{B2C6A2F5-2561-44F1-85D6-9C73CFE41854}">
+                <File Id="fil4E97D1128C4ECB99AC39CE49AD26B0EC" Source="$(var.Deployd.Agent.ProjectDir)\WebUi\Views\logs\list.cshtml" />
+            </Component>
+            <Component Id="cmp354866898DC400D53C4380B8A7589412" Directory="dir4E6DB4E9577F293CDBEA6A8B4DE9F880" Guid="{B90694FD-2B02-4071-B92D-F0FA04A5075F}">
+                <File Id="fil8C03F624829DDBECF8DFE825B02A77DB" Source="$(var.Deployd.Agent.ProjectDir)\WebUi\Views\logs\packages.cshtml" />
+            </Component>
+            <Component Id="cmpF908EEA0C7CA7A91E5EFAAB06D2A2F74" Directory="dir74529FC1394B0A29B22EDE612DAEE4F0" Guid="{2352E836-5FCD-4455-83FD-D61D563F0440}">
+                <File Id="filB4B035D0599FB382734E5A753F438F6B" Source="$(var.Deployd.Agent.ProjectDir)\WebUi\Views\installations\current.cshtml" />
+            </Component>
+            <Component Id="cmpC0DA083A182051F4037D2C7ADB571187" Directory="dir74529FC1394B0A29B22EDE612DAEE4F0" Guid="{01492F42-5599-4F9C-A656-D0D213EF5538}">
+                <File Id="fil9AFF4E408553BCCBE81FA0F29ECB7D96" Source="$(var.Deployd.Agent.ProjectDir)\WebUi\Views\installations\completed.cshtml" />
+            </Component>
+        </ComponentGroup>
+    </Fragment>
+    <Fragment>
+        <DirectoryRef Id="dirBC56B417D5BD7D8CFC485A9D6FC1A45B" />
+    </Fragment>
+    <Fragment>
+        <DirectoryRef Id="dirF41E4107F0FD162EAEE206FB24EA287C" />
+    </Fragment>
+    <Fragment>
+        <DirectoryRef Id="dir4E6DB4E9577F293CDBEA6A8B4DE9F880" />
+    </Fragment>
+    <Fragment>
+        <DirectoryRef Id="dir8BF9D985A9E75B563A8DD364A638D2BD" />
+    </Fragment>
+    <Fragment>
+        <DirectoryRef Id="dir74529FC1394B0A29B22EDE612DAEE4F0" />
+    </Fragment>
+    <Fragment>
+        <DirectoryRef Id="dirBC56B417D5BD7D8CFC485A9D6FC1A45B">
+            <Directory Id="dir4E6DB4E9577F293CDBEA6A8B4DE9F880" Name="logs" />
+        </DirectoryRef>
+    </Fragment>
+    <Fragment>
+        <DirectoryRef Id="dirBC56B417D5BD7D8CFC485A9D6FC1A45B">
+            <Directory Id="dir74529FC1394B0A29B22EDE612DAEE4F0" Name="installations" />
+        </DirectoryRef>
+    </Fragment>
+    <Fragment>
+        <DirectoryRef Id="dirC8A7F557349A737FA107A0C3B07E388D">
+            <Directory Id="dir8BF9D985A9E75B563A8DD364A638D2BD" Name="PS" />
+        </DirectoryRef>
+    </Fragment>
+    <Fragment>
+        <DirectoryRef Id="dirA1CAC3D6B61BBA797674120498661DDC">
+            <Directory Id="dirBC56B417D5BD7D8CFC485A9D6FC1A45B" Name="Views" />
+        </DirectoryRef>
+    </Fragment>
+</Wix>

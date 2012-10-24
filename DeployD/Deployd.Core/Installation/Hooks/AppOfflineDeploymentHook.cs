@@ -1,3 +1,4 @@
+using System;
 using System.IO;
 using System.IO.Abstractions;
 using System.Linq;
@@ -11,7 +12,7 @@ namespace Deployd.Core.Installation.Hooks
         private const string APP_ONLINE_FILE = "app_online.htm";
         private const string APP_OFFLINE_FILE = "app_offline.htm";
 
-        public AppOfflineDeploymentHook(IFileSystem fileSystem, IAgentSettings agentSettings) : base(agentSettings, fileSystem)
+        public AppOfflineDeploymentHook(IFileSystem fileSystem, IAgentSettingsManager agentSettingsManager) : base(agentSettingsManager, fileSystem)
         {
             _fileSystem = fileSystem;
         }
@@ -21,9 +22,10 @@ namespace Deployd.Core.Installation.Hooks
             return context.Package.Tags.ToLower().Split(' ', ',', ';').Contains("website");
         }
 
-        public override void BeforeDeploy(DeploymentContext context)
+        public override void BeforeDeploy(DeploymentContext context, Action<ProgressReport> reportProgress)
         {
             var logger = context.GetLoggerFor(this);
+
             // find an app_online.htm file in the package
             var appOnline = context.Package.GetFiles().SingleOrDefault(f => f.Path.EndsWith(APP_ONLINE_FILE));
 
@@ -41,6 +43,8 @@ namespace Deployd.Core.Installation.Hooks
             }
 
             logger.Info("Copying app_offline.htm to destination");
+            reportProgress(new ProgressReport(context, GetType(), "Copying app_offline.htm to destination"));
+            
             
             if (!_fileSystem.Directory.Exists(Path.GetDirectoryName(destinationFilePath)))
             {
@@ -60,10 +64,11 @@ namespace Deployd.Core.Installation.Hooks
             System.Threading.Thread.Sleep(1000);
         }
 
-        public override void AfterDeploy(DeploymentContext context)
+        public override void AfterDeploy(DeploymentContext context, Action<ProgressReport> reportProgress)
         {
             var logger = context.GetLoggerFor(this);
-            logger.Info("Removing app_offline.htm to destination");
+            logger.Info("Removing app_offline.htm from destination");
+            reportProgress(new ProgressReport(context, GetType(), "Removing app_offline.htm from destination"));
 
             var appOfflineFilePath = Path.Combine(context.TargetInstallationFolder, APP_OFFLINE_FILE);
             
@@ -71,6 +76,11 @@ namespace Deployd.Core.Installation.Hooks
             {
                 _fileSystem.File.Delete(appOfflineFilePath);
             }
+        }
+
+        public override string ProgressMessage
+        {
+            get { return "Placing app_offline.htm file"; }
         }
     }
 }

@@ -1,0 +1,16 @@
+﻿@{
+	Layout  = "layout.cshtml";
+}
+
+<h2>Watch List</h2>
+Groups:<br/>
+@foreach(string group in Model.WatchList.Groups)
+{
+    @group<br/>
+}
+
+Packages:<br/>
+@foreach(string package in Model.WatchList.Packages)
+{
+    @package<br/>
+}

@@ -15,8 +15,12 @@ namespace DeployD.Hub.Areas.Api.Code
         }
         public ActionResult RepresentationOf<T>(T resource, HttpContextBase httpContext)
         {
-            string[] acceptTypes = httpContext.Request.Headers["Accept"].Split(new[] {',',';'},
-                                                                               StringSplitOptions.RemoveEmptyEntries);
+            string[] acceptTypes = new string[]{"application/json"};
+            if (httpContext.Request.Headers["Accept"] != null)
+            {
+                acceptTypes = httpContext.Request.Headers["Accept"].Split(new[] {',', ';'},
+                                                                          StringSplitOptions.RemoveEmptyEntries);
+            }
 
             string contentType = AppropriateContentType(acceptTypes);
 

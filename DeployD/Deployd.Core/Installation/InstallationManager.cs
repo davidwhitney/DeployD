@@ -4,12 +4,13 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using log4net;
+using ILogger = Ninject.Extensions.Logging.ILogger;
 
 namespace Deployd.Core.Installation
 {
     public class InstallationManager : IInstallationManager
     {
-        private readonly ILog _logger = LogManager.GetLogger("InstallationManager");
+        private readonly ILogger _logger;
         private readonly IDeploymentService _deploymentService;
         public static readonly List<InstallationTask> InstallationTasks = new List<InstallationTask>();
 
@@ -27,9 +28,10 @@ namespace Deployd.Core.Installation
             }
         }
 
-        public InstallationManager(IDeploymentService deploymentService)
+        public InstallationManager(IDeploymentService deploymentService, ILogger logger)
         {
             _deploymentService = deploymentService;
+            _logger = logger;
             _progressReportAction = ReportProgress;
         }
 
@@ -37,16 +39,22 @@ namespace Deployd.Core.Installation
         {
             var cancellationToken = new CancellationTokenSource();
             string taskId = Guid.NewGuid().ToString();
-            var task = new TaskFactory<InstallationResult>().StartNew(() =>
-                    {
-                        _deploymentService.InstallPackage(packageId, version, taskId, cancellationToken, _progressReportAction);
-                        return new InstallationResult();
-                    }
-                );
-
-            task.Start();
-
+            
+            var task = new TaskFactory<InstallationResult>()
+                .StartNew(() => _deploymentService.InstallPackage(packageId, version, taskId, cancellationToken, _progressReportAction)); // set the result on the installation object
             InstallationTasks.Add(new InstallationTask(packageId, version, taskId, task, cancellationToken));
+            task.Start();
+        }
+
+        public void ClearCompletedTasks()
+        {
+            foreach(var task in InstallationTasks)
+            {
+                if (task.Task.IsCompleted || task.Task.IsCanceled || task.Task.IsFaulted)
+                {
+                    task.Task.Dispose();
+                }
+            }
         }
 
         public InstallationTask GetTaskById(string installationTaskId)

@@ -24,9 +24,13 @@ namespace DeployD.Hub.Areas.Api
                              "api/agent/updateAll",
                              new {controller = "Agent", action = "UpdateAll"},
                              new {httpMethod = new HttpMethodConstraint("POST")});
+            context.MapRoute("RegisterAgent",
+                             "api/agent/{hostname}",
+                             new { controller = "Agent", action = "register" },
+                             new { httpMethod = new HttpMethodConstraint("PUT") });
 
             context.MapRoute("AgentMethod",
-                "Api/agent/{id}/{action}",
+                "Api/agent/{hostname}/{action}",
                 new { controller = "Agent", action = "Index" },
                 new {httpMethod = new HttpMethodConstraint("GET","PUT","DELETE","POST")});
 

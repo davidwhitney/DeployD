@@ -11,13 +11,17 @@ li.agent {
     display: block;
     padding: 8px;
     margin: 0;
-    border: 4px solid #CCCCCC;
+    border: 2px solid #78256D;
+    -moz-border-radius: 4px;
+    border-radius: 4px;
+    margin-bottom: 2px;
 }
 
+/*li.agent:hover{
+    background-color: #f3f3f3;
+}*/
 ul.packages {
     list-style: none;
-    margin: 0;
-    padding: 0;
 }
 
 li.package {
@@ -27,6 +31,10 @@ li.package {
     margin-top: 0.5em;
 }
 
+li.package.Running {
+    list-style-image: url('/content/images/working.gif');
+}
+
 a.unregister-agent {
     float: right;
 }
@@ -34,6 +42,34 @@ label.agent-hostname {
     font-weight: bold;
     font-size: 1.2em;
 }
+label.agent-hostname.stale {
+    font-weight: bold;
+    font-size: 1.2em;
+    color: red;
+}
 ul.tasks li {
     color: green;
+}
+
+.notinstalled {
+    color: #888888;
+}
+.uptodate {
+    color: green;
+}
+.Running {
+    color: rgb(0, 131, 215);
+}
+.outofdate {
+    color: rgb(255, 168, 0);
+    font-weight: bold;
+}
+.notinstalled {
+    color: gray;   
+}
+.failed {
+    color: red;
+}
+div.agent-detail {
+    display: none;
 }

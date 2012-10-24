@@ -2,6 +2,8 @@
 using System.Linq;
 using System.Threading.Tasks;
 using Deployd.Agent.WebUi.Models;
+using Deployd.Core;
+using Deployd.Core.AgentConfiguration;
 using Deployd.Core.Installation;
 using Deployd.Core.PackageCaching;
 
@@ -9,28 +11,34 @@ namespace Deployd.Agent.WebUi.Converters
 {
     public static class RunningTasksToPackageListViewModelConverter
     {
-        public static PackageListViewModel Convert(ILocalPackageCache cache, RunningInstallationTaskList runningTasks, IInstalledPackageArchive installPackageArchive, CompletedInstallationTaskList completedTasks)
+        public static PackageListViewModel Convert(ILocalPackageCache cache, RunningInstallationTaskList runningTasks, 
+            IInstalledPackageArchive installPackageArchive, CompletedInstallationTaskList completedTasks,
+            IAgentSettings agentSettings, IPackagesList allPackagesList)
         {
             var model = new PackageListViewModel();
 
-            foreach(var packageId in cache.AvailablePackages)
+            var packagesById = allPackagesList.GetWatched().GroupBy(p => p.Id);
+            foreach (var package in packagesById)
             {
-                var package = new LocalPackageInformation
+                var packageInfo = new LocalPackageInformation
                                   {
-                                      PackageId = packageId,
-                                      LatestAvailableVersion = cache.GetLatestVersion(packageId).Version.ToString()
+                                      PackageId = package.Key
                                   };
+                var latestVersion = package.OrderByDescending(p=>p.Version).FirstOrDefault();
+                if (latestVersion != null)
+                    packageInfo.LatestAvailableVersion = latestVersion.Version.ToString();
 
-                var installedPackage = installPackageArchive.GetCurrentInstalledVersion(packageId);
-                package.InstalledVersion = installedPackage == null ? "0.0.0.0" : installedPackage.Version.ToString();
 
-                package.LastInstallationTask =
+                var installedPackage = installPackageArchive.GetCurrentInstalledVersion(package.Key);
+                packageInfo.InstalledVersion = installedPackage == null ? "0.0.0.0" : installedPackage.Version.ToString();
+
+                /*packageInfo.LastInstallationTask =
                     completedTasks
-                        .Where(t => t.PackageId == packageId).OrderByDescending(t => t.LogFileName).
-                        FirstOrDefault();
+                        .Where(t => t.PackageId == package.Key).OrderByDescending(t => t.LogFileName)
+                        .FirstOrDefault();*/
 
-                package.CurrentTask = runningTasks.Count > 0 ? runningTasks
-                           .Where(t => t.PackageId == packageId)
+                packageInfo.CurrentTask = runningTasks.Count > 0 ? runningTasks
+                           .Where(t => t.PackageId == package.Key)
                            .Select(t =>
                                        {
                                            var lastOrDefault = t.ProgressReports.LastOrDefault();
@@ -45,8 +53,25 @@ namespace Deployd.Agent.WebUi.Converters
                                        }).FirstOrDefault()
                            : null;
 
-                package.AvailableVersions = cache.AvailablePackageVersions(packageId).ToList();
-                model.Packages.Add(package);
+                packageInfo.AvailableVersions = package.OrderByDescending(x => x.Version).Select(x => x.Version.ToString()).ToList();
+
+                if (latestVersion != null)
+                {
+
+                    packageInfo.Tags = latestVersion.Tags.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+                    foreach (var tag in packageInfo.Tags)
+                    {
+                        if (!model.Tags.Any(t => t.Equals(tag.ToLower())))
+                        {
+                            model.Tags.Add(tag.ToLower());
+                        }
+                    }
+                }
+                else
+                {
+                    packageInfo.Tags = new string[0];
+                }
+                model.Packages.Add(packageInfo);
             }
 
             model.CurrentTasks = runningTasks
@@ -68,8 +93,9 @@ namespace Deployd.Agent.WebUi.Converters
 
 
             model.AvailableVersions =
-                cache.AllCachedPackages().Select(p => p.Version.ToString()).Distinct().OrderByDescending(s => s);
+                allPackagesList.Select(p => p.Version.ToString()).Distinct().OrderByDescending(s => s);
 
+            model.NugetRepository = agentSettings.NuGetRepository;
             return model;
         }
     }

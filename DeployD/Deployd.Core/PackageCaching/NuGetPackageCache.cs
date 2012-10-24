@@ -4,8 +4,8 @@ using System.IO;
 using System.Linq;
 using Deployd.Core.AgentConfiguration;
 using NuGet;
-using log4net;
 using IFileSystem = System.IO.Abstractions.IFileSystem;
+using ILogger = Ninject.Extensions.Logging.ILogger;
 
 namespace Deployd.Core.PackageCaching
 {
@@ -15,13 +15,16 @@ namespace Deployd.Core.PackageCaching
     public class NuGetPackageCache : ILocalPackageCache
     {
         private readonly IFileSystem _fileSystem;
-        protected static readonly ILog Logger = LogManager.GetLogger("NuGetPackageCache"); 
+        protected readonly ILogger Logger;
+        public event EventHandler<PackageEventArgs> OnUpdateStarted;
+        public event EventHandler<PackageEventArgs> OnUpdateFinished;
 
         private readonly string _cacheDirectory;
 
-        public NuGetPackageCache(IFileSystem fileSystem, IAgentSettings agentSettings)
-            : this(fileSystem, agentSettings.CacheDirectory)
+        public NuGetPackageCache(IFileSystem fileSystem, IAgentSettingsManager agentSettings, ILogger logger)
+            : this(fileSystem, agentSettings.Settings.CacheDirectory)
         {
+            Logger = logger;
         }
 
         public NuGetPackageCache(IFileSystem fileSystem, string cacheDirectory)
@@ -86,38 +89,53 @@ namespace Deployd.Core.PackageCaching
 
         public void Add(IPackage package)
         {
-            var packageCache = PackageCacheLocation(package);
+            var packageCacheLocation = PackageCacheLocation(package);
 
-            _fileSystem.EnsureDirectoryExists(packageCache);
+            _fileSystem.EnsureDirectoryExists(packageCacheLocation);
 
-            var cachedPackagePath = Path.Combine(packageCache, CachedPackageVersionFilename(package.Id, package.Version.ToString()));
+            var cachedPackagePath = Path.Combine(packageCacheLocation, CachedPackageVersionFilename(package.Id, package.Version.ToString()));
             
             if (CachedVersionExistsAndIsUpToDate(package, cachedPackagePath))
             {
                 return;
             }
 
-            Logger.InfoFormat("Downloading {0} to {1}.", package.Id, package);
-            File.WriteAllBytes(cachedPackagePath, package.GetStream().ReadAllBytes());
-            Logger.InfoFormat("Cached {0} to {1}.", package.Id, package);
+            Logger.Info("Downloading {0} to {1}.", package.Id, package);
+
+            if (OnUpdateStarted != null)
+            {
+                OnUpdateStarted(this, new PackageEventArgs(package));
+            }
+
+            // save the package
+            try
+            {
+                File.WriteAllBytes(cachedPackagePath, package.GetStream().ReadAllBytes());
+            } catch (OutOfMemoryException)
+            {
+                
+            }
+
+            Logger.Info("Cached {0} to {1}.", package.Id, package);
+
+            if (OnUpdateFinished != null)
+            {
+                OnUpdateFinished(this, new PackageEventArgs(package));
+            }
         }
 
-        private static bool CachedVersionExistsAndIsUpToDate(IPackage package, string packagePath)
+        public bool CachedVersionExistsAndIsUpToDate(IPackage package)
+        {
+            var packageCacheLocation = PackageCacheLocation(package);
+            var cachedPackagePath = Path.Combine(packageCacheLocation, CachedPackageVersionFilename(package.Id, package.Version.ToString()));
+            return CachedVersionExistsAndIsUpToDate(package, cachedPackagePath);
+        }
+
+        public bool CachedVersionExistsAndIsUpToDate(IPackage package, string packagePath)
         {
             bool exists = File.Exists(packagePath);
             bool upToDate = !package.Published.HasValue
                              || package.Published.Value.LocalDateTime < File.GetLastWriteTime(packagePath);
-            if (exists)
-            {
-                Logger.DebugFormat("Evaluating packageId: '{0}' - ver '{1}', cached item already exists.", package.Id, package.Version);
-            }
-            if (upToDate)
-            {
-                Logger.DebugFormat("Cached package is up to date");
-            } else
-            {
-                Logger.DebugFormat("Cached package needs updating");
-            }
             return exists && upToDate;
         }
 
@@ -167,7 +185,13 @@ namespace Deployd.Core.PackageCaching
                 throw new ArgumentOutOfRangeException("version");
             }
 
-            return new ZipPackage(packagePath);
+            try
+            {
+                return new ZipPackage(packagePath);
+            } catch (Exception ex)
+            {
+                return null;
+            }
         }
 
         private static string CachedPackageVersionFilename(string packageId, string version)

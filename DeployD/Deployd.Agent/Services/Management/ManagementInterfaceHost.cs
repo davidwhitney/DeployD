@@ -5,13 +5,24 @@ using System.ServiceModel.Web;
 using Deployd.Agent.WebUi.Modules;
 using Deployd.Core.Hosting;
 using Nancy.Hosting.Wcf;
-using log4net;
+using Ninject.Extensions.Logging;
 
 namespace Deployd.Agent.Services.Management
 {
     public class ManagementInterfaceHost : IWindowsService
     {
-        protected static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType); 
+        private readonly ILogger _logger;
+
+        public ManagementInterfaceHost(ILogger logger)
+        {
+            _logger = logger;
+        }
+
+        ~ManagementInterfaceHost()
+        {
+            _logger.Warn("Destroying a {0}", this.GetType());
+
+        }
         
         private WebServiceHost _host;
 
@@ -24,6 +35,10 @@ namespace Deployd.Agent.Services.Management
             PackagesModule.Container = AppContext.Container;
             InstallationsModule.Container = AppContext.Container;
             LogModule.Container = AppContext.Container;
+            ActionsModule.Container = AppContext.Container;
+            ConfigurationModule.Container = AppContext.Container;
+
+            Nancy.Json.JsonSettings.MaxJsonLength = 1024*1024*5; // 5mb max
 
             try
             {
@@ -34,10 +49,10 @@ namespace Deployd.Agent.Services.Management
             } 
             catch (Exception ex)
             {
-                Logger.Fatal("could not start listening", ex);
+                _logger.Fatal(ex, "could not start listening");
             }
 
-            Logger.Info("Hosting Web interface on: " + WebUiAddress);
+            _logger.Info("Hosting Web interface on: " + WebUiAddress);
         }
 
         public void Stop()

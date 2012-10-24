@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using DeployD.Hub.Areas.Api.Models;
+using Deployd.Core;
 
 namespace DeployD.Hub.Areas.Api.Code
 {
@@ -42,9 +43,23 @@ namespace DeployD.Hub.Areas.Api.Code
             return _agentList;
         }
 
-        public AgentRecord Get(Func<List<AgentRecord>, AgentRecord> predicate )
+        public AgentRecord Get(Func<AgentRecord, bool> predicate )
         {
-            return predicate.Invoke(_agentList);
+            return _agentList.SingleOrDefault(predicate);
+        }
+
+        public IEnumerable<AgentRecord> Where(Func<AgentRecord, bool> predicate)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void SetApproved(string hostname)
+        {
+            var agent = _agentList.SingleOrDefault(a => a.Hostname == hostname);
+            if (agent != null)
+            {
+                agent.Approved = true;
+            }
         }
     }
 }

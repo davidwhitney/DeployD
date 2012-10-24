@@ -3,18 +3,32 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Deployd.Agent.Services.HubCommunication;
+using Deployd.Agent.Services.PackageDownloading;
 using Deployd.Core;
+using Deployd.Core.AgentConfiguration;
 using Deployd.Core.Hosting;
 using Deployd.Core.Installation;
-using log4net;
+using Deployd.Core.Notifications;
+using Deployd.Core.PackageCaching;
+using Deployd.Core.Remoting;
 using log4net.Core;
+using ILogger = Ninject.Extensions.Logging.ILogger;
 
 namespace Deployd.Agent.Services.InstallationService
 {
     public class PackageInstallationService : IWindowsService
     {
         private readonly IDeploymentService _deploymentService;
-        protected static readonly ILog Logger = LogManager.GetLogger("PackageInstallationService");
+        private readonly ILogger _logger;
+        private readonly IHubCommunicator _hubCommunicator;
+        private ILocalPackageCache _agentCache;
+        private IInstalledPackageArchive _installCache;
+        private RunningInstallationTaskList _runningTasks;
+        private IAgentSettingsManager _settingsManager;
+        private readonly IPackagesList _allPackagesList;
+        private readonly CurrentlyDownloadingList _currentlyDownloadingList;
+        private readonly INotificationService _notificationService;
 
         public ApplicationContext AppContext { get; set; }
         public TimedSingleExecutionTask TimedTask { get; private set; }
@@ -26,13 +40,37 @@ namespace Deployd.Agent.Services.InstallationService
         public PackageInstallationService(InstallationTaskQueue pendingInstalls, 
             RunningInstallationTaskList runningInstalls, 
             CompletedInstallationTaskList completedInstalls,
-            IDeploymentService deploymentService)
+            IDeploymentService deploymentService,
+            ILogger logger,
+            IHubCommunicator hubCommunicator, 
+            ILocalPackageCache agentCache, 
+            IInstalledPackageArchive installCache, 
+            RunningInstallationTaskList runningTasks, 
+            IAgentSettingsManager settingsManager,
+            IPackagesList allPackagesList,
+            CurrentlyDownloadingList currentlyDownloadingList,
+            INotificationService notificationService)
         {
             CompletedInstalls = completedInstalls;
             _deploymentService = deploymentService;
+            _logger = logger;
+            _hubCommunicator = hubCommunicator;
+            _agentCache = agentCache;
+            _installCache = installCache;
+            _runningTasks = runningTasks;
+            _settingsManager = settingsManager;
+            _allPackagesList = allPackagesList;
+            _currentlyDownloadingList = currentlyDownloadingList;
+            _notificationService = notificationService;
             PendingInstalls = pendingInstalls;
             RunningInstalls = runningInstalls;
-            TimedTask = new TimedSingleExecutionTask(5000, CheckForNewInstallations);
+            TimedTask = new TimedSingleExecutionTask(5000, CheckForNewInstallations, _logger);
+        }
+
+        ~PackageInstallationService()
+        {
+            _logger.Warn("Destroying a {0}", this.GetType());
+
         }
 
         public void Start(string[] args)
@@ -52,13 +90,24 @@ namespace Deployd.Agent.Services.InstallationService
             while (PendingInstalls.Count > 0)
             {
                 var nextPendingInstall = PendingInstalls.Dequeue();
+                _logger.Debug("{0} {1} - Preparing installation", nextPendingInstall.PackageId, nextPendingInstall.Version);
                 
                 if (InstallationIsAlreadyRunningFor(nextPendingInstall.PackageId, nextPendingInstall.Version))
                 {
+                    _logger.Debug("{0} {1} - Already running, dropping", nextPendingInstall.PackageId, nextPendingInstall.Version);
                     alreadyRunning.Add(nextPendingInstall);
                     continue;
                 }
-                
+
+                if (RunningInstalls.Count >= _settingsManager.Settings.MaxConcurrentInstallations)
+                {
+                    _logger.Debug("{0} {1} - Max installations already running, will try again soon", nextPendingInstall.PackageId, nextPendingInstall.Version);
+                    alreadyRunning.Add(nextPendingInstall);
+                    continue;
+                }
+
+                _logger.Debug("{0} {1} - Starting installation", nextPendingInstall.PackageId, nextPendingInstall.Version);
+                _notificationService.NotifyAll(EventType.Installation, string.Format("{0} starting install {1}", nextPendingInstall.PackageId, nextPendingInstall.Version));
                 RunningInstalls.Add(nextPendingInstall);
                 StartInstall(nextPendingInstall);
             }
@@ -81,16 +130,18 @@ namespace Deployd.Agent.Services.InstallationService
 
         private void StartInstall(InstallationTask nextPendingInstall)
         {
-            nextPendingInstall.Task = new Task<InstallationResult>(() =>
-            {
+            nextPendingInstall.Task = new Task<InstallationResult>(() => 
                 _deploymentService.InstallPackage(nextPendingInstall.PackageId, nextPendingInstall.Version, Guid.NewGuid().ToString(), new CancellationTokenSource(),
-                                                    progressReport => HandleProgressReport(nextPendingInstall, progressReport));
-                return new InstallationResult();
-            });
+                                                                                            progressReport => HandleProgressReport(nextPendingInstall, progressReport)));
 
             nextPendingInstall.Task
                 .ContinueWith(RemoveFromRunningInstallationList)
-                .ContinueWith(task => Logger.Error("Installation task failed.", task.Exception), TaskContinuationOptions.OnlyOnFaulted);
+                .ContinueWith(task => _logger.Error(task.Exception, "Installation task failed."), TaskContinuationOptions.OnlyOnFaulted);
+
+            _logger.Debug("Installation task queued");
+            _notificationService.NotifyAll(EventType.Installation, string.Format("{0} will install {1} (queued)", 
+                nextPendingInstall.PackageId, 
+                string.IsNullOrWhiteSpace(nextPendingInstall.Version) ? "latest version" : nextPendingInstall.Version));
 
             nextPendingInstall.Task.Start();
         }
@@ -126,13 +177,19 @@ namespace Deployd.Agent.Services.InstallationService
             installationTask.LogFileName = progressReport.Context.LogFileName;
             installationTask.ProgressReports.Add(progressReport);
 
+            // update completed datetime in case an exception occurs
+            installationTask.DateCompleted = DateTime.Now;
+
             if (progressReport.Exception == null)
             {
+                _hubCommunicator.SendStatusToHubAsync(AgentStatusFactory.BuildStatus(_allPackagesList, _agentCache, _installCache, _runningTasks, _settingsManager, _currentlyDownloadingList, CompletedInstalls));
                 return;
             }
 
             installationTask.HasErrors = true;
             installationTask.Errors.Add(progressReport.Exception);
+
+            _hubCommunicator.SendStatusToHubAsync(AgentStatusFactory.BuildStatus(_allPackagesList, _agentCache, _installCache, _runningTasks, _settingsManager, _currentlyDownloadingList, CompletedInstalls));
         }
 
         private void RemoveFromRunningInstallationList(Task<InstallationResult> completedInstallationTask)
@@ -142,7 +199,9 @@ namespace Deployd.Agent.Services.InstallationService
             {
                 RunningInstalls.Remove(installationTask);
             }
+            
             CompletedInstalls.Add(installationTask);
+            _hubCommunicator.SendStatusToHubAsync(AgentStatusFactory.BuildStatus(_allPackagesList, _agentCache, _installCache, _runningTasks, _settingsManager, _currentlyDownloadingList, CompletedInstalls));
         }
     }
 }

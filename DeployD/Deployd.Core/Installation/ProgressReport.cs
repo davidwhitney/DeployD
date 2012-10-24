@@ -9,6 +9,7 @@ namespace Deployd.Core.Installation
         public string PackageId { get; private set; }
         public string Message { get; private set; }
         public string Level { get; private set; }
+        
         public DeploymentContext Context { get; private set; }
 
         public Exception Exception { get; private set; }
@@ -26,7 +27,23 @@ namespace Deployd.Core.Installation
             Context = deploymentContext;
             ReportingType = reportingType;
         }
-
+        public ProgressReport(DeploymentContext deploymentContext, Type reportingType, string message, string level = "Info", Exception exception = null)
+        {
+            Level = level;
+            if (Context != null && Context.Package != null)
+            {
+                PackageId = Context.Package.Id;
+                Version = Context.Package.Version.ToString();
+            }
+            if (Context != null)
+            {
+                InstallationTaskId = Context.InstallationTaskId;
+            }
+            Message = message;
+            Exception = exception;
+            Context = deploymentContext;
+            ReportingType = reportingType;
+        }
 
 
         public static ProgressReport Info(DeploymentContext deploymentContext, object sender, string packageId, string version, string taskId, string message)

@@ -1,0 +1,10 @@
+﻿@{
+	Layout  = "layout.cshtml";
+}
+<h2>Installation Logs for @Model.Group</h2>
+        
+@foreach (var log in Model.Logs)
+{
+    <p><a href="/log/@log.Group/@log.LogFileName">@log.LogFileName</a> - @log.DateModified</p>
+}
+

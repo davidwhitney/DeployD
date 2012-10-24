@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Linq;
 using NuGet;
-using log4net;
+using ILogger = Ninject.Extensions.Logging.ILogger;
 
 namespace Deployd.Core.PackageTransport
 {
@@ -9,26 +9,46 @@ namespace Deployd.Core.PackageTransport
     {
         private readonly IPackageRepositoryFactory _packageRepositoryFactory;
         private readonly IPackageRepository _packageRepository;
-        private readonly ILog _logger = LogManager.GetLogger("RetrieveNuGetPackageQuery");
+        private readonly ILogger _logger;
 
-        public RetrieveNuGetPackageQuery(IPackageRepositoryFactory packageRepositoryFactory, FeedLocation feedLocation)
+        public RetrieveNuGetPackageQuery(IPackageRepositoryFactory packageRepositoryFactory, FeedLocation feedLocation, ILogger logger)
         {
             _packageRepositoryFactory = packageRepositoryFactory;
+            _logger = logger;
             _packageRepository = _packageRepositoryFactory.CreateRepository(feedLocation.Source);
-            _logger.InfoFormat("Nuget feed: {0}", feedLocation.Source);
         }
 
         public IPackage GetLatestPackage(string packageId)
         {
             try
             {
-                var all = _packageRepository.GetPackages().Where(x => x.Id == packageId && x.IsLatestVersion).ToList();
-                all.Reverse();
-                return all.FirstOrDefault();
+                var all = _packageRepository.GetPackages().Where(x => x.Id == packageId && x.IsAbsoluteLatestVersion).ToList();
+
+                return all.OrderByDescending(v=>v.Version).FirstOrDefault();
             } 
             catch (Exception ex)
             {
-                _logger.Error("Could not get packages", ex);
+                _logger.Error(ex, "Could not get packages");
+                throw;
+            }
+        }
+
+        public IPackage GetSpecificPackage(string packageId, string version)
+        {
+            try
+            {
+                return _packageRepository
+                    .GetPackages()
+                    .Where(x => x.Id == packageId && x.Version.Equals(version))
+                    .ToList()
+                    .SingleOrDefault();
+            } catch (ArgumentNullException)
+            {
+                return null;
+            }
+            catch (Exception ex)
+            {
+                _logger.Error(ex, "Could not get packages");
                 throw;
             }
         }

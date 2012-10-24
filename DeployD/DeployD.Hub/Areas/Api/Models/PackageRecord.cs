@@ -1,3 +1,5 @@
+using Deployd.Core;
+
 namespace DeployD.Hub.Areas.Api.Models
 {
     public class PackageRecord

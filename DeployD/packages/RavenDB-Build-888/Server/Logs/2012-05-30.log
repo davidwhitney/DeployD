@@ -1,0 +1,112 @@
+time,logger,level,message,exception
+2012-05-30 17:44:29.6068,Raven.Database.Impl.DocumentCacher,Info,"MemoryCache Settings:
+  PhysicalMemoryLimit = 99
+  CacheMemoryLimit    = 3199205376
+  PollingInterval     = 00:02:00",
+2012-05-30 17:44:29.6628,Raven.Storage.Esent.TransactionalStorage,Info,"Esent Settings:
+  MaxVerPages      = 32768
+  CacheSizeMax     = 262144
+  DatabasePageSize = 4096",
+2012-05-30 17:44:41.2680,Raven.Storage.Esent.StorageActions.DocumentStorageActions,Debug,Document with key 'Raven/Backup/Status' was not found,
+2012-05-30 17:44:41.4260,Raven.Database.Indexing.WorkContext,Debug,"No work was found, workerWorkCounter: 0, for: IndexingExecuter, will wait for additional work",
+2012-05-30 17:44:41.4260,Raven.Database.Indexing.WorkContext,Debug,"No work was found, workerWorkCounter: 0, for: ReducingExecuter, will wait for additional work",
+2012-05-30 18:44:41.6420,Raven.Database.Indexing.WorkContext,Debug,"No work was found, workerWorkCounter: 0, for: IndexingExecuter, will wait for additional work",
+2012-05-30 18:44:41.6580,Raven.Database.Indexing.WorkContext,Debug,"No work was found, workerWorkCounter: 0, for: ReducingExecuter, will wait for additional work",
+2012-05-30 19:44:41.8280,Raven.Database.Indexing.WorkContext,Debug,"No work was found, workerWorkCounter: 0, for: IndexingExecuter, will wait for additional work",
+2012-05-30 19:44:41.8470,Raven.Database.Indexing.WorkContext,Debug,"No work was found, workerWorkCounter: 0, for: ReducingExecuter, will wait for additional work",
+time,logger,level,message,exception
+2012-05-30 19:50:53.1901,Raven.Database.Impl.DocumentCacher,Info,"MemoryCache Settings:
+  PhysicalMemoryLimit = 99
+  CacheMemoryLimit    = 3199205376
+  PollingInterval     = 00:02:00",
+2012-05-30 19:50:53.2211,Raven.Storage.Esent.TransactionalStorage,Info,"Esent Settings:
+  MaxVerPages      = 32768
+  CacheSizeMax     = 262144
+  DatabasePageSize = 4096",
+2012-05-30 19:50:55.4293,Raven.Storage.Esent.StorageActions.DocumentStorageActions,Debug,Document with key 'Raven/Backup/Status' was not found,
+2012-05-30 19:50:55.4833,Raven.Database.Indexing.WorkContext,Debug,"No work was found, workerWorkCounter: 0, for: ReducingExecuter, will wait for additional work",
+2012-05-30 19:50:55.4833,Raven.Database.Indexing.WorkContext,Debug,"No work was found, workerWorkCounter: 0, for: IndexingExecuter, will wait for additional work",
+2012-05-30 19:50:58.3856,Raven.Database.Server.HttpServer,Debug,Request #   1: GET     -   318 ms - <default>  - 200 - /stats?noCache=794683928,
+2012-05-30 19:51:26.0504,Raven.Database.Storage.IndexDefinitionStorage,Info,"New index Temp%2fAgentRecords:
+using Raven.Abstractions;
+using Raven.Database.Linq;
+using System.Linq;
+using System.Collections.Generic;
+using System.Collections;
+using System;
+using Raven.Database.Linq.PrivateExtensions;
+using Lucene.Net.Documents;
+using Raven.Database.Indexing;
+public class Index_Temp_2fAgentRecords : AbstractViewGenerator
+{
+	public Index_Temp_2fAgentRecords()
+	{
+		this.ViewText = @""from doc in docs.AgentRecords
+select new {  }
+"";
+		this.ForEntityNames.Add(""AgentRecords"");
+		this.AddMapDefinition(docs => from doc in docs
+			where doc[""@metadata""][""Raven-Entity-Name""] == ""AgentRecords""
+			select new { __document_id = doc.__document_id });
+		this.AddField(""__document_id"");
+		this.AddQueryParameterForMap(""__document_id"");
+		this.AddQueryParameterForReduce(""__document_id"");
+	}
+}
+
+Compiled to:
+using Raven.Abstractions;
+using Raven.Database.Linq;
+using System.Linq;
+using System.Collections.Generic;
+using System.Collections;
+using System;
+using Raven.Database.Linq.PrivateExtensions;
+using Lucene.Net.Documents;
+using Raven.Database.Indexing;
+public class Index_Temp_2fAgentRecords : AbstractViewGenerator
+{
+	public Index_Temp_2fAgentRecords()
+	{
+		this.ViewText = @""from doc in docs.AgentRecords
+select new {  }
+"";
+		this.ForEntityNames.Add(""AgentRecords"");
+		this.AddMapDefinition(docs => from doc in docs
+			where doc[""@metadata""][""Raven-Entity-Name""] == ""AgentRecords""
+			select new { __document_id = doc.__document_id });
+		this.AddField(""__document_id"");
+		this.AddQueryParameterForMap(""__document_id"");
+		this.AddQueryParameterForReduce(""__document_id"");
+	}
+}
+",
+2012-05-30 19:51:26.1724,Raven.Database.Indexing.IndexStorage,Info,Creating index Temp/AgentRecords with encoded name Temp/AgentRecords,
+2012-05-30 19:51:26.3284,Raven.Database.Indexing.Index.Indexing,Debug,Creating index for Temp/AgentRecords,
+2012-05-30 19:51:26.4204,Raven.Database.Indexing.WorkContext,Debug,Incremented work counter to 1 because: PUT INDEX Temp/AgentRecords,
+2012-05-30 19:51:26.5494,Raven.Database.Indexing.WorkContext,Debug,"No work was found, workerWorkCounter: 1, for: ReducingExecuter, will wait for additional work",
+2012-05-30 19:51:26.5494,Raven.Database.Indexing.WorkContext,Debug,"No work was found, workerWorkCounter: 1, for: IndexingExecuter, will wait for additional work",
+2012-05-30 19:51:26.5774,Raven.Database.Indexing.Index.Querying,Debug,Issuing query on index Temp/AgentRecords for all documents,
+2012-05-30 19:51:26.6265,Raven.Database.Server.HttpServer,Debug,"Request #   2: GET     - 1,335 ms - <default>  - 200 - /indexes/dynamic/AgentRecords?query=&start=0&pageSize=128&aggregation=None",
+2012-05-30 19:51:26.6665,Raven.Database.Server.HttpServer,Debug,"	Query: 
+	Time: 1,296 ms
+	Index: Temp/AgentRecords
+	Results: 0 returned out of 0 total.
+",
+2012-05-30 19:51:35.1553,Raven.Database.Server.HttpServer,Debug,Request #   3: GET     -    25 ms - <default>  - 304 - /indexes/dynamic/AgentRecords?query=&start=0&pageSize=128&aggregation=None,
+2012-05-30 19:51:35.1553,Raven.Database.Server.HttpServer,Debug,"	Query: 
+	Time: 25 ms
+",
+2012-05-30 19:52:06.9275,Raven.Storage.Esent.StorageActions.DocumentStorageActions,Debug,Document with key 'Raven/Replication/Destinations' was not found,
+2012-05-30 19:52:06.9275,Raven.Database.Server.HttpServer,Debug,Request #   4: GET     -    24 ms - <default>  - 404 - /docs/Raven/Replication/Destinations,
+2012-05-30 19:52:08.4656,Raven.Database.Indexing.Index.Querying,Debug,Issuing query on index Temp/AgentRecords for all documents,
+2012-05-30 19:52:08.4656,Raven.Database.Server.HttpServer,Debug,Request #   5: GET     -     1 ms - <default>  - 200 - /indexes/dynamic/AgentRecords?query=&start=0&pageSize=128&aggregation=None,
+2012-05-30 19:52:08.4656,Raven.Database.Server.HttpServer,Debug,"	Query: 
+	Time: 0 ms
+	Index: Temp/AgentRecords
+	Results: 0 returned out of 0 total.
+",
+2012-05-30 19:52:20.6058,Raven.Storage.Esent.StorageActions.DocumentStorageActions,Debug,Document with key 'agent/devpc12' was not found,
+2012-05-30 19:52:20.6058,Raven.Database.Server.HttpServer,Debug,Request #   6: GET     -     0 ms - <default>  - 404 - /docs/agent/devpc12,
+2012-05-30 19:52:26.7435,Raven.Storage.Esent.StorageActions.DocumentStorageActions,Debug,Document with key 'devpc12' was not found,
+2012-05-30 19:52:26.7435,Raven.Database.Server.HttpServer,Debug,Request #   7: GET     -     0 ms - <default>  - 404 - /docs/devpc12,

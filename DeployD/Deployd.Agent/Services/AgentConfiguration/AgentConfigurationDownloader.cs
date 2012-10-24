@@ -7,29 +7,46 @@ using Deployd.Core.AgentConfiguration;
 using Deployd.Core.PackageTransport;
 using NuGet;
 using log4net;
+using ILogger = Ninject.Extensions.Logging.ILogger;
 
 namespace Deployd.Agent.Services.AgentConfiguration
 {
     public class AgentConfigurationDownloader : IAgentConfigurationDownloader
     {
         public const string DeploydConfigurationPackageName = "Deployd.Configuration";
-        private static readonly ILog Logger = LogManager.GetLogger(typeof (AgentConfigurationDownloader));
         private readonly IAgentConfigurationManager _agentConfigurationManager;
         private readonly IRetrievePackageQuery _packageQuery;
         private readonly IAgentSettingsManager _agentSettingsManager;
+        private readonly ILogger _logger;
+        private readonly IConfigurationDefaults _configurationDefaults;
 
         public AgentConfigurationDownloader(IAgentConfigurationManager agentConfigurationManager,
                                             IRetrievePackageQuery packageQuery,
-                                            IAgentSettingsManager agentSettingsManager)
+                                            IAgentSettingsManager agentSettingsManager,
+            ILogger logger,
+            IConfigurationDefaults configurationDefaults)
         {
             _agentConfigurationManager = agentConfigurationManager;
             _packageQuery = packageQuery;
             _agentSettingsManager = agentSettingsManager;
+            _logger = logger;
+            _configurationDefaults = configurationDefaults;
         }
 
         public void DownloadAgentConfiguration()
         {
-            var configPackage = DownloadConfigurationPackage();
+            if (!_agentSettingsManager.Settings.EnableConfigurationSync)
+                return;
+
+            IPackage configPackage = null;
+            try
+            {
+                configPackage = DownloadConfigurationPackage();
+            } catch(Exception ex)
+            {
+                _logger.Error(ex, "Could not download configuration package");
+                return;
+            }
 
             try
             {
@@ -38,7 +55,7 @@ namespace Deployd.Agent.Services.AgentConfiguration
             }
             catch (Exception ex)
             {
-                Logger.Error("failed", ex);
+                _logger.Error(ex, "failed");
             }
         }
 
@@ -57,12 +74,12 @@ namespace Deployd.Agent.Services.AgentConfiguration
             }
         }
 
-        private static IPackageFile ExtractConfig(IPackage configPackage)
+        private IPackageFile ExtractConfig(IPackage configPackage)
         {
             using (new DebugTimer("Extracting config from " + DeploydConfigurationPackageName))
             {
                 var files = configPackage.GetFiles();
-                var agentConfigurationFile = ExtractAgentConfigurationFile(ConfigurationFiles.AgentConfigurationFile, files);
+                var agentConfigurationFile = ExtractAgentConfigurationFile(_configurationDefaults.AgentConfigurationFile, files);
                 return agentConfigurationFile;
             }
         }
@@ -72,7 +89,7 @@ namespace Deployd.Agent.Services.AgentConfiguration
             using (new DebugTimer("Saving config from " + DeploydConfigurationPackageName))
             {
                 var configBytes = GetConfigurationFileAsBytes(agentConfigurationFile);
-                _agentConfigurationManager.SaveToDisk(configBytes);
+                _agentConfigurationManager.SaveToDisk(configBytes, _agentConfigurationManager.ApplicationFilePath(_configurationDefaults.AgentConfigurationFile));
                 _agentSettingsManager.UnloadSettings();
             }
         }

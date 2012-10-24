@@ -13,7 +13,7 @@ namespace Deployd.Core.Hosting
     /// Instantiated by the framework as part of installation.
     /// Weird looking implementation is required to work around the way the famework
     /// service installation class works (it finds a class that inherits Installer and has a RunInstaller(true) attrib
-    /// creates an instance of it and executes it. To enable configuration, we need to punch an Action shaped hole in the side
+    /// creates an instance of it and executes it. To enable configuration, we need to punch an ScriptName shaped hole in the side
     /// that can be invoked by the zero param ctor)
     /// </summary>
     [RunInstaller(true)]

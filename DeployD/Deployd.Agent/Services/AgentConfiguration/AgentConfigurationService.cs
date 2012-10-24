@@ -2,25 +2,32 @@
 using Deployd.Core;
 using Deployd.Core.AgentConfiguration;
 using Deployd.Core.Hosting;
+using Ninject.Extensions.Logging;
 using log4net;
 
 namespace Deployd.Agent.Services.AgentConfiguration
 {
     public class AgentConfigurationService : IWindowsService
     {
-        protected static readonly ILog Logger = LogManager.GetLogger(typeof(AgentConfigurationService));
-        
         public ApplicationContext AppContext { get; set; }
         public TimedSingleExecutionTask TimedTask { get; private set; }
 
         private readonly IAgentConfigurationDownloader _configurationDownloader;
+        private readonly ILogger _logger;
 
-        public AgentConfigurationService(IAgentSettings agentSettings, IAgentConfigurationDownloader configurationDownloader)
+        public AgentConfigurationService(IAgentSettings agentSettings, IAgentConfigurationDownloader configurationDownloader, ILogger logger)
         {
             if (agentSettings == null) throw new ArgumentNullException("agentSettings");
             if (configurationDownloader == null) throw new ArgumentNullException("configurationDownloader");
             _configurationDownloader = configurationDownloader;
-            TimedTask = new TimedSingleExecutionTask(agentSettings.ConfigurationSyncIntervalMs, DownloadConfiguration, true);
+            _logger = logger;
+            TimedTask = new TimedSingleExecutionTask(agentSettings.ConfigurationSyncIntervalMs, DownloadConfiguration,logger, true);
+        }
+
+        ~AgentConfigurationService()
+        {
+            _logger.Warn("Destroying a {0}", this.GetType());
+
         }
 
         public void Start(string[] args)
@@ -35,7 +42,7 @@ namespace Deployd.Agent.Services.AgentConfiguration
 
         public void DownloadConfiguration()
         {
-            Logger.DebugFormat("Downloading configuration");
+            _logger.Debug("Downloading configuration");
             _configurationDownloader.DownloadAgentConfiguration();
         }
     }

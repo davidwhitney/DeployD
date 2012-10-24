@@ -13,19 +13,21 @@ namespace Deployd.Core.Installation.Hooks
     /// </summary>
     public abstract class DeploymentHookBase : IDeploymentHook
     {
-        protected readonly IAgentSettings AgentSettings;
+        protected readonly IAgentSettingsManager AgentSettingsManager;
         protected readonly IFileSystem FileSystem;
 
-        protected DeploymentHookBase(IAgentSettings agentSettings, IFileSystem fileSystem)
+        protected DeploymentHookBase(IAgentSettingsManager agentSettingsManager, IFileSystem fileSystem)
         {
-            AgentSettings = agentSettings;
+            AgentSettingsManager = agentSettingsManager;
             FileSystem = fileSystem;
         }
 
         public abstract bool HookValidForPackage(DeploymentContext context);
-        public virtual void BeforeDeploy(DeploymentContext context){}
-        public virtual void Deploy(DeploymentContext context){}
-        public virtual void AfterDeploy(DeploymentContext context) { }
+        public virtual void BeforeDeploy(DeploymentContext context, Action<ProgressReport> reportProgress) { }
+        public virtual void Deploy(DeploymentContext context, Action<ProgressReport> reportProgress) { }
+        public virtual void AfterDeploy(DeploymentContext context, Action<ProgressReport> reportProgress) { }
+
+        public abstract string ProgressMessage { get; }
 
         protected void CopyAllFilesToDestination(DeploymentContext context)
         {
@@ -52,6 +54,7 @@ namespace Deployd.Core.Installation.Hooks
 
         private void CleanDestinationFolder(DeploymentContext context, ILog logger)
         {
+            logger.InfoFormat("Cleaning folder {0}", context.TargetInstallationFolder);
             // wait 1 second for processes to release locks on destination files
             System.Threading.Thread.Sleep(1000);
 
@@ -90,7 +93,7 @@ namespace Deployd.Core.Installation.Hooks
         protected bool EnvironmentIsValidForPackage(DeploymentContext context)
         {
             var tags = context.Package.Tags.ToLower().Split(' ', ',', ';');
-            return tags.Intersect(AgentSettings.Tags).Any();
+            return tags.Intersect(AgentSettingsManager.Settings.Tags).Any();
         }
 
         protected void RunProcess(string executablePath, string executableArgs, ILog logger)

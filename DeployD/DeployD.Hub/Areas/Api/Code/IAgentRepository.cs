@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using DeployD.Hub.Areas.Api.Models;
+using Deployd.Core;
 
 namespace DeployD.Hub.Areas.Api.Code
 {
@@ -10,6 +11,8 @@ namespace DeployD.Hub.Areas.Api.Code
         void Remove(AgentRecord agent);
         void Remove(string hostname);
         List<AgentRecord> List();
-        AgentRecord Get(Func<List<AgentRecord>, AgentRecord> predicate );
+        AgentRecord Get(Func<AgentRecord, bool> predicate );
+        IEnumerable<AgentRecord> Where(Func<AgentRecord, bool> predicate);
+        void SetApproved(string hostname);
     }
 }

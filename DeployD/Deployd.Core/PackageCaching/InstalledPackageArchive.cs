@@ -8,20 +8,20 @@ namespace Deployd.Core.PackageCaching
 {
     public class InstalledPackageArchive : IInstalledPackageArchive
     {
-        private readonly IAgentSettings _agentSettings;
+        private readonly IAgentSettingsManager _agentSettingsManager;
         private readonly IFileSystem _fileSystem;
         private readonly ILocalPackageCache _packageCache;
 
-        public InstalledPackageArchive(IAgentSettings agentSettings, IFileSystem fileSystem, ILocalPackageCache packageCache)
+        public InstalledPackageArchive(IAgentSettingsManager agentSettingsManager, IFileSystem fileSystem, ILocalPackageCache packageCache)
         {
-            _agentSettings = agentSettings;
+            _agentSettingsManager = agentSettingsManager;
             _fileSystem = fileSystem;
             _packageCache = packageCache;
         }
 
         public IEnumerable<IPackage> GetCurrentInstalledPackages()
         {
-            var latestFolder = new DirectoryInfo(_agentSettings.LatestDirectory);
+            var latestFolder = new DirectoryInfo(_agentSettingsManager.Settings.LatestDirectory);
             
             if (latestFolder.Exists)
             {
@@ -48,7 +48,7 @@ namespace Deployd.Core.PackageCaching
 
         public IPackage GetCurrentInstalledVersion(string packageId)
         {
-            var latestPackageLocation = Path.Combine(_agentSettings.LatestDirectory, packageId);
+            var latestPackageLocation = Path.Combine(_agentSettingsManager.Settings.LatestDirectory, packageId);
             if (_fileSystem.Directory.Exists(latestPackageLocation))
             {
                 var installMarkerPath = Path.Combine(latestPackageLocation, "installed.txt");
@@ -64,7 +64,7 @@ namespace Deployd.Core.PackageCaching
 
         public void SetCurrentInstalledVersion(IPackage package)
         {
-            var latestPackageLocation = Path.Combine(_agentSettings.LatestDirectory, package.Id);
+            var latestPackageLocation = Path.Combine(_agentSettingsManager.Settings.LatestDirectory, package.Id);
 
             if (!_fileSystem.Directory.Exists(latestPackageLocation))
             {

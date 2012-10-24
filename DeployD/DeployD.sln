@@ -1,6 +1,6 @@
 ﻿
-Microsoft Visual Studio Solution File, Format Version 11.00
-# Visual Studio 2010
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2012
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Deployd.Agent", "Deployd.Agent\Deployd.Agent.csproj", "{A14CAFBC-947D-4381-8090-AC03D005AF66}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Deployd.Core", "Deployd.Core\Deployd.Core.csproj", "{86CDB912-81EA-45E1-B8DB-B09DE466540F}"
@@ -11,7 +11,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Deployd.Core.Test.Unit", "D
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DeployD.Hub", "DeployD.Hub\DeployD.Hub.csproj", "{005D88FF-E474-4C9B-A8F6-4BD668E456DF}"
 EndProject
-Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "Deployd.Agent.Setup", "Deployd.Agent.Setup\Deployd.Agent.Setup.vdproj", "{6A539E80-C7DB-400E-9421-8705A09064F6}"
+Project("{930C7802-8A8C-48F9-8165-68863BCCD9DD}") = "DeployD.Agent.Setup", "DeployD.Agent.Setup\DeployD.Agent.Setup.wixproj", "{E5C46369-9FC6-4FEE-B2F1-06A5B98BFAAB}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -73,12 +73,15 @@ Global
 		{005D88FF-E474-4C9B-A8F6-4BD668E456DF}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{005D88FF-E474-4C9B-A8F6-4BD668E456DF}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{005D88FF-E474-4C9B-A8F6-4BD668E456DF}.Release|x86.ActiveCfg = Release|Any CPU
-		{6A539E80-C7DB-400E-9421-8705A09064F6}.Debug|Any CPU.ActiveCfg = Debug
-		{6A539E80-C7DB-400E-9421-8705A09064F6}.Debug|Mixed Platforms.ActiveCfg = Debug
-		{6A539E80-C7DB-400E-9421-8705A09064F6}.Debug|x86.ActiveCfg = Debug
-		{6A539E80-C7DB-400E-9421-8705A09064F6}.Release|Any CPU.ActiveCfg = Release
-		{6A539E80-C7DB-400E-9421-8705A09064F6}.Release|Mixed Platforms.ActiveCfg = Release
-		{6A539E80-C7DB-400E-9421-8705A09064F6}.Release|x86.ActiveCfg = Release
+		{E5C46369-9FC6-4FEE-B2F1-06A5B98BFAAB}.Debug|Any CPU.ActiveCfg = Debug|x86
+		{E5C46369-9FC6-4FEE-B2F1-06A5B98BFAAB}.Debug|Mixed Platforms.ActiveCfg = Debug|x86
+		{E5C46369-9FC6-4FEE-B2F1-06A5B98BFAAB}.Debug|x86.ActiveCfg = Debug|x86
+		{E5C46369-9FC6-4FEE-B2F1-06A5B98BFAAB}.Debug|x86.Build.0 = Debug|x86
+		{E5C46369-9FC6-4FEE-B2F1-06A5B98BFAAB}.Release|Any CPU.ActiveCfg = Release|x86
+		{E5C46369-9FC6-4FEE-B2F1-06A5B98BFAAB}.Release|Mixed Platforms.ActiveCfg = Release|x86
+		{E5C46369-9FC6-4FEE-B2F1-06A5B98BFAAB}.Release|Mixed Platforms.Build.0 = Release|x86
+		{E5C46369-9FC6-4FEE-B2F1-06A5B98BFAAB}.Release|x86.ActiveCfg = Release|x86
+		{E5C46369-9FC6-4FEE-B2F1-06A5B98BFAAB}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

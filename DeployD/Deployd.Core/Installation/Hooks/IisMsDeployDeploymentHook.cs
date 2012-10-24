@@ -22,7 +22,7 @@ namespace Deployd.Core.Installation.Hooks
             Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86), @"IIS\Microsoft Web Deploy V3\msdeploy.exe"),
         };
 
-        public IisMsDeployDeploymentHook(IAgentSettings agentSettings, IFileSystem fileSystem) : base(agentSettings, fileSystem)
+        public IisMsDeployDeploymentHook(IAgentSettingsManager agentSettingsManager, IFileSystem fileSystem) : base(agentSettingsManager, fileSystem)
         {
         }
 
@@ -52,29 +52,47 @@ namespace Deployd.Core.Installation.Hooks
                 && TryFindWebsite("localhost", context.Package.Title, out website);
         }
 
-        public override void Deploy(DeploymentContext context)
+        public override void Deploy(DeploymentContext context, Action<ProgressReport> reportProgress)
         {
+            reportProgress(new ProgressReport(context, GetType(), "Deploying website")); 
+            
             var installationLogger = context.GetLoggerFor(this);
             LocateMsDeploy(installationLogger);
+
+            var applicationName = context.MetaData != null
+                                      ? context.MetaData.IISPath
+                                      : context.Package.Title;
+
             DeployWebsite(
                 "localhost",
                 Path.Combine(context.WorkingFolder, "Content\\" + context.Package.Id + ".zip"),
-                context.Package.Title,
+                applicationName,
                 installationLogger,
                 Ignore.AppOffline().And().LogFiles().And().MaintenanceFile());
         }
 
-        public override void AfterDeploy(DeploymentContext context)
+        public override void AfterDeploy(DeploymentContext context, Action<ProgressReport> reportProgress)
         {
+            reportProgress(new ProgressReport(context, GetType(), "Starting website"));
+
             var installationLogger = context.GetLoggerFor(this);
             RestartApplication(context, installationLogger);
 
         }
 
+        public override string ProgressMessage
+        {
+            get { return "Installing website on server"; }
+        }
+
         private void RestartApplication(DeploymentContext context, ILog logger)
         {
             string virtualDirectoryPath = null;
-            string[] websitePath = context.Package.Title.Split(new[] {'/'}, StringSplitOptions.RemoveEmptyEntries);
+            var applicationName = context.MetaData != null
+                                      ? context.MetaData.IISPath
+                                      : context.Package.Title;
+
+            string[] websitePath = applicationName.Split(new[] { '/' }, StringSplitOptions.RemoveEmptyEntries);
             if (websitePath.Length > 1)
             {
                 virtualDirectoryPath = string.Join("/", websitePath.Skip(1).ToArray());
@@ -83,8 +101,15 @@ namespace Deployd.Core.Installation.Hooks
             {
                 if (website == null)
                 {
-                    logger.WarnFormat("No such IIS website found: '{0}'", context.Package.Id);
+                    logger.WarnFormat("No such IIS website found: '{0}'", applicationName);
                 }
+
+                if (website.Properties["AppPoolId"] == null)
+                {
+                    logger.WarnFormat("Website has no AppPoolId: '{0}'", applicationName);
+                    DumpWebsiteProperties(website, logger);
+                }
+
                 var appPoolId = website.Properties["AppPoolId"].Value;
 
                 using (var applicationPool = new DirectoryEntry("IIS://localhost/W3SVC/AppPools/" + appPoolId))
@@ -93,6 +118,27 @@ namespace Deployd.Core.Installation.Hooks
                     applicationPool.Invoke("Stop");
                     logger.InfoFormat("Starting AppPool {0}...", appPoolId);
                     applicationPool.Invoke("Start");
+                }
+            }
+        }
+
+        private static void DumpWebsiteProperties(DirectoryEntry website, ILog logger)
+        {
+            foreach(string propertyName in website.Properties.PropertyNames)
+            {
+                var propertyValueCollection = website.Properties[propertyName];
+                if (propertyValueCollection != null)
+                {
+                    if (propertyValueCollection.Count == 1)
+                    {
+                        logger.DebugFormat("{0}={1}", propertyName, propertyValueCollection.Value);
+                    } else if (propertyValueCollection.Count > 0)
+                    {
+                        foreach(var value in propertyValueCollection)
+                        {
+                            logger.DebugFormat("{0}={1}", propertyName, value);
+                        }
+                    }
                 }
             }
         }
@@ -107,7 +153,7 @@ namespace Deployd.Core.Installation.Hooks
             }
 
             const string msDeployArgsFormat = @"-verb:sync -source:package=""{0}"" -dest:auto,computername=""{1}"" {3} -allowUntrusted -setParam:""IIS Web Application Name""=""{2}"" -verbose";
-            var executableArgs = string.Format(msDeployArgsFormat, sourcePackagePath, AgentSettings.MsDeployServiceUrl,
+            var executableArgs = string.Format(msDeployArgsFormat, sourcePackagePath, AgentSettingsManager.Settings.MsDeployServiceUrl,
                                                iisApplicationName, ignore);
 
             RunProcess(MsWebDeployPath, executableArgs, logger);

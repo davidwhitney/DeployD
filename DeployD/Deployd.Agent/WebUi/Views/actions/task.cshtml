@@ -1,0 +1,18 @@
+﻿@{
+	Layout  = "layout.cshtml";
+}
+
+<h2>Task execution @Model.Id</h2>
+
+<form method="POST" action="/actions/@Model.PackageId/@Model.ScriptName/run">
+    <input type="submit" value="Start"/>
+</form>
+
+Action: @Model.ScriptName<br/>
+Id: @Model.Id<br/>
+State: @Model.State<br/>
+Queued: @Model.DateQueued<br/>
+Started: @Model.DateStarted<br/>
+Completed: @Model.DateCompleted<br/>
+Log:<br/>
+<p>@Model.Log</p>

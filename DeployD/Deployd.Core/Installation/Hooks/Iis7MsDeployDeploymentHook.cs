@@ -11,35 +11,44 @@ namespace Deployd.Core.Installation.Hooks
 {
     public class Iis7MsDeployDeploymentHook : IisMsDeployDeploymentHook
     {
-        public Iis7MsDeployDeploymentHook(IAgentSettings agentSettings, IFileSystem fileSystem)
-            : base(agentSettings, fileSystem)
+        public Iis7MsDeployDeploymentHook(IAgentSettingsManager agentSettingsManager, IFileSystem fileSystem)
+            : base(agentSettingsManager, fileSystem)
         {
         }
 
-        public override void BeforeDeploy(DeploymentContext context)
+        public override void BeforeDeploy(DeploymentContext context, Action<ProgressReport> reportProgress)
         {
+            reportProgress(new ProgressReport(context, GetType(), "Stopping application pool(s)")); 
+            
             var logger = context.GetLoggerFor(this);
             var appPools = GetApplicationPoolsForWebsite(context.Package.Title);
             foreach (var appPool in appPools)
             {
-                logger.InfoFormat("Stopping application pool {0}", appPool.Name);
-                appPool.Stop();
+                if (appPool.State == ObjectState.Started)
+                {
+                    logger.InfoFormat("Stopping application pool {0}", appPool.Name);
+                    appPool.Stop();
+                }
             }
         }
 
         private IEnumerable<ApplicationPool> GetApplicationPoolsForWebsite(string websiteName)
         {
-            var site = FindIis7Website(websiteName);
-            var serverManager = new ServerManager();
-            if (site != null)
+            Site site = null;
+            if (TryFindIis7Website(websiteName, out site))
             {
-                foreach (var application in site.Applications)
+                var serverManager = new ServerManager();
+                if (site != null)
                 {
-                    var appPool =
-                        serverManager.ApplicationPools.SingleOrDefault(ap => ap.Name == application.ApplicationPoolName);
-                    if (appPool != null)
+                    foreach (var application in site.Applications)
                     {
-                        yield return appPool;
+                        var appPool =
+                            serverManager.ApplicationPools.SingleOrDefault(
+                                ap => ap.Name == application.ApplicationPoolName);
+                        if (appPool != null)
+                        {
+                            yield return appPool;
+                        }
                     }
                 }
             }
@@ -64,14 +73,18 @@ namespace Deployd.Core.Installation.Hooks
             }
         }
 
-        public override void AfterDeploy(DeploymentContext context)
+        public override void AfterDeploy(DeploymentContext context, Action<ProgressReport> reportProgress)
         {
             var logger = context.GetLoggerFor(this);
+            reportProgress(new ProgressReport(context, GetType(), "Starting application pool(s)")); 
             var appPools = GetApplicationPoolsForWebsite(context.Package.Title);
             foreach(var appPool in appPools)
             {
-                logger.InfoFormat("Starting application pool {0}", appPool.Name);
-                appPool.Start();
+                if (appPool.State == ObjectState.Stopped)
+                {
+                    logger.InfoFormat("Starting application pool {0}", appPool.Name);
+                    appPool.Start();
+                }
             }
         }
 
@@ -79,10 +92,16 @@ namespace Deployd.Core.Installation.Hooks
         {
             Site site;
             LocateMsDeploy(context.GetLoggerFor(this));
-            var iis7SiteInstance = FindIis7Website(context.Package.Title);
-            return context.Package.Tags.ToLower().Split(' ', ',', ';').Contains("website")
-                   && !string.IsNullOrEmpty(MsWebDeployPath)
-                   && TryFindIis7Website(context.Package.Id, out site);
+            Site iis7SiteInstance = null;
+            if (TryFindIis7Website(context.Package.Title, out iis7SiteInstance))
+            {
+                return context.Package.Tags.ToLower().Split(' ', ',', ';').Contains("website")
+                       && !string.IsNullOrEmpty(MsWebDeployPath)
+                       && TryFindIis7Website(context.Package.Id, out site);
+            } else
+            {
+                return false;
+            }
         }
     }
 }
