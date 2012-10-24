@@ -57,7 +57,13 @@ namespace Deployd.Core.AgentConfiguration
                 {"LogsDirectory", "~\\logs"},
                 {"Hub.Address", "http://localhost:80"},
                 {"MaxConcurrentInstallations", "3"},
-                {"EnableConfigurationSync", "false"}
+                {"EnableConfigurationSync", "false"},
+                {"Notifications.XMPP.Host","talk.google.com"},
+                {"Notifications.XMPP.Port","5222"},
+                {"Notifications.XMPP.Username",""},
+                {"Notifications.XMPP.Password",""},
+                {"Notifications.XMPP.Recipients",""},
+                {"Notifications.Recipients", ""}
             };
         }
 

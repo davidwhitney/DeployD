@@ -54,6 +54,7 @@ namespace Deployd.Core.Installation.Hooks
 
         private void CleanDestinationFolder(DeploymentContext context, ILog logger)
         {
+            logger.InfoFormat("Cleaning folder {0}", context.TargetInstallationFolder);
             // wait 1 second for processes to release locks on destination files
             System.Threading.Thread.Sleep(1000);
 

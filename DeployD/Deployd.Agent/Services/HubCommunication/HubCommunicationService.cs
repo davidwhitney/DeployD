@@ -12,6 +12,7 @@ using Deployd.Core;
 using Deployd.Core.AgentConfiguration;
 using Deployd.Core.Hosting;
 using Deployd.Core.Installation;
+using Deployd.Core.Notifications;
 using Deployd.Core.PackageCaching;
 using Deployd.Core.Remoting;
 using Ninject.Extensions.Logging;
@@ -32,6 +33,7 @@ namespace Deployd.Agent.Services.HubCommunication
         private readonly ILogger _logger;
         private readonly CurrentlyDownloadingList _currentlyDownloadingList;
         private CompletedInstallationTaskList CompletedInstalls;
+        private readonly INotificationService _notificationService;
 
         public HubCommunicationService(IHubCommunicator hubCommunicator,
             IPackagesList allPackagesList, 
@@ -41,7 +43,8 @@ namespace Deployd.Agent.Services.HubCommunication
             IAgentSettingsManager settingsManager, 
             ILogger logger,
             CurrentlyDownloadingList currentlyDownloadingList,
-            CompletedInstallationTaskList completedInstalls)
+            CompletedInstallationTaskList completedInstalls,
+            INotificationService notificationService)
         {
             _hubCommunicator = hubCommunicator;
             _allPackagesList = allPackagesList;
@@ -52,6 +55,7 @@ namespace Deployd.Agent.Services.HubCommunication
             _logger = logger;
             _currentlyDownloadingList = currentlyDownloadingList;
             CompletedInstalls = completedInstalls;
+            _notificationService = notificationService;
         }
 
         ~HubCommunicationService()
@@ -68,6 +72,8 @@ namespace Deployd.Agent.Services.HubCommunication
 
             // say hello immediately
             SendStatusToHub(this, null);
+
+            _notificationService.NotifyAll(EventType.SystemEvents, "Agent started");
         }
 
         public void SendStatusToHub(object sender, ElapsedEventArgs e)
@@ -80,6 +86,8 @@ namespace Deployd.Agent.Services.HubCommunication
             _pingTimer.Enabled = false;
             _pingTimer.Dispose();
             _pingTimer = null;
+
+            _notificationService.NotifyAll(EventType.SystemEvents, "Agent stopped");
         }
 
         public ApplicationContext AppContext { get; set; }

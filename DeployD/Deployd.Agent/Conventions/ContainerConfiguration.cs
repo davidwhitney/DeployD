@@ -10,6 +10,7 @@ using Deployd.Core.AgentManagement;
 using Deployd.Core.Hosting;
 using Deployd.Core.Installation;
 using Deployd.Core.Installation.Hooks;
+using Deployd.Core.Notifications;
 using Deployd.Core.PackageCaching;
 using Deployd.Core.PackageTransport;
 using Deployd.Core.Remoting;
@@ -31,6 +32,7 @@ namespace Deployd.Agent.Conventions
             Bind<IConfigurationDefaults>().To<ConfigurationDefaults>();
 
             // services
+            Bind<IWindowsService>().To<NotificationService>().InSingletonScope(); // make sure this is first so it is ready to send messages from other services
             Bind<IWindowsService>().To<AgentConfigurationService>().InSingletonScope();
             Bind<IWindowsService>().To<PackageDownloadingService>().InSingletonScope();
             Bind<IWindowsService>().To<ManagementInterfaceHost>().InSingletonScope();
@@ -81,6 +83,10 @@ namespace Deployd.Agent.Conventions
             Bind<IDeploymentHook>().To<AppOfflineDeploymentHook>();
             Bind<IDeploymentHook>().To<CustomActionsExtractionDeploymentHook>();
             Bind<System.IO.Abstractions.IFileSystem>().To<System.IO.Abstractions.FileSystem>();
+
+            // notifiers
+            Bind<INotificationService>().To<NotificationService>();
+            Bind<INotifier>().To<JabberNotifier>().InSingletonScope();
         }
 
         public T GetService<T>()

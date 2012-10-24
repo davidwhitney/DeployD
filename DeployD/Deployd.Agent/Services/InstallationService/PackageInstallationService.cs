@@ -9,6 +9,7 @@ using Deployd.Core;
 using Deployd.Core.AgentConfiguration;
 using Deployd.Core.Hosting;
 using Deployd.Core.Installation;
+using Deployd.Core.Notifications;
 using Deployd.Core.PackageCaching;
 using Deployd.Core.Remoting;
 using log4net.Core;
@@ -27,6 +28,7 @@ namespace Deployd.Agent.Services.InstallationService
         private IAgentSettingsManager _settingsManager;
         private readonly IPackagesList _allPackagesList;
         private readonly CurrentlyDownloadingList _currentlyDownloadingList;
+        private readonly INotificationService _notificationService;
 
         public ApplicationContext AppContext { get; set; }
         public TimedSingleExecutionTask TimedTask { get; private set; }
@@ -46,7 +48,8 @@ namespace Deployd.Agent.Services.InstallationService
             RunningInstallationTaskList runningTasks, 
             IAgentSettingsManager settingsManager,
             IPackagesList allPackagesList,
-            CurrentlyDownloadingList currentlyDownloadingList)
+            CurrentlyDownloadingList currentlyDownloadingList,
+            INotificationService notificationService)
         {
             CompletedInstalls = completedInstalls;
             _deploymentService = deploymentService;
@@ -58,6 +61,7 @@ namespace Deployd.Agent.Services.InstallationService
             _settingsManager = settingsManager;
             _allPackagesList = allPackagesList;
             _currentlyDownloadingList = currentlyDownloadingList;
+            _notificationService = notificationService;
             PendingInstalls = pendingInstalls;
             RunningInstalls = runningInstalls;
             TimedTask = new TimedSingleExecutionTask(5000, CheckForNewInstallations, _logger);
@@ -103,6 +107,7 @@ namespace Deployd.Agent.Services.InstallationService
                 }
 
                 _logger.Debug("{0} {1} - Starting installation", nextPendingInstall.PackageId, nextPendingInstall.Version);
+                _notificationService.NotifyAll(EventType.Installation, string.Format("{0} starting install {1}", nextPendingInstall.PackageId, nextPendingInstall.Version));
                 RunningInstalls.Add(nextPendingInstall);
                 StartInstall(nextPendingInstall);
             }
@@ -134,6 +139,9 @@ namespace Deployd.Agent.Services.InstallationService
                 .ContinueWith(task => _logger.Error(task.Exception, "Installation task failed."), TaskContinuationOptions.OnlyOnFaulted);
 
             _logger.Debug("Installation task queued");
+            _notificationService.NotifyAll(EventType.Installation, string.Format("{0} will install {1} (queued)", 
+                nextPendingInstall.PackageId, 
+                string.IsNullOrWhiteSpace(nextPendingInstall.Version) ? "latest version" : nextPendingInstall.Version));
 
             nextPendingInstall.Task.Start();
         }

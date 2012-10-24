@@ -1,6 +1,6 @@
 ﻿
-Microsoft Visual Studio Solution File, Format Version 11.00
-# Visual Studio 2010
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2012
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Deployd.Agent", "Deployd.Agent\Deployd.Agent.csproj", "{A14CAFBC-947D-4381-8090-AC03D005AF66}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Deployd.Core", "Deployd.Core\Deployd.Core.csproj", "{86CDB912-81EA-45E1-B8DB-B09DE466540F}"

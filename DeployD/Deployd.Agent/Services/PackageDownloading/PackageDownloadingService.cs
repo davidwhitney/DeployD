@@ -9,6 +9,7 @@ using Deployd.Core;
 using Deployd.Core.AgentConfiguration;
 using Deployd.Core.Hosting;
 using Deployd.Core.Installation;
+using Deployd.Core.Notifications;
 using Deployd.Core.PackageCaching;
 using Deployd.Core.PackageTransport;
 using Deployd.Core.Remoting;
@@ -34,6 +35,7 @@ namespace Deployd.Agent.Services.PackageDownloading
         protected readonly IRetrievePackageQuery AllPackagesQuery;
         protected readonly ILocalPackageCache AgentCache;
         private CompletedInstallationTaskList _installationResults;
+        private readonly INotificationService _notificationService;
 
         public TimedSingleExecutionTask TimedTask { get; private set; }
 
@@ -46,7 +48,8 @@ namespace Deployd.Agent.Services.PackageDownloading
                                          IInstalledPackageArchive installCache,
                                          IPackageRepositoryFactory packageRepositoryFactory,
                                         IPackagesList allPackagesList,
-            ICurrentlyDownloadingList currentlyDownloadingList, CompletedInstallationTaskList installationResults)
+            ICurrentlyDownloadingList currentlyDownloadingList, CompletedInstallationTaskList installationResults,
+            INotificationService notificationService)
         {
             _settingsManager = agentSettingsManager;
             AllPackagesQuery = allPackagesQuery;
@@ -59,6 +62,7 @@ namespace Deployd.Agent.Services.PackageDownloading
             _allPackagesList = allPackagesList;
             _currentlyDownloadingList = currentlyDownloadingList;
             _installationResults = installationResults;
+            _notificationService = notificationService;
             TimedTask = new TimedSingleExecutionTask(agentSettingsManager.Settings.PackageSyncIntervalMs, FetchPackages,
                                                      _logger);
         }
@@ -126,6 +130,8 @@ namespace Deployd.Agent.Services.PackageDownloading
                 _currentlyDownloadingList.RemoveAll(p=>p.Equals(package.Title, StringComparison.InvariantCulture));
                 _hubCommunicator.SendStatusToHub(AgentStatusFactory.BuildStatus(_allPackagesList, AgentCache, _installCache, _runningTasks,
                                                                                     _settingsManager, _currentlyDownloadingList, _installationResults));
+
+                _notificationService.NotifyAll(EventType.PackageCache, string.Format("{0} cached version {1}", package.Title, package.Version.Version));
             }
         }
     }
