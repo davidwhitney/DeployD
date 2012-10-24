@@ -7,6 +7,7 @@ using Deployd.Agent.Conventions;
 using Deployd.Core;
 using Deployd.Core.AgentConfiguration;
 using Deployd.Core.Hosting;
+using Deployd.Core.Notifications;
 using Ninject;
 using Ninject.Modules;
 using log4net;

@@ -5,6 +5,7 @@ using System.Threading;
 using Deployd.Core.AgentConfiguration;
 using Deployd.Core.Hosting;
 using Deployd.Core.Installation.Hooks;
+using Deployd.Core.Notifications;
 using Deployd.Core.PackageCaching;
 using Deployd.Core.PackageFormats.NuGet;
 using Deployd.Core.PackageTransport;
@@ -22,12 +23,14 @@ namespace Deployd.Core.Installation
         private readonly IAgentSettingsManager _agentSettingsManager;
         protected readonly ILogger Logger;
         private readonly IRetrievePackageQuery _nugetPackageQuery;
+        private readonly INotificationService _notificationService;
         public ApplicationContext AppContext { get; set; }
 
         public DeploymentService(IEnumerable<IDeploymentHook> hooks, 
                                  ILocalPackageCache packageCache,
                                  IInstalledPackageArchive installedPackageArchive,
-            IAgentSettingsManager agentSettingsManager, ILogger logger, IRetrievePackageQuery nugetPackageQuery)
+            IAgentSettingsManager agentSettingsManager, ILogger logger, IRetrievePackageQuery nugetPackageQuery,
+            INotificationService notificationService)
         {
             _hooks = hooks;
             _packageCache = packageCache;
@@ -35,6 +38,7 @@ namespace Deployd.Core.Installation
             _agentSettingsManager = agentSettingsManager;
             Logger = logger;
             _nugetPackageQuery = nugetPackageQuery;
+            _notificationService = notificationService;
         }
 
         public InstallationResult InstallPackage(string packageId, string taskId, CancellationTokenSource cancellationToken, Action<ProgressReport> reportProgress)
@@ -138,13 +142,17 @@ namespace Deployd.Core.Installation
             }
 
             Logger.Debug("Installing {0} {1}", package.Title, package.Version);
+            _notificationService.NotifyAll(EventType.Installation, string.Format("{0} {1} Installing", package.Title, package.Version));
             if (Deploy(taskId, package, cancellationToken, reportProgress))
             {
                 WriteInstallMarker(package);
 
+                _notificationService.NotifyAll(EventType.Installation, string.Format("{0} {1} installed successfully", package.Title, package.Version));
+
                 return new InstallationResult() { Failed = false};
             }
 
+            _notificationService.NotifyAll(EventType.Installation, string.Format("{0} {1} installation failed", package.Title, package.Version));
             return new InstallationResult(){Failed = true};
         }
 

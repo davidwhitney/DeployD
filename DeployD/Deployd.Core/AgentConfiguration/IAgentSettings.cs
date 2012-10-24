@@ -19,5 +19,16 @@ namespace Deployd.Core.AgentConfiguration
         string HubAddress { get;  }
         int MaxConcurrentInstallations { get; }
         bool EnableConfigurationSync { get; }
+        IXMPPSettings XMPPSettings { get; }
+        string NotificationRecipients { get; }
+    }
+
+    public interface IXMPPSettings
+    {
+        bool Enabled { get; }
+        string Host { get; }
+        string Username { get; }
+        string Password { get;  }
+        int Port { get; set; }
     }
 }

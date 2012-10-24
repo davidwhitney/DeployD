@@ -136,6 +136,14 @@ namespace Deployd.Core.Hosting
 
 			_context.Log("Listening..");
 			Console.ReadLine();
+
+            foreach (var service in services)
+            {
+                _context.Log("Stopping service: " + service);
+                service.AppContext = _context;
+                var service1 = service;
+                service1.Stop();
+            }
 		}
 
         private void LaunchNonInteractiveServices(IWindowsService[] services)
