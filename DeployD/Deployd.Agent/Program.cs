@@ -40,6 +40,8 @@ namespace Deployd.Agent
 
                 SetLogAppenderPaths(agentSettingsManager.Settings, LogManager.GetLogger("Agent.Main"));
 
+                var notificationService = _containerWrapper.GetType<INotificationService>();
+
                 new WindowsServiceRunner(args,
                                         () => _kernel.GetAll<IWindowsService>().ToArray(),
                                             installationSettings: (serviceInstaller, serviceProcessInstaller) =>
@@ -52,7 +54,8 @@ namespace Deployd.Agent
                                                                 },
                                         registerContainer: () => _containerWrapper,
                                         configureContext: x => { x.Log = s => Logger.Info(s); },
-                                        agentSettingsManager:agentSettingsManager)
+                                        agentSettingsManager:agentSettingsManager,
+                                        notify: (x,message)=> notificationService.NotifyAll(EventType.SystemEvents, message))
                 .Host();
  } catch (Exception ex)
             {

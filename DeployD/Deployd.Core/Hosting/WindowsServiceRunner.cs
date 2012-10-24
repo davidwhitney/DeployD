@@ -12,7 +12,8 @@ namespace Deployd.Core.Hosting
 {
     public class WindowsServiceRunner
     {
-    	private readonly string[] _args;
+        private readonly Action<ApplicationContext, string> _notify;
+        private readonly string[] _args;
 		private readonly ApplicationContext _context;
         private readonly Func<IWindowsService[]> _createServices;
         private readonly IAgentSettingsManager _agentSettingsManager=null;
@@ -34,8 +35,10 @@ namespace Deployd.Core.Hosting
                                     Action<System.ServiceProcess.ServiceInstaller, 
                                     ServiceProcessInstaller> installationSettings = null,
                                     Func<IIocContainer> registerContainer = null,
-                                    IAgentSettingsManager agentSettingsManager = null)
+                                    IAgentSettingsManager agentSettingsManager = null,
+                                    Action<ApplicationContext,string> notify=null)
         {
+            _notify = notify ?? ((ctx,message) => { });
             var log = LogManager.GetLogger(typeof (WindowsServiceRunner));
             _args = args;
 			_context = new ApplicationContext();
@@ -135,7 +138,18 @@ namespace Deployd.Core.Hosting
 			}
 
 			_context.Log("Listening..");
-			Console.ReadLine();
+            string command = "";
+            do
+            {
+                command = Console.ReadLine();
+                if (command == "quit")
+                    break;
+                else if (command=="notify")
+                {
+                    _notify(_context, "Test notification from deployment agent");
+                    _logger.Info("Test notification sent");
+                }
+            } while(true);
 
             foreach (var service in services)
             {
