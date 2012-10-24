@@ -85,7 +85,7 @@ namespace Deployd.Agent.Conventions
             Bind<System.IO.Abstractions.IFileSystem>().To<System.IO.Abstractions.FileSystem>();
 
             // notifiers
-            Bind<INotificationService>().To<NotificationService>();
+            Bind<INotificationService>().To<NotificationService>().InSingletonScope();
             Bind<INotifier>().To<JabberNotifier>().InSingletonScope();
         }
 

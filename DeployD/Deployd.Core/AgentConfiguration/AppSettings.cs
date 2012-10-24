@@ -95,6 +95,7 @@ namespace Deployd.Core.AgentConfiguration
                         Username = this["Notifications.XMPP.Username"],
                         Password = this["Notifications.XMPP.Password"],
                         Port = int.Parse(this["Notifications.XMPP.Port"]),
+                        Enabled = bool.Parse(this["Notifications.XMPP.Enabled"]),
                     };
                 }
                 return _xmppSettings;

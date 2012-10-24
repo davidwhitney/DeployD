@@ -37,8 +37,15 @@ namespace Deployd.Core.Notifications
             if (_connected)
             {
                 foreach (var recipient in _recipients)
-                    _client.Send(new Message(recipient, MessageType.chat, _messageQueue.Dequeue()));
-            }
+                {
+                    if (_messageQueue.Count > 0)
+                    {
+                        var message = _messageQueue.Dequeue();
+                        _client.Send(new Message(recipient, MessageType.chat, message));
+                        _logger.DebugFormat("sent message to {0}: {1}", recipient, message);
+                    }
+                }
+            } 
         }
 
         private void Connect()
@@ -51,18 +58,8 @@ namespace Deployd.Core.Notifications
                                                               ? 80
                                                               : _settingsManager.Settings.XMPPSettings.Port;
 
-            _client.OnLogin += delegate
-                {
-                    _logger.DebugFormat("Logged in to {0}", _settingsManager.Settings.XMPPSettings.Host);
-                    _connecting = false;
-                    _connected = true;
-                };
-            _client.OnAuthError += delegate
-                {
-                    _logger.WarnFormat("auth error");
-                    _connecting = false;
-                    _connected = false;
-                };
+            _client.OnLogin += ClientOnOnLogin;
+            _client.OnAuthError += ClientOnOnAuthError;
             _client.OnClose += ClientOnOnClose;
             _client.OnSocketError += ClientOnOnSocketError;
             _client.OnStreamError += ClientOnOnStreamError;
@@ -91,6 +88,20 @@ namespace Deployd.Core.Notifications
             {
                 System.Threading.Thread.Sleep(1000); // wait to connect
             }
+        }
+
+        private void ClientOnOnAuthError(object sender, Element element)
+        {
+            _logger.WarnFormat("auth error");
+            _connecting = false;
+            _connected = false;
+        }
+
+        private void ClientOnOnLogin(object sender)
+        {
+            _logger.DebugFormat("Logged in to {0}", _settingsManager.Settings.XMPPSettings.Host);
+            _connecting = false;
+            _connected = true;
         }
 
         ~JabberNotifier()

@@ -197,6 +197,10 @@
             <Component Id="cmp002CBFACC84B356E41FD3DA247C51A4B" Directory="dir3123ED679E4E2D092C943CF5FAE06A3B" Guid="{E270EF4C-4748-4289-9F8C-4922008DC4E5}">
                 <File Id="fil567F8D963CDEC5433253A48694893A33" KeyPath="yes" Source="$(var.Deployd.Agent.ProjectDir)\bin\$(var.Deployd.Agent.Configuration)\WebUi\Views\logs\packages.cshtml" />
             </Component>
+            <Component Id="cmp002CBFACC84B356E41FD3DA247C51A4C" Directory="INSTALLDIR" Guid="{dfda333e-36c3-4fbd-95a5-0e3d46ed4031}">
+                <File Id="fil567F8D963CDEC5433253A48694893A34" KeyPath="yes" Source="$(var.Deployd.Agent.ProjectDir)\bin\$(var.Deployd.Agent.Configuration)\agsXMPP.dll" />
+            </Component>
+            
         </ComponentGroup>
     </Fragment>
     <Fragment>
