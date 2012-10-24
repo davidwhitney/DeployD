@@ -202,6 +202,7 @@
     </Content>
     <None Include="app.config">
       <SubType>Designer</SubType>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="DebugPackageSource\Deployd.Configuration.1.0.0.nupkg">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
